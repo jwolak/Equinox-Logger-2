@@ -1,0 +1,73 @@
+
+#eclipse
+.cproject
+.project
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.x86
+*.x64
+*.arm
+
+#Eclipse setting
+.settings
+
+#Visual Studio Code setting
+.metadata/
+.vscode
+.settings
+
+#gdb debugger
+.gdb_history
+.gdb_*
+
+#direcory
+build/CMakeCache.txt
+build/CMakeFiles/
+build/Makefile
+build/cmake_install.cmake
+build/*.log
+build/*.so*
+build/*.so
+build/*.a
+build
+
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+cmake_install.cmake
+*.a
+*.so.*
+*.so*
+*.so
+*.log

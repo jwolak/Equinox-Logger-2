@@ -1,1 +1,1 @@
-# -Equinox-Logger-2
+# Equinox-Logger-2
