@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger.h
+ * EquinoxLogger-LoggerEngine.h
  *
  * Copylefts (C) 2022
  * Author: Janusz Wolak
@@ -18,28 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef EQUINOXLOGGER_H_
-#define EQUINOXLOGGER_H_
+#ifndef INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
+#define INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
 
 #include "EquinoxLogger-Common.h"
-#include "EquinoxLogger-LoggerManager.h"
 
-inline void trace() {
-}
+namespace equinox {
 
-inline void debug() {
-}
+class EQUINOX_API LoggerEngine {
+ public:
+  LoggerEngine() {
+  }
+};
 
-inline void info() {
-}
+} /*namespace equinox*/
 
-inline void warn() {
-}
-
-inline void error() {
-}
-
-inline void critical() {
-}
-
-#endif /* EQUINOXLOGGER_H_ */
+#endif /* INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_ */

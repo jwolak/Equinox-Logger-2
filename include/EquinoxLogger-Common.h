@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger.h
+ * Common.h
  *
  * Copylefts (C) 2022
  * Author: Janusz Wolak
@@ -18,28 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef EQUINOXLOGGER_H_
-#define EQUINOXLOGGER_H_
 
-#include "EquinoxLogger-Common.h"
-#include "EquinoxLogger-LoggerManager.h"
+#ifndef INCLUDE_EQUINOXLOGGER_COMMON_H_
+#define INCLUDE_EQUINOXLOGGER_COMMON_H_
 
-inline void trace() {
-}
+#if defined(EQUINOX_SHARED_SHARED_LIB)
+#            define EQUINOX_API __attribute__((visibility("default")))
+#else // !defined(EQUINOX_SHARED_SHARED_LIB)
+#    define EQUINOX_API
+#    define EQUINOX_HEADER_ONLY
+#    define EQUINOX_INLINE inline
+#endif // #ifdef EQUINOX_SHARED_SHARED_LIB
 
-inline void debug() {
-}
-
-inline void info() {
-}
-
-inline void warn() {
-}
-
-inline void error() {
-}
-
-inline void critical() {
-}
-
-#endif /* EQUINOXLOGGER_H_ */
+#endif /* INCLUDE_EQUINOXLOGGER_COMMON_H_ */
