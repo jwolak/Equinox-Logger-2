@@ -24,22 +24,80 @@
 #include "EquinoxLogger-Common.h"
 #include "EquinoxLogger-LoggerManager.h"
 
-inline void trace() {
+namespace equinox {
+
+template<typename T>
+inline void trace(const T &logMessage)
+{
 }
 
-inline void debug() {
+template<typename T>
+inline void debug(const T &logMessage)
+{
 }
 
-inline void info() {
+template<typename T>
+inline void info(const T &logMessage)
+{
 }
 
-inline void warn() {
+template<typename T>
+inline void warn(const T &logMessage)
+{
 }
 
-inline void error() {
+template<typename T>
+inline void error(const T &logMessage)
+{
 }
 
-inline void critical() {
+template<typename T>
+inline void critical(const T &logMessage)
+{
 }
+
+template<typename... Args>
+inline void trace(Args& ... args)
+{
+}
+
+template<typename... Args>
+inline void debug(Args& ... args)
+{
+}
+
+template<typename... Args>
+inline void info(Args& ... args)
+{
+}
+
+template<typename... Args>
+inline void warn(Args& ... args)
+{
+}
+
+template<typename... Args>
+inline void error(Args& ... args)
+{
+}
+
+template<typename... Args>
+inline void critical(Args& ... args)
+{
+}
+
+EQUINOX_INLINE void setLevel(level::LOG_LEVEL logLevel)
+{
+}
+
+EQUINOX_INLINE void setBacktrace(size_t numberOfMessages)
+{
+}
+
+EQUINOX_INLINE void setLogsOutputSink(logs_output::SINK logsOutputSink)
+{
+}
+
+} /*namespace equinox*/
 
 #endif /* EQUINOXLOGGER_H_ */

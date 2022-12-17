@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include "EquinoxLogger.h"
+
 int main(void) {
 
 	return 0;
