@@ -22,6 +22,7 @@
 #define INCLUDE_EQUINOXLOGGER_LOGGERMANAGER_H_
 
 #include <memory>
+#include <mutex>
 
 #include "EquinoxLogger-Common.h"
 #include "EquinoxLogger-LoggerEngine.h"
@@ -30,10 +31,20 @@ namespace equinox {
 
 class EQUINOX_API LoggerManager {
  public:
-  LoggerManager() {
+  static LoggerEngine* GetLoggerEngineInstance();
+
+  LoggerManager(LoggerManager &loggerManagerObject)  = delete;  /* no clone/copy */
+  LoggerManager(LoggerManager &&loggerManagerObject) = delete;  /* no move */
+  void operator=(const LoggerManager &)              = delete;  /* no copy assign */
+
+ protected:
+  LoggerManager()
+  {
   }
 
-  LoggerEngine* GetLoggerEngineInstance();
+ private:
+  static LoggerEngine* mLoggerEngineInstance_;
+  static std::mutex mLoggerEngineInstanceMutex_;
 };
 
 }

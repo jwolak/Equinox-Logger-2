@@ -19,4 +19,18 @@
  *
  */
 
-#include "../include/EquinoxLogger-LoggerManager.h"
+#include "EquinoxLogger-LoggerManager.h"
+
+equinox::LoggerEngine* equinox::LoggerManager::mLoggerEngineInstance_ { nullptr };
+std::mutex equinox::LoggerManager::mLoggerEngineInstanceMutex_;
+
+EQUINOX_INLINE equinox::LoggerEngine* equinox::LoggerManager::GetLoggerEngineInstance()
+{
+    std::lock_guard<std::mutex> lock(equinox::LoggerManager::mLoggerEngineInstanceMutex_);
+
+    if (equinox::LoggerManager::mLoggerEngineInstance_  == nullptr) {
+        equinox::LoggerManager::mLoggerEngineInstance_  = new equinox::LoggerEngine();
+    }
+
+    return equinox::LoggerManager::mLoggerEngineInstance_;
+}
