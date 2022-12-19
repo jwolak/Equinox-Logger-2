@@ -21,3 +21,7 @@
 
 #include "EquinoxLogger-LoggerEngine.h"
 
+bool equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
+{
+    return true;
+}

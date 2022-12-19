@@ -31,20 +31,25 @@ namespace equinox {
 
 class EQUINOX_API LoggerManager {
  public:
-  static LoggerEngine* GetLoggerEngineInstance();
+    static LoggerManager* getLoggerManagerInstance();
 
-  LoggerManager(LoggerManager &loggerManagerObject)  = delete;  /* no clone/copy */
-  LoggerManager(LoggerManager &&loggerManagerObject) = delete;  /* no move */
-  void operator=(const LoggerManager &)              = delete;  /* no copy assign */
+    LoggerManager(LoggerManager &) = delete;        /* no clone/copy */
+    LoggerManager(LoggerManager &&) = delete;       /* no move */
+    void operator=(const LoggerManager&) = delete;  /* no copy assign */
+
+    std::shared_ptr<LoggerEngine> getLoggerEngine();
 
  protected:
-  LoggerManager()
-  {
-  }
+    LoggerManager()
+    : mLoggerEngine_ { std::make_shared<LoggerEngine>() }
+    , mLoggerEngineMutex_ {}
+    {
+    }
 
  private:
-  static LoggerEngine* mLoggerEngineInstance_;
-  static std::mutex mLoggerEngineInstanceMutex_;
+    static LoggerManager *mLoggerManagerInstance_;
+    std::shared_ptr<LoggerEngine> mLoggerEngine_;
+    std::mutex mLoggerEngineMutex_;
 };
 
 }

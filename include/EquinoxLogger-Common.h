@@ -1,5 +1,5 @@
 /*
- * Common.h
+ * EquinoxLogger-Common.h
  *
  * Copylefts (C) 2022
  * Author: Janusz Wolak
@@ -23,7 +23,9 @@
 #define INCLUDE_EQUINOXLOGGER_COMMON_H_
 
 #if defined(EQUINOX_SHARED_SHARED_LIB)
+#            undef EQUINOX_HEADER_ONLY
 #            define EQUINOX_API __attribute__((visibility("default")))
+#            define EQUINOX_INLINE
 #else // !defined(EQUINOX_SHARED_SHARED_LIB)
 #    define EQUINOX_API
 #    define EQUINOX_HEADER_ONLY

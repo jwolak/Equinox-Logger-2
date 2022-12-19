@@ -22,13 +22,25 @@
 #define INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
 
 #include "EquinoxLogger-Common.h"
+#include "EquinoxLogger-LoggerEngineLogic.h"
+
+#include <memory>
 
 namespace equinox {
 
-class EQUINOX_API LoggerEngine {
- public:
-  LoggerEngine() {
-  }
+class EQUINOX_API LoggerEngine
+{
+     public:
+        LoggerEngine()
+        : mLoggerEngineLogic_ { std::make_shared<LoggerEngineLogic>() }
+        {
+        }
+
+        bool setLogLevel(level::LOG_LEVEL logLevel);
+
+     private:
+        std::shared_ptr<LoggerEngineLogic> mLoggerEngineLogic_;
+
 };
 
 } /*namespace equinox*/
