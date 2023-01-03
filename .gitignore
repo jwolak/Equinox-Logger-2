@@ -71,3 +71,10 @@ cmake_install.cmake
 *.so*
 *.so
 *.log
+
+tests/CMakeCache.txt
+tests/CMakeFiles/
+tests/Makefile
+tests/cmake_install.cmake
+tests/*.x86
+tests/*.log
