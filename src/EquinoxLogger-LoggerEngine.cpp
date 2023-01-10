@@ -23,5 +23,15 @@
 
 bool equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
 {
-    return true;
+    return mLoggerEngineLogic_->setLogLevel(logLevel);
+}
+
+void equinox::LoggerEngine::setBacktrace(size_t numberOfMessages)
+{
+  mLoggerEngineLogic_->setBacktrace(numberOfMessages);
+}
+
+void equinox::LoggerEngine::setLogsOutputSink(logs_output::SINK logsOutputSink)
+{
+  mLoggerEngineLogic_->setLogsOutputSink(logsOutputSink);
 }

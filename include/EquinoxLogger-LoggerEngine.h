@@ -21,7 +21,6 @@
 #ifndef INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
 #define INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
 
-#include "EquinoxLogger-Common.h"
 #include "EquinoxLogger-LoggerEngineLogic.h"
 
 #include <memory>
@@ -36,7 +35,15 @@ class EQUINOX_API LoggerEngine
         {
         }
 
+        template<typename... Args>
+        void logTrace(const char* format, Args &&... args)
+        {
+          mLoggerEngineLogic_->logTrace(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
+        }
+
         bool setLogLevel(level::LOG_LEVEL logLevel);
+        void setBacktrace(size_t numberOfMessages);
+        void setLogsOutputSink(logs_output::SINK logsOutputSink);
 
      private:
         std::shared_ptr<LoggerEngineLogic> mLoggerEngineLogic_;

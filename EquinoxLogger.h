@@ -93,10 +93,12 @@ EQUINOX_INLINE bool setLevel(level::LOG_LEVEL logLevel)
 
 EQUINOX_INLINE void setBacktrace(size_t numberOfMessages)
 {
+  equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setBacktrace(numberOfMessages);
 }
 
 EQUINOX_INLINE void setLogsOutputSink(logs_output::SINK logsOutputSink)
 {
+  equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setLogsOutputSink(logsOutputSink);
 }
 
 } /*namespace equinox*/

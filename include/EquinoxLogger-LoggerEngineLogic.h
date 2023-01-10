@@ -21,15 +21,28 @@
 #ifndef INCLUDE_EQUINOXLOGGER_LOGGERENGINELOGIC_H_
 #define INCLUDE_EQUINOXLOGGER_LOGGERENGINELOGIC_H_
 
+#include <stddef.h>
+
+#include "EquinoxLogger-Common.h"
+
 namespace equinox
 {
 
 class LoggerEngineLogic
 {
-     public:
-        LoggerEngineLogic()
-        {
-        }
+ public:
+  LoggerEngineLogic()
+  {
+  }
+
+  template<typename... Args>
+  void logTrace(level::LOG_LEVEL level, const char* format, Args &&... args)
+  {
+  }
+
+  bool setLogLevel(level::LOG_LEVEL logLevel);
+  void setBacktrace(size_t numberOfMessages);
+  void setLogsOutputSink(logs_output::SINK logsOutputSink);
 };
 
 } /*namespace equinox*/
