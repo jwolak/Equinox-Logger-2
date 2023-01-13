@@ -38,4 +38,5 @@ set(EQUINOX_LOGGER_EXAMPLES_SRC
 
 include_directories(${EQUINOX_LOGGER_API_HEADER_INCLUDE_DIR})
 add_executable(${PROJECT_NAME} ${EQUINOX_LOGGER_EXAMPLES_SRC})
+add_dependencies (${PROJECT_NAME} EquinoxLogger)                 #to build libEquinoxLogger before try to link it
 target_link_libraries(${PROJECT_NAME} ${EQUINOX_LOGGER_LIB_DIR})

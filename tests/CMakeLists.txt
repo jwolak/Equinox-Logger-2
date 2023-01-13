@@ -18,7 +18,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(GTest REQUIRED)
 
 set(EQUINOX_LOGGER_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../include)
-set(EQUINOX_LOGGER_API_HEADER_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../EquinoxLogger.h)
+set(EQUINOX_LOGGER_API_HEADER_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../)
 set(EQUINOX_LOGGER_SRC_DIR ${PROJECT_SOURCE_DIR}/../src)
 
 set(EQUINOX_LOGGER_SRC
@@ -39,6 +39,7 @@ include_directories(${EQUINOX_LOGGER_INCLUDE_DIR} ${EQUINOX_LOGGER_MOCKS_INCLUDE
 
 add_executable(${PROJECT_NAME} ${EQUINOX_LOGGER_SRC} ${EQUINOX_LOGGER_TESTS_SRC})
 
+add_dependencies (${PROJECT_NAME} EquinoxLogger)                      #to build libEquinoxLogger before try to link it
 target_link_libraries(${PROJECT_NAME} gmock gtest gtest_main pthread)
 target_link_libraries(${PROJECT_NAME} ${GTEST_LIBRARIES} gtest_main)
 target_link_libraries(${PROJECT_NAME} ${EQUINOX_LOGGER_LIB_DIR})
