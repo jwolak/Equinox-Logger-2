@@ -25,5 +25,16 @@
 
 int main(void) {
 
+  equinox::setLevel(equinox::level::LOG_LEVEL::warning);
+  equinox::setBacktrace(10);
+  equinox::setLogsOutputSink(equinox::logs_output::SINK::console);
+
+  equinox::trace(   "Example trace log no:    [%d]" , 1);
+  equinox::debug(   "Example debug log no:    [%d]" , 2);
+  equinox::info(    "Example info log no:     [%d]" , 3);
+  equinox::warning( "Example warning log no:  [%d]" , 4);
+  equinox::error(   "Example error log no:    [%d]" , 5);
+  equinox::critical("Example critical log no: [%d]" , 6);
+
 	return 0;
 }

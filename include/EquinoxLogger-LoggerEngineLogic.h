@@ -23,6 +23,10 @@
 
 #include <string>
 
+#include <chrono>
+#include <cstring>
+#include <iostream>
+
 #include <stddef.h>
 
 #include "EquinoxLogger-Common.h"
@@ -40,6 +44,11 @@ class LoggerEngineLogic
   template<typename... Args>
   void log(level::LOG_LEVEL level, std::string format, Args &&... args)
   {
+    std::string formatAsString = "[%s] ";
+    formatAsString += format;
+    formatAsString += "\n";
+    const time_t currentTime = std::chrono::system_clock::system_clock::to_time_t(std::chrono::system_clock::system_clock::now());
+    printf(formatAsString.c_str(), strtok(ctime(&currentTime), "\n"), args...);
   }
 
   bool setLogLevel(level::LOG_LEVEL logLevel);

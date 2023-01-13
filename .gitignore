@@ -78,3 +78,11 @@ tests/Makefile
 tests/cmake_install.cmake
 tests/*.x86
 tests/*.log
+
+examples/CMakeCache.txt
+examples/CMakeFiles/
+examples/cmake_install.cmake
+examples/*.x86
+examples/*.log
+examples/EquinoxLoggerExamples
+

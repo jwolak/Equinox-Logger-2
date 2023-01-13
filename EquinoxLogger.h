@@ -27,37 +27,37 @@
 namespace equinox {
 
 template<typename... Args>
-inline void trace(std::string format, Args& ... args)
+inline void trace(std::string format, Args&& ... args)
 {
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logTrace(format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-inline void debug(std::string format, Args& ... args)
+inline void debug(std::string format, Args&& ... args)
 {
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logDebug(format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-inline void info(std::string format, Args& ... args)
+inline void info(std::string format, Args&& ... args)
 {
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logInfo(format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-inline void warning(std::string format, Args& ... args)
+inline void warning(std::string format, Args&& ... args)
 {
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logWarning(format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-inline void error(std::string format, Args& ... args)
+inline void error(std::string format, Args&& ... args)
 {
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logError(format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-inline void critical(std::string format, Args& ... args)
+inline void critical(std::string format, Args&& ... args)
 {
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logCritical(format, std::forward<Args>(args)...);
 }

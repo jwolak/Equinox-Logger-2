@@ -35,7 +35,7 @@
 #define EQUINOX_LEVEL_TRACE     0
 #define EQUINOX_LEVEL_DEBUG     1
 #define EQUINOX_LEVEL_INFO      2
-#define EQUINOX_LEVEL_WARN      3
+#define EQUINOX_LEVEL_WARNING   3
 #define EQUINOX_LEVEL_ERROR     4
 #define EQUINOX_LEVEL_CRITICAL  5
 #define EQUINOX_LEVEL_OFF       6
@@ -53,7 +53,7 @@ enum class LOG_LEVEL : int
     trace    = EQUINOX_LEVEL_TRACE,
     debug    = EQUINOX_LEVEL_DEBUG,
     info     = EQUINOX_LEVEL_INFO,
-    warning  = EQUINOX_LEVEL_WARN,
+    warning  = EQUINOX_LEVEL_WARNING,
     error    = EQUINOX_LEVEL_ERROR,
     critical = EQUINOX_LEVEL_CRITICAL,
     off      = EQUINOX_LEVEL_OFF
