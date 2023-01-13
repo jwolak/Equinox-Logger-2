@@ -21,6 +21,8 @@
 #ifndef INCLUDE_EQUINOXLOGGER_LOGGERENGINELOGIC_H_
 #define INCLUDE_EQUINOXLOGGER_LOGGERENGINELOGIC_H_
 
+#include <string>
+
 #include <stddef.h>
 
 #include "EquinoxLogger-Common.h"
@@ -36,7 +38,7 @@ class LoggerEngineLogic
   }
 
   template<typename... Args>
-  void logTrace(level::LOG_LEVEL level, const char* format, Args &&... args)
+  void log(level::LOG_LEVEL level, std::string format, Args &&... args)
   {
   }
 

@@ -24,6 +24,7 @@
 #include "EquinoxLogger-LoggerEngineLogic.h"
 
 #include <memory>
+#include <string>
 
 namespace equinox {
 
@@ -36,9 +37,39 @@ class EQUINOX_API LoggerEngine
         }
 
         template<typename... Args>
-        void logTrace(const char* format, Args &&... args)
+        void logTrace(std::string format, Args &&... args)
         {
-          mLoggerEngineLogic_->logTrace(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
+          mLoggerEngineLogic_->log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
+        }
+
+        template<typename... Args>
+        void logDebug(std::string format, Args &&... args)
+        {
+          mLoggerEngineLogic_->log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
+        }
+
+        template<typename... Args>
+        void logInfo(std::string format, Args &&... args)
+        {
+          mLoggerEngineLogic_->log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
+        }
+
+        template<typename... Args>
+        void logWarning(std::string format, Args &&... args)
+        {
+          mLoggerEngineLogic_->log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
+        }
+
+        template<typename... Args>
+        void logError(std::string format, Args &&... args)
+        {
+          mLoggerEngineLogic_->log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
+        }
+
+        template<typename... Args>
+        void logCritical(std::string format, Args &&... args)
+        {
+          mLoggerEngineLogic_->log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
         }
 
         bool setLogLevel(level::LOG_LEVEL logLevel);
