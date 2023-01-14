@@ -27,9 +27,12 @@
 #include <cstring>
 #include <iostream>
 
+#include <memory>
+
 #include <stddef.h>
 
 #include "EquinoxLogger-Common.h"
+#include "EquinoxLogger-TimestampProducer.h"
 #include "EquinoxLogger-ConsoleLogsProducer.h"
 #include "EquinoxLogger-FileLogsProducer.h"
 
@@ -42,8 +45,9 @@ class EQUINOX_API LoggerEngineLogic
   LoggerEngineLogic()
   : mLogLevel { level::LOG_LEVEL::critical }
   , mSink { logs_output::SINK::console }
-  , mConsoleLogsProducer {}
-  , mFileLogsProducer {}
+  , mTimestampProducer { std::make_shared<TimestampProducer>() }
+  , mConsoleLogsProducer { mTimestampProducer }
+  , mFileLogsProducer { mTimestampProducer }
   {
   }
 
@@ -82,6 +86,7 @@ class EQUINOX_API LoggerEngineLogic
 
   level::LOG_LEVEL mLogLevel;
   logs_output::SINK mSink;
+  std::shared_ptr<ITimestampProducer> mTimestampProducer;
   ConsoleLogsProducer mConsoleLogsProducer;
   FileLogsProducer mFileLogsProducer;
 };

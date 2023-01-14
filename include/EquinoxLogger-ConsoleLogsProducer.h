@@ -41,8 +41,10 @@
 #define INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
 
 #include <string>
+#include <memory>
 
 #include "EquinoxLogger-Common.h"
+#include "EquinoxLogger-TimestampProducer.h"
 
 namespace equinox
 {
@@ -50,7 +52,8 @@ namespace equinox
 class EQUINOX_API ConsoleLogsProducer
 {
  public:
-  ConsoleLogsProducer()
+  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+  : mTimestampProducer { timestampProducer }
   {
   }
 
@@ -58,6 +61,9 @@ class EQUINOX_API ConsoleLogsProducer
   void LogMessage(level::LOG_LEVEL level, std::string format, Args &&... args)
   {
   }
+
+ private:
+  std::shared_ptr<ITimestampProducer> mTimestampProducer;
 };
 
 } /*namespace equinox*/

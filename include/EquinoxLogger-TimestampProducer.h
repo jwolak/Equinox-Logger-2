@@ -44,14 +44,22 @@
 
 namespace equinox
 {
-class TimestampProducer
+
+class ITimestampProducer
+{
+ public:
+  virtual ~ITimestampProducer() = default;
+  virtual std::string getTimestamp() const = 0;
+};
+
+class TimestampProducer : public ITimestampProducer
 {
  public:
   TimestampProducer()
   {
   }
 
-  std::string getTimestamp() const;
+  std::string getTimestamp() const override;
 };
 } /*namespace equinox*/
 

@@ -41,15 +41,18 @@
 #define INCLUDE_EQUINOXLOGGER_FILELOGSPRODUCER_H_
 
 #include <string>
+#include <memory>
 
 #include "EquinoxLogger-Common.h"
+#include "EquinoxLogger-TimestampProducer.h"
 
 namespace equinox
 {
 class EQUINOX_API FileLogsProducer
 {
  public:
-  FileLogsProducer()
+  FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+  : mTimestampProducer { timestampProducer }
   {
   }
 
@@ -58,6 +61,8 @@ class EQUINOX_API FileLogsProducer
   {
   }
 
+ private:
+  std::shared_ptr<ITimestampProducer> mTimestampProducer;
 };
 } /*namespace equinox*/
 
