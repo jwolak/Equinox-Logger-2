@@ -36,7 +36,7 @@
 namespace equinox
 {
 
-class LoggerEngineLogic
+class EQUINOX_API LoggerEngineLogic
 {
  public:
   LoggerEngineLogic()
@@ -84,7 +84,6 @@ class LoggerEngineLogic
   logs_output::SINK mSink;
   ConsoleLogsProducer mConsoleLogsProducer;
   FileLogsProducer mFileLogsProducer;
-
 };
 
 } /*namespace equinox*/

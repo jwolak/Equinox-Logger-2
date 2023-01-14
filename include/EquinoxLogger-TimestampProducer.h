@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-ConsoleLogsProducer.h
+ * EquinoxLogger-TimestampProducer.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,29 +37,22 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
-#define INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
+#ifndef INCLUDE_EQUINOXLOGGER_TIMESTAMPPRODUCER_H_
+#define INCLUDE_EQUINOXLOGGER_TIMESTAMPPRODUCER_H_
 
 #include <string>
 
-#include "EquinoxLogger-Common.h"
-
 namespace equinox
 {
-
-class EQUINOX_API ConsoleLogsProducer
+class TimestampProducer
 {
  public:
-  ConsoleLogsProducer()
+  TimestampProducer()
   {
   }
 
-  template<typename... Args>
-  void LogMessage(level::LOG_LEVEL level, std::string format, Args &&... args)
-  {
-  }
+  std::string getTimestamp() const;
 };
-
 } /*namespace equinox*/
 
-#endif /* INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_ */
+#endif /* INCLUDE_EQUINOXLOGGER_TIMESTAMPPRODUCER_H_ */

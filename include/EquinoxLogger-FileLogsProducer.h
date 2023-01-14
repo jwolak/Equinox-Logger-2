@@ -46,7 +46,7 @@
 
 namespace equinox
 {
-class FileLogsProducer
+class EQUINOX_API FileLogsProducer
 {
  public:
   FileLogsProducer()
