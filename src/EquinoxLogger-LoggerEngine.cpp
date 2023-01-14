@@ -21,9 +21,9 @@
 
 #include "EquinoxLogger-LoggerEngine.h"
 
-bool equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
+void equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
 {
-    return mLoggerEngineLogic_->setLogLevel(logLevel);
+  mLoggerEngineLogic_->setLogLevel(logLevel);
 }
 
 void equinox::LoggerEngine::setBacktrace(size_t numberOfMessages)

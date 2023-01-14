@@ -30,6 +30,8 @@
 #include <stddef.h>
 
 #include "EquinoxLogger-Common.h"
+#include "EquinoxLogger-ConsoleLogsProducer.h"
+#include "EquinoxLogger-FileLogsProducer.h"
 
 namespace equinox
 {
@@ -38,22 +40,51 @@ class LoggerEngineLogic
 {
  public:
   LoggerEngineLogic()
+  : mLogLevel { level::LOG_LEVEL::critical }
+  , mSink { logs_output::SINK::console }
+  , mConsoleLogsProducer {}
+  , mFileLogsProducer {}
   {
   }
 
   template<typename... Args>
   void log(level::LOG_LEVEL level, std::string format, Args &&... args)
   {
-    std::string formatAsString = "[%s] ";
+/*    std::string formatAsString = "[%s] ";
     formatAsString += format;
     formatAsString += "\n";
     const time_t currentTime = std::chrono::system_clock::system_clock::to_time_t(std::chrono::system_clock::system_clock::now());
-    printf(formatAsString.c_str(), strtok(ctime(&currentTime), "\n"), args...);
+    printf(formatAsString.c_str(), strtok(ctime(&currentTime), "\n"), args...);*/
+
+    if (mLogLevel >= level)
+    {
+      switch (mSink)
+      {
+        case logs_output::SINK::console:
+          mConsoleLogsProducer.LogMessage(level, format, std::forward<Args>(args)...);
+          break;
+
+        case logs_output::SINK::file:
+          mFileLogsProducer.LogMessage(level, format, std::forward<Args>(args)...);
+          break;
+
+        case logs_output::SINK::console_and_file:
+          mConsoleLogsProducer.LogMessage(level, format, std::forward<Args>(args)...);
+          mFileLogsProducer.LogMessage(level, format, std::forward<Args>(args)...);
+          break;
+      }
+    }
   }
 
-  bool setLogLevel(level::LOG_LEVEL logLevel);
+  void setLogLevel(level::LOG_LEVEL logLevel);
   void setBacktrace(size_t numberOfMessages);
   void setLogsOutputSink(logs_output::SINK logsOutputSink);
+
+  level::LOG_LEVEL mLogLevel;
+  logs_output::SINK mSink;
+  ConsoleLogsProducer mConsoleLogsProducer;
+  FileLogsProducer mFileLogsProducer;
+
 };
 
 } /*namespace equinox*/

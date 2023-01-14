@@ -72,7 +72,7 @@ class EQUINOX_API LoggerEngine
           mLoggerEngineLogic_->log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
         }
 
-        bool setLogLevel(level::LOG_LEVEL logLevel);
+        void setLogLevel(level::LOG_LEVEL logLevel);
         void setBacktrace(size_t numberOfMessages);
         void setLogsOutputSink(logs_output::SINK logsOutputSink);
 

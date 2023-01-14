@@ -62,9 +62,9 @@ inline void critical(std::string format, Args&& ... args)
   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logCritical(format, std::forward<Args>(args)...);
 }
 
-EQUINOX_INLINE bool setLevel(level::LOG_LEVEL logLevel)
+EQUINOX_INLINE void setLevel(level::LOG_LEVEL logLevel)
 {
-    return equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setLogLevel(logLevel);
+  equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setLogLevel(logLevel);
 }
 
 EQUINOX_INLINE void setBacktrace(size_t numberOfMessages)

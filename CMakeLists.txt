@@ -47,6 +47,8 @@ set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngine.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerManager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngineLogic.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-ConsoleLogsProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-FileLogsProducer.cpp
 )
 
 if (EQUINOX_LOGGER_BUILD_SHARED)
