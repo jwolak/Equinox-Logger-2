@@ -53,17 +53,17 @@ class EQUINOX_API ConsoleLogsProducer
 {
  public:
   ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mTimestampProducer { timestampProducer }
+  : mMessageBuffer_ {}
+  , mTimestampProducer_ { timestampProducer }
   {
   }
 
-  template<typename... Args>
-  void LogMessage(std::string format)
-  {
-  }
+  void LogMessage(std::string format);
+
+  std::string mMessageBuffer_;
 
  private:
-  std::shared_ptr<ITimestampProducer> mTimestampProducer;
+  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
 };
 
 } /*namespace equinox*/

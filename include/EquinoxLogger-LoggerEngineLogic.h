@@ -44,54 +44,58 @@ class EQUINOX_API LoggerEngineLogic
 {
  public:
   LoggerEngineLogic(std::shared_ptr<LogsProducer> logsProducer)
-  : mLogLevel { level::LOG_LEVEL::critical }
+  : mLogLevel_ { level::LOG_LEVEL::critical }
+  , mFormatedOutpurMessage_ {}
   , mLogsProducer_ { logsProducer }
   {
   }
 
-  template<typename... Args>
-  void log(level::LOG_LEVEL level, std::string format, Args &&... args)
+  template<typename ... Args>
+  void log(level::LOG_LEVEL msgLevel, std::string msgFormat, Args &&... args)
   {
-
-    if (level >= mLogLevel && level != level::LOG_LEVEL::off)
+    if (msgLevel != level::LOG_LEVEL::off && msgLevel >= mLogLevel_)
     {
-      int size_s = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1;
-      if (size_s <= 0)
+      const int nullEndCharacter = 1;
+      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args) ...) + nullEndCharacter;
+      if (numberOfCharacters > 0)
       {
-        throw std::runtime_error("Error during formatting.");
-      }
-      auto size = static_cast<size_t>(size_s);
-      std::unique_ptr<char[]> buf(new char[size]);
-      std::snprintf(buf.get(), size, format.c_str(), args ...);
-      std::string tmp(buf.get(), buf.get() + size - 1);
+        auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
+        auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
+        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args)  ...);
+        mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
 
-      switch(level)
+        switch (msgLevel)
+        {
+          case level::LOG_LEVEL::critical:
+            mFormatedOutpurMessage_ = kCriticalPrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::debug:
+            mFormatedOutpurMessage_ = kDebugPrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::error:
+            mFormatedOutpurMessage_ = kErrorPrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::info:
+            mFormatedOutpurMessage_ = kInfoPrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::trace:
+            mFormatedOutpurMessage_ = kTracePrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::warning:
+            mFormatedOutpurMessage_ = kWarningPrefix + mFormatedOutpurMessage_;
+            break;
+        }
+        mLogsProducer_->LogMessage(mFormatedOutpurMessage_);
+      }
+      else
       {
-        case level::LOG_LEVEL::critical:
-          tmp = "[critical] " + tmp;
-          break;
-
-        case level::LOG_LEVEL::debug:
-          tmp = "[debug] " + tmp;
-          break;
-
-        case level::LOG_LEVEL::error:
-          tmp = "[error] " + tmp;
-          break;
-
-        case level::LOG_LEVEL::info:
-          tmp = "[info] " + tmp;
-          break;
-
-        case level::LOG_LEVEL::trace:
-          tmp = "[trace] " + tmp;
-          break;
-
-        case level::LOG_LEVEL::warning:
-          tmp = "[warning] " + tmp;
-          break;
+        std::cout << "[LoggerEngineLogic] Message formatting error" << std::endl;
       }
-      mLogsProducer_->LogMessage(tmp);
     }
 
   }
@@ -100,7 +104,8 @@ class EQUINOX_API LoggerEngineLogic
   void setBacktrace(size_t numberOfMessages);
   void setLogsOutputSink(logs_output::SINK logsOutputSink);
 
-  level::LOG_LEVEL mLogLevel;
+  level::LOG_LEVEL mLogLevel_;
+  std::string mFormatedOutpurMessage_;
 
  private:
   std::shared_ptr<LogsProducer> mLogsProducer_;

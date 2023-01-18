@@ -37,6 +37,13 @@
  *
  */
 
+#include <iostream>
+
 #include "EquinoxLogger-ConsoleLogsProducer.h"
 
+void equinox::ConsoleLogsProducer::LogMessage(std::string format)
+{
+  mMessageBuffer_ = std::string(mTimestampProducer_->getTimestamp() + format);
 
+  std::cout << mMessageBuffer_ << std::endl;
+}

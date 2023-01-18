@@ -23,7 +23,7 @@
 
 void equinox::LoggerEngineLogic::setLogLevel(equinox::level::LOG_LEVEL logLevel)
 {
-  mLogLevel = logLevel;
+  mLogLevel_ = logLevel;
 }
 
 void equinox::LoggerEngineLogic::setBacktrace(size_t numberOfMessages)

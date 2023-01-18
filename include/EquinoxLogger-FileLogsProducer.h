@@ -42,6 +42,9 @@
 
 #include <string>
 #include <memory>
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 #include "EquinoxLogger-Common.h"
 #include "EquinoxLogger-TimestampProducer.h"
@@ -52,16 +55,28 @@ class EQUINOX_API FileLogsProducer
 {
  public:
   FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mTimestampProducer { timestampProducer }
+  : mMessageBuffer_ {}
+  , mTimestampProducer { timestampProducer }
+  , mFdLogFile_ { kLogFileName.c_str(), std::ios::out | std::ios::app }
   {
   }
 
-  void LogMessage(std::string messageToLog)
+  ~FileLogsProducer()
   {
+    mFdLogFile_.close();
   }
+
+  FileLogsProducer(const FileLogsProducer&) = delete;
+  FileLogsProducer(const FileLogsProducer&&) = delete;
+  FileLogsProducer& operator=(FileLogsProducer&) = delete;
+
+  void LogMessage(std::string messageToLog);
+
+  std::string mMessageBuffer_;
 
  private:
   std::shared_ptr<ITimestampProducer> mTimestampProducer;
+  std::ofstream mFdLogFile_;
 };
 } /*namespace equinox*/
 

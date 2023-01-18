@@ -37,10 +37,20 @@
  *
  */
 
-#include "EquinoxLogger-TimestampProducer.h"
+#include <chrono>
+#include <ctime>
 
+#include "EquinoxLogger-TimestampProducer.h"
 
 std::string equinox::TimestampProducer::getTimestamp() const
 {
-  return "";
+  std::chrono::system_clock::time_point sys_clock_time_point;
+
+  sys_clock_time_point = std::chrono::system_clock::now();
+  std::time_t t = std::chrono::system_clock::to_time_t(sys_clock_time_point);
+  std::string timestamp_ = std::ctime(&t);
+  timestamp_.resize(timestamp_.size() - 1);
+  timestamp_ = std::string("[" + timestamp_ + "]");
+
+  return timestamp_;
 }

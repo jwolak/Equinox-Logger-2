@@ -39,4 +39,9 @@
 
 #include "EquinoxLogger-FileLogsProducer.h"
 
+void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
+{
+  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + messageToLog);
 
+  mFdLogFile_ << mMessageBuffer_ << std::endl;
+}
