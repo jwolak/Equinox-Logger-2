@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-ConsoleLogsProducer.h
+ * EquinoxLogger-LogsProducer.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,35 +37,34 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
-#define INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
+#include "EquinoxLogger-LogsProducer.h"
 
-#include <string>
-#include <memory>
 
-#include "EquinoxLogger-Common.h"
-#include "EquinoxLogger-TimestampProducer.h"
+void equinox::LogsProducer::LogMessage(std::string messageToLog)
+{
+  switch(mSink)
+  {
+    case logs_output::SINK::console:
+      mConsoleLogsProducer->LogMessage(messageToLog);
+      break;
 
-namespace equinox
+    case logs_output::SINK::file:
+      mFileLogsProducer->LogMessage(messageToLog);
+      break;
+
+    case logs_output::SINK::console_and_file:
+      mConsoleLogsProducer->LogMessage(messageToLog);
+      mFileLogsProducer->LogMessage(messageToLog);
+      break;
+  }
+}
+
+void equinox::LogsProducer::setBacktrace(size_t numberOfMessages)
 {
 
-class EQUINOX_API ConsoleLogsProducer
+}
+
+void equinox::LogsProducer::setLogsOutputSink(equinox::logs_output::SINK logsOutputSink)
 {
- public:
-  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mTimestampProducer { timestampProducer }
-  {
-  }
-
-  template<typename... Args>
-  void LogMessage(std::string format)
-  {
-  }
-
- private:
-  std::shared_ptr<ITimestampProducer> mTimestampProducer;
-};
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_ */
+  mSink = logsOutputSink;
+}

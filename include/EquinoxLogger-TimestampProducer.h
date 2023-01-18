@@ -42,6 +42,8 @@
 
 #include <string>
 
+#include "EquinoxLogger-Common.h"
+
 namespace equinox
 {
 
@@ -52,7 +54,7 @@ class ITimestampProducer
   virtual std::string getTimestamp() const = 0;
 };
 
-class TimestampProducer : public ITimestampProducer
+class EQUINOX_API TimestampProducer : public ITimestampProducer
 {
  public:
   TimestampProducer()

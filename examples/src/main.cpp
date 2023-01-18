@@ -36,5 +36,7 @@ int main(void) {
   equinox::error(   "Example error log no:    [%d]" , 5);
   equinox::critical("Example critical log no: [%d]" , 6);
 
+  LOG_TRACE("Example LOG_TRACE log no:    [%d]" , 1);
+
 	return 0;
 }

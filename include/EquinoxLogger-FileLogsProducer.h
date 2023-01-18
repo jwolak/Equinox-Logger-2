@@ -56,8 +56,7 @@ class EQUINOX_API FileLogsProducer
   {
   }
 
-  template<typename... Args>
-  void LogMessage(level::LOG_LEVEL level, std::string format, Args &&... args)
+  void LogMessage(std::string messageToLog)
   {
   }
 

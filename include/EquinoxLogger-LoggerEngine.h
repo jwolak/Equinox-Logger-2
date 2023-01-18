@@ -32,7 +32,11 @@ class EQUINOX_API LoggerEngine
 {
      public:
         LoggerEngine()
-        : mLoggerEngineLogic_ { std::make_shared<LoggerEngineLogic>() }
+        : mTimestampProducer { std::make_shared<TimestampProducer>() }
+        , mFileLogsProducer { std::make_shared<FileLogsProducer>(mTimestampProducer) }
+        , mConsoleLogsProducer { std::make_shared<ConsoleLogsProducer>(mTimestampProducer) }
+        , mLogsProducer_ { std::make_shared<LogsProducer>(mFileLogsProducer, mConsoleLogsProducer) }
+        , mLoggerEngineLogic_ { std::make_shared<LoggerEngineLogic>(mLogsProducer_) }
         {
         }
 
@@ -77,6 +81,10 @@ class EQUINOX_API LoggerEngine
         void setLogsOutputSink(logs_output::SINK logsOutputSink);
 
      private:
+        std::shared_ptr<ITimestampProducer> mTimestampProducer;
+        std::shared_ptr<FileLogsProducer> mFileLogsProducer;
+        std::shared_ptr<ConsoleLogsProducer> mConsoleLogsProducer;
+        std::shared_ptr<LogsProducer> mLogsProducer_;
         std::shared_ptr<LoggerEngineLogic> mLoggerEngineLogic_;
 
 };

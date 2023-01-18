@@ -79,4 +79,15 @@ EQUINOX_INLINE void setLogsOutputSink(logs_output::SINK logsOutputSink)
 
 } /*namespace equinox*/
 
+#define LOG_TRACE(format, ...)     equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logTrace(format, __VA_ARGS__);
+#define LOG_DEBUG(format, ...)     equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logDebug(format, __VA_ARGS__);
+#define LOG_INFO(format, ...)      equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logInfo(format, __VA_ARGS__);
+#define LOG_WARNING(format, ...)   equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logWarning(format, __VA_ARGS__);
+#define LOG_ERROR(format, ...)     equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logError(format, __VA_ARGS__);
+#define LOG_CRITICAL(format, ...)  equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->logCritical(format, __VA_ARGS__);
+
+#define SET_LOG_LEVEL(level)       equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setLogLevel(level);
+#define SET_BACKTRACE(num_of_msgs) equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setBacktrace(num_of_msgs);
+#define SET_OUTPUT_SINK(sink)      equinox::LoggerManager::getLoggerManagerInstance()->getLoggerEngine()->setLogsOutputSink(sink);
+
 #endif /* EQUINOXLOGGER_H_ */
