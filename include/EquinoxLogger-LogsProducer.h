@@ -62,7 +62,6 @@ class EQUINOX_API LogsProducer
   }
 
   void LogMessage(std::string messageToLog);
-  void setBacktrace(size_t numberOfMessages);
   void setLogsOutputSink(logs_output::SINK logsOutputSink);
 
   logs_output::SINK mSink;

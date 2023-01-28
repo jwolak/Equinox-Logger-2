@@ -59,11 +59,6 @@ void equinox::LogsProducer::LogMessage(std::string messageToLog)
   }
 }
 
-void equinox::LogsProducer::setBacktrace(size_t numberOfMessages)
-{
-
-}
-
 void equinox::LogsProducer::setLogsOutputSink(equinox::logs_output::SINK logsOutputSink)
 {
   mSink = logsOutputSink;

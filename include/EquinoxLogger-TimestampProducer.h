@@ -64,6 +64,7 @@ class EQUINOX_API TimestampProducer : public ITimestampProducer
 
   std::string getTimestamp() const override;
 
+ private:
   std::string timestamp_;
 };
 } /*namespace equinox*/

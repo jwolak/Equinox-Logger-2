@@ -101,7 +101,6 @@ class EQUINOX_API LoggerEngineLogic
   }
 
   void setLogLevel(level::LOG_LEVEL logLevel);
-  void setBacktrace(size_t numberOfMessages);
   void setLogsOutputSink(logs_output::SINK logsOutputSink);
 
   level::LOG_LEVEL mLogLevel_;

@@ -26,11 +26,6 @@ void equinox::LoggerEngineLogic::setLogLevel(equinox::level::LOG_LEVEL logLevel)
   mLogLevel_ = logLevel;
 }
 
-void equinox::LoggerEngineLogic::setBacktrace(size_t numberOfMessages)
-{
-  mLogsProducer_->setBacktrace(numberOfMessages);
-}
-
 void equinox::LoggerEngineLogic::setLogsOutputSink(equinox::logs_output::SINK logsOutputSink)
 {
   mLogsProducer_->setLogsOutputSink(logsOutputSink);

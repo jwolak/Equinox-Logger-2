@@ -26,7 +26,6 @@
 int main(void) {
 
   equinox::setLevel(equinox::level::LOG_LEVEL::trace);
-  equinox::setBacktrace(10);
   equinox::setLogsOutputSink(equinox::logs_output::SINK::console_and_file);
 
   equinox::trace(   "Example trace log no:    [%d]" , 1);
