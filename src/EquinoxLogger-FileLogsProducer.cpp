@@ -41,7 +41,7 @@
 
 void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
 {
-  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + messageToLog);
+  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
 
   mFdLogFile_ << mMessageBuffer_ << std::endl;
 }

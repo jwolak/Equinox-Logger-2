@@ -41,9 +41,9 @@
 
 #include "EquinoxLogger-ConsoleLogsProducer.h"
 
-void equinox::ConsoleLogsProducer::LogMessage(std::string format)
+void equinox::ConsoleLogsProducer::LogMessage(std::string messageToLog)
 {
-  mMessageBuffer_ = std::string(mTimestampProducer_->getTimestamp() + format);
+  mMessageBuffer_ = std::string(mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog);
 
   std::cout << mMessageBuffer_ << std::endl;
 }

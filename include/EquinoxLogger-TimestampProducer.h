@@ -52,6 +52,7 @@ class ITimestampProducer
  public:
   virtual ~ITimestampProducer() = default;
   virtual std::string getTimestamp() const = 0;
+  virtual std::string getTimestampInUs() = 0;
 };
 
 class EQUINOX_API TimestampProducer : public ITimestampProducer
@@ -63,6 +64,7 @@ class EQUINOX_API TimestampProducer : public ITimestampProducer
   }
 
   std::string getTimestamp() const override;
+  std::string getTimestampInUs() override;
 
  private:
   std::string timestamp_;
