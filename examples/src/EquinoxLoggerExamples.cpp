@@ -1,5 +1,5 @@
 /*
- * main.cpp
+ * EquinoxLoggerExamples.cpp
  *
  * Copylefts (C) 2022
  * Author: Janusz Wolak
@@ -35,7 +35,12 @@ int main(void) {
   equinox::error(   "Example error log no:    [%d]" , 5);
   equinox::critical("Example critical log no: [%d]" , 6);
 
-  LOG_TRACE("Example LOG_TRACE log no:    [%d]" , 1);
+  LOG_TRACE(   "Example LOG_TRACE log no:    [%d]" , 1);
+  LOG_DEBUG(   "Example LOG_DEBUG log no:    [%d]" , 2);
+  LOG_INFO(    "Example LOG_INFO log no:     [%d]" , 3);
+  LOG_WARNING( "Example LOG_WARNING log no:  [%d]" , 4);
+  LOG_ERROR(   "Example LOG_ERROR log no:    [%d]" , 5);
+  LOG_CRITICAL("Example LOG_CRITICAL log no: [%d]" , 6);
 
 	return 0;
 }

@@ -47,7 +47,7 @@
 namespace equinox
 {
 
-class ITimestampProducer
+class EQUINOX_API ITimestampProducer
 {
  public:
   virtual ~ITimestampProducer() = default;

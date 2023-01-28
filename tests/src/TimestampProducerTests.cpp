@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-ConsoleLogsProducer.h
+ * TimestampProducerTests.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,42 +37,45 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
-#define INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
-
-#include <string>
 #include <memory>
+#include <iostream>
 
-#include "EquinoxLogger-Common.h"
+#include <gtest/gtest.h>
+
 #include "EquinoxLogger-TimestampProducer.h"
 
-namespace equinox
+namespace time_stampproducer_tests
 {
 
-class EQUINOX_API IConsoleLogsProducer
+class TimestampProducerTests : public ::testing::Test
 {
  public:
-  virtual ~IConsoleLogsProducer() = default;
-  virtual void LogMessage(std::string) = 0;
-};
-
-class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
-{
- public:
-  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mMessageBuffer_ {}
-  , mTimestampProducer_ { timestampProducer }
+  TimestampProducerTests()
+  : mTimestampProducer { std::make_unique<equinox::TimestampProducer>() }
   {
   }
 
-  void LogMessage(std::string format) override;
-
-  std::string mMessageBuffer_;
-
- private:
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+  std::unique_ptr<equinox::ITimestampProducer> mTimestampProducer;
 };
 
-} /*namespace equinox*/
+TEST_F(TimestampProducerTests, Call_getTimestamp_And_No_Failure)
+{
+  ASSERT_NO_FATAL_FAILURE(mTimestampProducer->getTimestamp());
+}
 
-#endif /* INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_ */
+TEST_F(TimestampProducerTests, Call_getTimestampInUs_And_No_Failure)
+{
+  ASSERT_NO_FATAL_FAILURE(mTimestampProducer->getTimestampInUs());
+}
+
+TEST_F(TimestampProducerTests, Call_getTimestamp_And_Print_Result)
+{
+  std::cout << mTimestampProducer->getTimestamp() << std::endl;
+}
+
+TEST_F(TimestampProducerTests, Call_getTimestampInUs_And_Print_Result)
+{
+  std::cout << mTimestampProducer->getTimestampInUs() << std::endl;
+}
+
+} /*namespace time_stampproducer_tests*/

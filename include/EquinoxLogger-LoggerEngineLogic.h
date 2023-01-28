@@ -43,7 +43,7 @@ namespace equinox
 class EQUINOX_API LoggerEngineLogic
 {
  public:
-  LoggerEngineLogic(std::shared_ptr<LogsProducer> logsProducer)
+  LoggerEngineLogic(std::shared_ptr<ILogsProducer> logsProducer)
   : mLogLevel_ { level::LOG_LEVEL::critical }
   , mFormatedOutpurMessage_ {}
   , mLogsProducer_ { logsProducer }
@@ -107,7 +107,7 @@ class EQUINOX_API LoggerEngineLogic
   std::string mFormatedOutpurMessage_;
 
  private:
-  std::shared_ptr<LogsProducer> mLogsProducer_;
+  std::shared_ptr<ILogsProducer> mLogsProducer_;
 };
 
 } /*namespace equinox*/

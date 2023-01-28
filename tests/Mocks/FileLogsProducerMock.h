@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-ConsoleLogsProducer.h
+ * FileLogsProducerMock.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,42 +37,22 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
-#define INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_
+#ifndef MOCKS_FILELOGSPRODUCERMOCK_H_
+#define MOCKS_FILELOGSPRODUCERMOCK_H_
 
-#include <string>
-#include <memory>
+#include <gmock/gmock.h>
 
-#include "EquinoxLogger-Common.h"
-#include "EquinoxLogger-TimestampProducer.h"
+#include "EquinoxLogger-FileLogsProducer.h"
 
-namespace equinox
+namespace equinox_mocks
 {
 
-class EQUINOX_API IConsoleLogsProducer
+class FileLogsProducerMock : public equinox::IFileLogsProducer
 {
  public:
-  virtual ~IConsoleLogsProducer() = default;
-  virtual void LogMessage(std::string) = 0;
+  MOCK_METHOD(void, LogMessage, (std::string), (override));
 };
 
-class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
-{
- public:
-  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mMessageBuffer_ {}
-  , mTimestampProducer_ { timestampProducer }
-  {
-  }
+} /*namespace equinox_mocks*/
 
-  void LogMessage(std::string format) override;
-
-  std::string mMessageBuffer_;
-
- private:
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-};
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_EQUINOXLOGGER_CONSOLELOGSPRODUCER_H_ */
+#endif /* MOCKS_FILELOGSPRODUCERMOCK_H_ */

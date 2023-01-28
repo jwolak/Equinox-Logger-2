@@ -50,25 +50,33 @@
 namespace equinox
 {
 
-class EQUINOX_API LogsProducer
+class EQUINOX_API ILogsProducer
 {
  public:
-  LogsProducer(std::shared_ptr<FileLogsProducer> fileLogsProducer,
-               std::shared_ptr<ConsoleLogsProducer> consoleLogsProducer)
+  virtual ~ILogsProducer() = default;
+  virtual void LogMessage(std::string) = 0;
+  virtual void setLogsOutputSink(logs_output::SINK) = 0;
+};
+
+class EQUINOX_API LogsProducer : public ILogsProducer
+{
+ public:
+  LogsProducer(std::shared_ptr<IFileLogsProducer> fileLogsProducer,
+               std::shared_ptr<IConsoleLogsProducer> consoleLogsProducer)
   : mSink { logs_output::SINK::console }
   , mFileLogsProducer { fileLogsProducer }
   , mConsoleLogsProducer { consoleLogsProducer }
   {
   }
 
-  void LogMessage(std::string messageToLog);
-  void setLogsOutputSink(logs_output::SINK logsOutputSink);
+  void LogMessage(std::string messageToLog) override;
+  void setLogsOutputSink(logs_output::SINK logsOutputSink) override;
 
   logs_output::SINK mSink;
 
  private:
-  std::shared_ptr<FileLogsProducer> mFileLogsProducer;
-  std::shared_ptr<ConsoleLogsProducer> mConsoleLogsProducer;
+  std::shared_ptr<IFileLogsProducer> mFileLogsProducer;
+  std::shared_ptr<IConsoleLogsProducer> mConsoleLogsProducer;
 };
 
 } /*namespace equinox*/

@@ -83,7 +83,7 @@ class EQUINOX_API LoggerEngine
         std::shared_ptr<ITimestampProducer> mTimestampProducer;
         std::shared_ptr<FileLogsProducer> mFileLogsProducer;
         std::shared_ptr<ConsoleLogsProducer> mConsoleLogsProducer;
-        std::shared_ptr<LogsProducer> mLogsProducer_;
+        std::shared_ptr<ILogsProducer> mLogsProducer_;
         std::shared_ptr<LoggerEngineLogic> mLoggerEngineLogic_;
 
 };

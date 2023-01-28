@@ -51,7 +51,15 @@
 
 namespace equinox
 {
-class EQUINOX_API FileLogsProducer
+
+class EQUINOX_API IFileLogsProducer
+{
+ public:
+  virtual ~IFileLogsProducer() = default;
+  virtual void LogMessage(std::string messageToLog) = 0;
+};
+
+class EQUINOX_API FileLogsProducer : public IFileLogsProducer
 {
  public:
   FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
@@ -70,7 +78,7 @@ class EQUINOX_API FileLogsProducer
   FileLogsProducer(const FileLogsProducer&&) = delete;
   FileLogsProducer& operator=(FileLogsProducer&) = delete;
 
-  void LogMessage(std::string messageToLog);
+  void LogMessage(std::string messageToLog) override;
 
   std::string mMessageBuffer_;
 
