@@ -39,6 +39,11 @@
 
 #include "EquinoxLogger-FileLogsProducer.h"
 
+void equinox::FileLogsProducer::setupFile(std::string logFileName)
+{
+  mFdLogFile_.open (logFileName, std::ofstream::out | std::ofstream::app);
+}
+
 void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
 {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);

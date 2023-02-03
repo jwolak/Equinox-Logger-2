@@ -21,6 +21,19 @@
 
 #include "EquinoxLogger-LoggerEngine.h"
 
+void equinox::LoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName)
+{
+  mLogLevel_ = logLevel;
+  mLogPrefix_ = std::string("[" + logPrefix + "]");
+  mLogsProducer_->setLogsOutputSink(logsOutputSink);
+
+  if(equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
+  {
+    mFileLogsProducer_->setupFile(logFileName);
+  }
+
+}
+
 void equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
 {
   mLogLevel_ = logLevel;

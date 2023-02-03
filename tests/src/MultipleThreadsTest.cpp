@@ -56,8 +56,7 @@ void LogDebugInThreadTwo()
 
 TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First)
 {
-  equinox::setLevel(equinox::level::LOG_LEVEL::trace);
-  equinox::setLogsOutputSink(equinox::logs_output::SINK::console);
+  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsTest"), equinox::logs_output::SINK::console);
 
   auto fut1 = std::async(std::launch::async,LogTraceInThreadOne);
   fut1 = std::async(std::launch::async,LogDebugInThreadTwo);

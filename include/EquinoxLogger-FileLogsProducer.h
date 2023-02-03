@@ -67,7 +67,7 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   : mMessageBuffer_ {}
   , mMessageBufferAccessLock_ {}
   , mTimestampProducer { timestampProducer }
-  , mFdLogFile_ { kLogFileName.c_str(), std::ios::out | std::ios::app }
+  , mFdLogFile_ {}
   {
   }
 
@@ -80,6 +80,7 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   FileLogsProducer(const FileLogsProducer&&) = delete;
   FileLogsProducer& operator=(FileLogsProducer&) = delete;
 
+  void setupFile(std::string logFileName);
   void LogMessage(std::string messageToLog) override;
 
   std::string mMessageBuffer_;
