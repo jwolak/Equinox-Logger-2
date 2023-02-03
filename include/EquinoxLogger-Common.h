@@ -22,6 +22,8 @@
 #ifndef INCLUDE_EQUINOXLOGGER_COMMON_H_
 #define INCLUDE_EQUINOXLOGGER_COMMON_H_
 
+#include <string>
+
 #if defined(EQUINOX_SHARED_SHARED_LIB)
 #            undef EQUINOX_HEADER_ONLY
 #            define EQUINOX_API __attribute__((visibility("default")))
@@ -35,7 +37,7 @@
 #define EQUINOX_LEVEL_TRACE     0
 #define EQUINOX_LEVEL_DEBUG     1
 #define EQUINOX_LEVEL_INFO      2
-#define EQUINOX_LEVEL_WARN      3
+#define EQUINOX_LEVEL_WARNING   3
 #define EQUINOX_LEVEL_ERROR     4
 #define EQUINOX_LEVEL_CRITICAL  5
 #define EQUINOX_LEVEL_OFF       6
@@ -46,6 +48,16 @@
 
 namespace equinox
 {
+
+const std::string kLogFileName = "logs.log";
+
+const std::string kTracePrefix = std::string("[TRACE] ");
+const std::string kDebugPrefix = std::string("[DEBUG] ");
+const std::string kInfoPrefix = std::string("[INFO] ");
+const std::string kWarningPrefix = std::string("[WARNING] ");
+const std::string kErrorPrefix = std::string("[ERROR] ");
+const std::string kCriticalPrefix = std::string("[CRITICAL] ");
+
 namespace level
 {
 enum class LOG_LEVEL : int
@@ -53,7 +65,7 @@ enum class LOG_LEVEL : int
     trace    = EQUINOX_LEVEL_TRACE,
     debug    = EQUINOX_LEVEL_DEBUG,
     info     = EQUINOX_LEVEL_INFO,
-    warning  = EQUINOX_LEVEL_WARN,
+    warning  = EQUINOX_LEVEL_WARNING,
     error    = EQUINOX_LEVEL_ERROR,
     critical = EQUINOX_LEVEL_CRITICAL,
     off      = EQUINOX_LEVEL_OFF

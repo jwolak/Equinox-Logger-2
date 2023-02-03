@@ -21,7 +21,12 @@
 
 #include "EquinoxLogger-LoggerEngine.h"
 
-bool equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
+void equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
 {
-    return true;
+  mLogLevel_ = logLevel;
+}
+
+void equinox::LoggerEngine::setLogsOutputSink(logs_output::SINK logsOutputSink)
+{
+  mLogsProducer_->setLogsOutputSink(logsOutputSink);
 }

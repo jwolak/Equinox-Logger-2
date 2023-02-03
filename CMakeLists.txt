@@ -30,13 +30,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(EQUINOX_LOGGER_TESTS			"Build tests"			ON)
-option(EQUINOX_LOGGER_EXAMPLES		"Build examples"		OFF)
+option(EQUINOX_LOGGER_EXAMPLES		"Build examples"		ON)
 option(EQUINOX_LOGGER_BUILD_SHARED	"Build shared lib"		ON)
 option(EQUINOX_LOGGER_BUILD_STATIC	"Build static lib"		OFF)
 
 
 set(EQUINOX_LOGGER_PUBLIC_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/EquinoxLogger.h
+	${CMAKE_CURRENT_SOURCE_DIR}/api
 )
 
 set(EQUINOX_LOGGER_INCLUDE
@@ -45,8 +45,10 @@ set(EQUINOX_LOGGER_INCLUDE
 
 set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngine.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerManager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngineLogic.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-ConsoleLogsProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-FileLogsProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-TimestampProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LogsProducer.cpp
 )
 
 if (EQUINOX_LOGGER_BUILD_SHARED)
