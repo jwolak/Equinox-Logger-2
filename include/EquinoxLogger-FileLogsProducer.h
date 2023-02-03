@@ -45,6 +45,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <mutex>
 
 #include "EquinoxLogger-Common.h"
 #include "EquinoxLogger-TimestampProducer.h"
@@ -64,6 +65,7 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
  public:
   FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
   : mMessageBuffer_ {}
+  , mMessageBufferAccessLock_ {}
   , mTimestampProducer { timestampProducer }
   , mFdLogFile_ { kLogFileName.c_str(), std::ios::out | std::ios::app }
   {
@@ -83,6 +85,7 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   std::string mMessageBuffer_;
 
  private:
+  std::mutex mMessageBufferAccessLock_;
   std::shared_ptr<ITimestampProducer> mTimestampProducer;
   std::ofstream mFdLogFile_;
 };

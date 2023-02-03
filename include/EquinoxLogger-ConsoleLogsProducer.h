@@ -42,6 +42,7 @@
 
 #include <string>
 #include <memory>
+#include <mutex>
 
 #include "EquinoxLogger-Common.h"
 #include "EquinoxLogger-TimestampProducer.h"
@@ -61,6 +62,7 @@ class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
  public:
   ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
   : mMessageBuffer_ {}
+  , mMessageBufferAccessLock_ {}
   , mTimestampProducer_ { timestampProducer }
   {
   }
@@ -70,6 +72,7 @@ class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
   std::string mMessageBuffer_;
 
  private:
+  std::mutex mMessageBufferAccessLock_;
   std::shared_ptr<ITimestampProducer> mTimestampProducer_;
 };
 

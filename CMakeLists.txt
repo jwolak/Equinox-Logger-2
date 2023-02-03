@@ -36,7 +36,7 @@ option(EQUINOX_LOGGER_BUILD_STATIC	"Build static lib"		OFF)
 
 
 set(EQUINOX_LOGGER_PUBLIC_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/
+	${CMAKE_CURRENT_SOURCE_DIR}/api
 )
 
 set(EQUINOX_LOGGER_INCLUDE
@@ -45,8 +45,6 @@ set(EQUINOX_LOGGER_INCLUDE
 
 set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngine.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerManager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngineLogic.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-ConsoleLogsProducer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-FileLogsProducer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-TimestampProducer.cpp

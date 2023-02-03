@@ -43,6 +43,7 @@
 
 void equinox::ConsoleLogsProducer::LogMessage(std::string messageToLog)
 {
+  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
   mMessageBuffer_ = std::string(mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog);
 
   std::cout << mMessageBuffer_ << std::endl;

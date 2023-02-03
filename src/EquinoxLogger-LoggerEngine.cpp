@@ -23,10 +23,10 @@
 
 void equinox::LoggerEngine::setLogLevel(level::LOG_LEVEL logLevel)
 {
-  mLoggerEngineLogic_->setLogLevel(logLevel);
+  mLogLevel_ = logLevel;
 }
 
 void equinox::LoggerEngine::setLogsOutputSink(logs_output::SINK logsOutputSink)
 {
-  mLoggerEngineLogic_->setLogsOutputSink(logsOutputSink);
+  mLogsProducer_->setLogsOutputSink(logsOutputSink);
 }

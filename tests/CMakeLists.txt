@@ -23,8 +23,6 @@ set(EQUINOX_LOGGER_SRC_DIR ${PROJECT_SOURCE_DIR}/../src)
 
 set(EQUINOX_LOGGER_SRC
 	${EQUINOX_LOGGER_SRC_DIR}/EquinoxLogger-LoggerEngine.cpp
-	${EQUINOX_LOGGER_SRC_DIR}/EquinoxLogger-LoggerEngineLogic.cpp
-	${EQUINOX_LOGGER_SRC_DIR}/EquinoxLogger-LoggerManager.cpp
 )
 
 set(EQUINOX_LOGGER_TESTS_DIR

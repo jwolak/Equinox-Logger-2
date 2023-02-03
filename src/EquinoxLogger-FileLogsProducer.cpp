@@ -41,6 +41,7 @@
 
 void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
 {
+  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
   mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
 
   mFdLogFile_ << mMessageBuffer_ << std::endl;

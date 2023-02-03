@@ -21,71 +21,99 @@
 #ifndef INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
 #define INCLUDE_EQUINOXLOGGER_LOGGERENGINE_H_
 
-#include "EquinoxLogger-LoggerEngineLogic.h"
-
 #include <memory>
 #include <string>
+
+#include "EquinoxLogger-Common.h"
+#include "EquinoxLogger-TimestampProducer.h"
+#include "EquinoxLogger-ConsoleLogsProducer.h"
+#include "EquinoxLogger-FileLogsProducer.h"
+#include "EquinoxLogger-LogsProducer.h"
 
 namespace equinox {
 
 class EQUINOX_API LoggerEngine
 {
-     public:
-        LoggerEngine()
-        : mTimestampProducer { std::make_shared<TimestampProducer>() }
-        , mFileLogsProducer { std::make_shared<FileLogsProducer>(mTimestampProducer) }
-        , mConsoleLogsProducer { std::make_shared<ConsoleLogsProducer>(mTimestampProducer) }
-        , mLogsProducer_ { std::make_shared<LogsProducer>(mFileLogsProducer, mConsoleLogsProducer) }
-        , mLoggerEngineLogic_ { std::make_shared<LoggerEngineLogic>(mLogsProducer_) }
-        {
-        }
+ public:
+  static LoggerEngine& getInstance()
+  {
+    static LoggerEngine sLoggerEngine;
+    return sLoggerEngine;
+  }
 
-        template<typename... Args>
-        void logTrace(std::string format, Args &&... args)
-        {
-          mLoggerEngineLogic_->log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
-        }
+  LoggerEngine(LoggerEngine &) = delete;         /* no clone/copy   */
+  LoggerEngine(LoggerEngine &&) = delete;        /* no move         */
+  void operator=(const LoggerEngine&) = delete;  /* no copy assign  */
 
-        template<typename... Args>
-        void logDebug(std::string format, Args &&... args)
-        {
-          mLoggerEngineLogic_->log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
-        }
+  template<typename ... Args>
+  void log(level::LOG_LEVEL msgLevel, std::string msgFormat, Args &&... args)
+  {
+    if (msgLevel != level::LOG_LEVEL::off && msgLevel >= mLogLevel_)
+    {
+      const int nullEndCharacter = 1;
+      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args) ...) + nullEndCharacter;
+      if (numberOfCharacters > 0)
+      {
+        auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
+        auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
+        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args) ...);
+        mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
 
-        template<typename... Args>
-        void logInfo(std::string format, Args &&... args)
+        switch (msgLevel)
         {
-          mLoggerEngineLogic_->log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
-        }
+          case level::LOG_LEVEL::critical:
+            mFormatedOutpurMessage_ = kCriticalPrefix + mFormatedOutpurMessage_;
+            break;
 
-        template<typename... Args>
-        void logWarning(std::string format, Args &&... args)
-        {
-          mLoggerEngineLogic_->log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
-        }
+          case level::LOG_LEVEL::debug:
+            mFormatedOutpurMessage_ = kDebugPrefix + mFormatedOutpurMessage_;
+            break;
 
-        template<typename... Args>
-        void logError(std::string format, Args &&... args)
-        {
-          mLoggerEngineLogic_->log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
-        }
+          case level::LOG_LEVEL::error:
+            mFormatedOutpurMessage_ = kErrorPrefix + mFormatedOutpurMessage_;
+            break;
 
-        template<typename... Args>
-        void logCritical(std::string format, Args &&... args)
-        {
-          mLoggerEngineLogic_->log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
+          case level::LOG_LEVEL::info:
+            mFormatedOutpurMessage_ = kInfoPrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::trace:
+            mFormatedOutpurMessage_ = kTracePrefix + mFormatedOutpurMessage_;
+            break;
+
+          case level::LOG_LEVEL::warning:
+            mFormatedOutpurMessage_ = kWarningPrefix + mFormatedOutpurMessage_;
+            break;
         }
+        mLogsProducer_->LogMessage(mFormatedOutpurMessage_);
+      } else
+      {
+        std::cout << "[LoggerEngineLogic] Message formatting error" << std::endl;
+      }
+    }
+  }
 
         void setLogLevel(level::LOG_LEVEL logLevel);
         void setLogsOutputSink(logs_output::SINK logsOutputSink);
 
-     private:
-        std::shared_ptr<ITimestampProducer> mTimestampProducer;
-        std::shared_ptr<FileLogsProducer> mFileLogsProducer;
-        std::shared_ptr<ConsoleLogsProducer> mConsoleLogsProducer;
-        std::shared_ptr<ILogsProducer> mLogsProducer_;
-        std::shared_ptr<LoggerEngineLogic> mLoggerEngineLogic_;
+ protected:
+    LoggerEngine()
+    : mLogLevel_ { level::LOG_LEVEL::critical }
+    , mFormatedOutpurMessage_ {}
+    , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
+    , mFileLogsProducer_ { std::make_shared<FileLogsProducer>(mTimestampProducer_) }
+    , mConsoleLogsProducer_ { std::make_shared<ConsoleLogsProducer>(mTimestampProducer_) }
+    , mLogsProducer_ { std::make_shared<LogsProducer>(mFileLogsProducer_, mConsoleLogsProducer_) }
+    {
+    }
 
+ private:
+  level::LOG_LEVEL mLogLevel_;
+  std::string mFormatedOutpurMessage_;
+  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+  std::shared_ptr<FileLogsProducer> mFileLogsProducer_;
+  std::shared_ptr<ConsoleLogsProducer> mConsoleLogsProducer_;
+  std::shared_ptr<ILogsProducer> mLogsProducer_;
 };
 
 } /*namespace equinox*/
