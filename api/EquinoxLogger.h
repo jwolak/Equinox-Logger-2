@@ -62,26 +62,32 @@ inline void critical(std::string format, Args&& ... args)
   equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
 }
 
-EQUINOX_INLINE void setLevel(level::LOG_LEVEL logLevel)
+EQUINOX_INLINE void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName = kLogFileName)
+{
+  equinox::LoggerEngine::getInstance().setup(logLevel, logPrefix, logsOutputSink, logFileName);
+}
+
+EQUINOX_INLINE void changeLevel(level::LOG_LEVEL logLevel)
 {
   equinox::LoggerEngine::getInstance().setLogLevel(logLevel);
 }
 
-EQUINOX_INLINE void setLogsOutputSink(logs_output::SINK logsOutputSink)
+EQUINOX_INLINE void changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
   equinox::LoggerEngine::getInstance().setLogsOutputSink(logsOutputSink);
 }
 
 } /*namespace equinox*/
 
-#define LOG_TRACE(format, ...)     equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::trace, format, __VA_ARGS__);
-#define LOG_DEBUG(format, ...)     equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::debug, format, __VA_ARGS__);
-#define LOG_INFO(format, ...)      equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::info, format, __VA_ARGS__);
-#define LOG_WARNING(format, ...)   equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::warning, format, __VA_ARGS__);
-#define LOG_ERROR(format, ...)     equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::error, format, __VA_ARGS__);
-#define LOG_CRITICAL(format, ...)  equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::critical, format, __VA_ARGS__);
+#define SETUP(logLevel, logPrefix, logsOutputSink, logFileName) equinox::LoggerEngine::getInstance().setup(logLevel, logPrefix, logsOutputSink, logFileName)
+#define LOG_TRACE(format, ...)     equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::trace, format, __VA_ARGS__)
+#define LOG_DEBUG(format, ...)     equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::debug, format, __VA_ARGS__)
+#define LOG_INFO(format, ...)      equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::info, format, __VA_ARGS__)
+#define LOG_WARNING(format, ...)   equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::warning, format, __VA_ARGS__)
+#define LOG_ERROR(format, ...)     equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::error, format, __VA_ARGS__)
+#define LOG_CRITICAL(format, ...)  equinox::LoggerEngine::getInstance().log(equinox::level::LOG_LEVEL::critical, format, __VA_ARGS__)
 
-#define SET_LOG_LEVEL(level)       equinox::LoggerEngine::getInstance().setLogLevel(level);
-#define SET_OUTPUT_SINK(sink)      equinox::LoggerEngine::getInstance().setLogsOutputSink(sink);
+#define CHANGE_LOG_LEVEL(level)    equinox::LoggerEngine::getInstance().setLogLevel(level);
+#define CHANGE_OUTPUT_SINK(sink)   equinox::LoggerEngine::getInstance().setLogsOutputSink(sink);
 
 #endif /* EQUINOXLOGGER_H_ */

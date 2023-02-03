@@ -45,6 +45,8 @@ class EQUINOX_API LoggerEngine
   LoggerEngine(LoggerEngine &&) = delete;        /* no move         */
   void operator=(const LoggerEngine&) = delete;  /* no copy assign  */
 
+  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName);
+
   template<typename ... Args>
   void log(level::LOG_LEVEL msgLevel, std::string msgFormat, Args &&... args)
   {
@@ -62,27 +64,27 @@ class EQUINOX_API LoggerEngine
         switch (msgLevel)
         {
           case level::LOG_LEVEL::critical:
-            mFormatedOutpurMessage_ = kCriticalPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + kCriticalPrefix + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::debug:
-            mFormatedOutpurMessage_ = kDebugPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + kDebugPrefix + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::error:
-            mFormatedOutpurMessage_ = kErrorPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + kErrorPrefix + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::info:
-            mFormatedOutpurMessage_ = kInfoPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + kInfoPrefix + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::trace:
-            mFormatedOutpurMessage_ = kTracePrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_+ kTracePrefix + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::warning:
-            mFormatedOutpurMessage_ = kWarningPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + kWarningPrefix + mFormatedOutpurMessage_;
             break;
         }
         mLogsProducer_->LogMessage(mFormatedOutpurMessage_);
@@ -100,6 +102,7 @@ class EQUINOX_API LoggerEngine
     LoggerEngine()
     : mLogLevel_ { level::LOG_LEVEL::critical }
     , mFormatedOutpurMessage_ {}
+    , mLogPrefix_ {}
     , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
     , mFileLogsProducer_ { std::make_shared<FileLogsProducer>(mTimestampProducer_) }
     , mConsoleLogsProducer_ { std::make_shared<ConsoleLogsProducer>(mTimestampProducer_) }
@@ -110,6 +113,7 @@ class EQUINOX_API LoggerEngine
  private:
   level::LOG_LEVEL mLogLevel_;
   std::string mFormatedOutpurMessage_;
+  std::string mLogPrefix_;
   std::shared_ptr<ITimestampProducer> mTimestampProducer_;
   std::shared_ptr<FileLogsProducer> mFileLogsProducer_;
   std::shared_ptr<ConsoleLogsProducer> mConsoleLogsProducer_;

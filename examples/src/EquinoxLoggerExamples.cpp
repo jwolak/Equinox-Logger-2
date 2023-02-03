@@ -25,8 +25,7 @@
 
 int main(void) {
 
-  equinox::setLevel(equinox::level::LOG_LEVEL::trace);
-  equinox::setLogsOutputSink(equinox::logs_output::SINK::console_and_file);
+  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("equinox-test"), equinox::logs_output::SINK::console_and_file, std::string("equinox.log"));
 
   equinox::trace(   "Example trace log no:    [%d]" , 1);
   equinox::debug(   "Example debug log no:    [%d]" , 2);
@@ -41,6 +40,14 @@ int main(void) {
   LOG_WARNING( "Example LOG_WARNING log no:  [%d]" , 4);
   LOG_ERROR(   "Example LOG_ERROR log no:    [%d]" , 5);
   LOG_CRITICAL("Example LOG_CRITICAL log no: [%d]" , 6);
+
+  CHANGE_LOG_LEVEL(equinox::level::LOG_LEVEL::critical);
+  LOG_TRACE(   "Example LOG_TRACE log no:    [%d]" , 1);
+  LOG_DEBUG(   "Example LOG_DEBUG log no:    [%d]" , 2);
+  LOG_INFO(    "Example LOG_INFO log no:     [%d]" , 3);
+  LOG_WARNING( "Example LOG_WARNING log no:  [%d]" , 4);
+  LOG_ERROR(   "Example LOG_ERROR log no:    [%d]" , 5);
+  LOG_CRITICAL("%s", "Only LOG_CRITICAL log");
 
 	return 0;
 }
