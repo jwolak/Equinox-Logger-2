@@ -44,6 +44,7 @@ class EQUINOX_API LoggerEngine
   LoggerEngine(LoggerEngine &) = delete;         /* no clone/copy   */
   LoggerEngine(LoggerEngine &&) = delete;        /* no move         */
   void operator=(const LoggerEngine&) = delete;  /* no copy assign  */
+  void operator=(const LoggerEngine&&) = delete; /* no move assign  */
 
   void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName);
 
@@ -64,27 +65,27 @@ class EQUINOX_API LoggerEngine
         switch (msgLevel)
         {
           case level::LOG_LEVEL::critical:
-            mFormatedOutpurMessage_ = mLogPrefix_ + kCriticalPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + std::string("[CRITICAL] ") + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::debug:
-            mFormatedOutpurMessage_ = mLogPrefix_ + kDebugPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + std::string("[DEBUG] ") + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::error:
-            mFormatedOutpurMessage_ = mLogPrefix_ + kErrorPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + std::string("[ERROR] ") + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::info:
-            mFormatedOutpurMessage_ = mLogPrefix_ + kInfoPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + std::string("[INFO] ") + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::trace:
-            mFormatedOutpurMessage_ = mLogPrefix_+ kTracePrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_+ std::string("[TRACE] ") + mFormatedOutpurMessage_;
             break;
 
           case level::LOG_LEVEL::warning:
-            mFormatedOutpurMessage_ = mLogPrefix_ + kWarningPrefix + mFormatedOutpurMessage_;
+            mFormatedOutpurMessage_ = mLogPrefix_ + std::string("[WARNING] ") + mFormatedOutpurMessage_;
             break;
         }
         mLogsProducer_->LogMessage(mFormatedOutpurMessage_);

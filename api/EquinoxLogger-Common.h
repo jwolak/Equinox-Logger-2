@@ -51,13 +51,6 @@ namespace equinox
 
 const std::string kLogFileName = "logs.log";
 
-const std::string kTracePrefix = std::string("[TRACE] ");
-const std::string kDebugPrefix = std::string("[DEBUG] ");
-const std::string kInfoPrefix = std::string("[INFO] ");
-const std::string kWarningPrefix = std::string("[WARNING] ");
-const std::string kErrorPrefix = std::string("[ERROR] ");
-const std::string kCriticalPrefix = std::string("[CRITICAL] ");
-
 namespace level
 {
 enum class LOG_LEVEL : int
