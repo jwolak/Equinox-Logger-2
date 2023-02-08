@@ -15,7 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#------------------------------------------------------------------------------------------
+#                                cmake settings
+#------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.22.1)
+
+#------------------------------------------------------------------------------------------
+#                                Project settings
+#------------------------------------------------------------------------------------------
 project(EquinoxLogger)
 
 set(LIB_MAJOR_VERSION "1")
@@ -29,19 +36,25 @@ message(STATUS "CMAKE_SOURCE_DIR:	" ${CMAKE_SOURCE_DIR})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#------------------------------------------------------------------------------------------
+#                                Project options
+#------------------------------------------------------------------------------------------
+
 option(EQUINOX_LOGGER_TESTS         "Build tests"           ON)
 option(EQUINOX_LOGGER_EXAMPLES      "Build examples"        ON)
 option(EQUINOX_LOGGER_BUILD_SHARED  "Build shared lib"      ON)
 option(EQUINOX_LOGGER_BUILD_STATIC  "Build static lib"      OFF)
 
-set(EQUINOX_LOGGER_PUBLIC_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/api
-)
-
+#------------------------------------------------------------------------------------------
+#                                Project include
+#------------------------------------------------------------------------------------------
 set(EQUINOX_LOGGER_INCLUDE
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+#------------------------------------------------------------------------------------------
+#                                Project source
+#------------------------------------------------------------------------------------------
 set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngine.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-ConsoleLogsProducer.cpp
@@ -50,6 +63,9 @@ set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LogsProducer.cpp
 )
 
+#------------------------------------------------------------------------------------------
+#                                Project target
+#------------------------------------------------------------------------------------------
 if (EQUINOX_LOGGER_BUILD_SHARED)
 	include_directories(EquinoxLogger PRIVATE  ${EQUINOX_LOGGER_INCLUDE} ${EQUINOX_LOGGER_PUBLIC_HEADERS})
 	add_library(EquinoxLogger SHARED ${EQUINOX_LOGGER_SRC})
@@ -61,20 +77,33 @@ if (EQUINOX_LOGGER_BUILD_STATIC)
 	add_library(EquinoxLogger STATIC ${EQUINOX_LOGGER_SRC})
 endif()
 
+#------------------------------------------------------------------------------------------
+#                                Project tests
+#------------------------------------------------------------------------------------------
 if(EQUINOX_LOGGER_TESTS)
 	add_subdirectory(tests)
 endif(EQUINOX_LOGGER_TESTS)
 
+#------------------------------------------------------------------------------------------
+#                                Project examples
+#------------------------------------------------------------------------------------------
 if(EQUINOX_LOGGER_EXAMPLES)
 	add_subdirectory(examples)
 endif(EQUINOX_LOGGER_EXAMPLES)
 
-install(FILES ${EQUINOX_LOGGER_PUBLIC_HEADERS}/EquinoxLogger.h
-              ${EQUINOX_LOGGER_PUBLIC_HEADERS}/EquinoxLogger-Common.h
-              ${EQUINOX_LOGGER_PUBLIC_HEADERS}/EquinoxLogger-LoggerEngine.h
+#------------------------------------------------------------------------------------------
+#                                Project install
+#------------------------------------------------------------------------------------------
+install(FILES ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger.h
+              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-Common.h
+              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-LoggerEngine.h
+              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-ConsoleLogsProducer.h
+              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-FileLogsProducer.h
+              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-LogsProducer.h
+              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-TimestampProducer.h
         DESTINATION include)
 
 install(TARGETS EquinoxLogger DESTINATION lib)
-#install(FILES FooConfig.cmake DESTINATION lib/cmake/Fo
+install(FILES EquinoxLoggerConfig.cmake DESTINATION lib/cmake/EquinoxLogger)
 
 

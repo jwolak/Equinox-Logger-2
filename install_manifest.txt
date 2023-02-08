@@ -1,4 +1,9 @@
 /usr/local/include/EquinoxLogger.h
 /usr/local/include/EquinoxLogger-Common.h
 /usr/local/include/EquinoxLogger-LoggerEngine.h
+/usr/local/include/EquinoxLogger-ConsoleLogsProducer.h
+/usr/local/include/EquinoxLogger-FileLogsProducer.h
+/usr/local/include/EquinoxLogger-LogsProducer.h
+/usr/local/include/EquinoxLogger-TimestampProducer.h
 /usr/local/lib/libEquinoxLogger.so
+/usr/local/lib/cmake/EquinoxLogger/EquinoxLoggerConfig.cmake
