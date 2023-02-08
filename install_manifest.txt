@@ -1,0 +1,4 @@
+/usr/local/include/EquinoxLogger.h
+/usr/local/include/EquinoxLogger-Common.h
+/usr/local/include/EquinoxLogger-LoggerEngine.h
+/usr/local/lib/libEquinoxLogger.so

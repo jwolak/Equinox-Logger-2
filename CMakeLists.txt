@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.22.1)
 project(EquinoxLogger)
 
 set(LIB_MAJOR_VERSION "1")
@@ -29,11 +29,10 @@ message(STATUS "CMAKE_SOURCE_DIR:	" ${CMAKE_SOURCE_DIR})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(EQUINOX_LOGGER_TESTS			"Build tests"			ON)
-option(EQUINOX_LOGGER_EXAMPLES		"Build examples"		ON)
-option(EQUINOX_LOGGER_BUILD_SHARED	"Build shared lib"		ON)
-option(EQUINOX_LOGGER_BUILD_STATIC	"Build static lib"		OFF)
-
+option(EQUINOX_LOGGER_TESTS         "Build tests"           ON)
+option(EQUINOX_LOGGER_EXAMPLES      "Build examples"        ON)
+option(EQUINOX_LOGGER_BUILD_SHARED  "Build shared lib"      ON)
+option(EQUINOX_LOGGER_BUILD_STATIC  "Build static lib"      OFF)
 
 set(EQUINOX_LOGGER_PUBLIC_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/api
@@ -69,5 +68,13 @@ endif(EQUINOX_LOGGER_TESTS)
 if(EQUINOX_LOGGER_EXAMPLES)
 	add_subdirectory(examples)
 endif(EQUINOX_LOGGER_EXAMPLES)
+
+install(FILES ${EQUINOX_LOGGER_PUBLIC_HEADERS}/EquinoxLogger.h
+              ${EQUINOX_LOGGER_PUBLIC_HEADERS}/EquinoxLogger-Common.h
+              ${EQUINOX_LOGGER_PUBLIC_HEADERS}/EquinoxLogger-LoggerEngine.h
+        DESTINATION include)
+
+install(TARGETS EquinoxLogger DESTINATION lib)
+#install(FILES FooConfig.cmake DESTINATION lib/cmake/Fo
 
 
