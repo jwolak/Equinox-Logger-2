@@ -61,6 +61,7 @@ set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-FileLogsProducer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-TimestampProducer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LogsProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger.cpp
 )
 
 #------------------------------------------------------------------------------------------
