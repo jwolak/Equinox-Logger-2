@@ -1,5 +1,5 @@
 /*
- * TimestampProducerTests.cpp
+ * EquinoxLoggerEngine.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,45 +37,45 @@
  *
  */
 
+#ifndef API_EQUINOXLOGGERENGINE_H_
+#define API_EQUINOXLOGGERENGINE_H_
+
 #include <memory>
-#include <iostream>
 
-#include <gtest/gtest.h>
+#include "EquinoxLoggerCommon.h"
 
-#include "EquinoxLogger-TimestampProducer.h"
-
-namespace time_stampproducer_tests
+namespace equinox
 {
 
-class TimestampProducerTests : public ::testing::Test
+class LoggerEngineImpl;
+
+class LoggerEngine
 {
  public:
-  TimestampProducerTests()
-  : mTimestampProducer { std::make_unique<equinox::TimestampProducer>() }
+  static LoggerEngine& getInstance();
+
+  LoggerEngine(LoggerEngine &) = delete;
+  LoggerEngine(LoggerEngine &&) = delete;
+  void operator=(const LoggerEngine&) = delete;
+  void operator=(const LoggerEngine&&) = delete;
+
+  template<typename ... Args>
+  void log(level::LOG_LEVEL msgLevel, std::string msgFormat, Args &&... args)
+  {
+    //processLogMessage();
+  }
+
+ protected:
+  LoggerEngine()
+  : mLoggerEngineImpl { std::make_unique<LoggerEngineImpl>() }
   {
   }
 
-  std::unique_ptr<equinox::ITimestampProducer> mTimestampProducer;
+ private:
+  std::unique_ptr<LoggerEngineImpl> mLoggerEngineImpl;
+  void processLogMessage(std::string formatedOutputMessage);
 };
 
-TEST_F(TimestampProducerTests, Call_getTimestamp_And_No_Failure)
-{
-  ASSERT_NO_FATAL_FAILURE(mTimestampProducer->getTimestamp());
-}
+} /*namespace equinox*/
 
-TEST_F(TimestampProducerTests, Call_getTimestampInUs_And_No_Failure)
-{
-  ASSERT_NO_FATAL_FAILURE(mTimestampProducer->getTimestampInUs());
-}
-
-TEST_F(TimestampProducerTests, Call_getTimestamp_And_Print_Result)
-{
-  std::cout << mTimestampProducer->getTimestamp() << std::endl;
-}
-
-TEST_F(TimestampProducerTests, Call_getTimestampInUs_And_Print_Result)
-{
-  std::cout << mTimestampProducer->getTimestampInUs() << std::endl;
-}
-
-} /*namespace time_stampproducer_tests*/
+#endif /* API_EQUINOXLOGGERENGINE_H_ */

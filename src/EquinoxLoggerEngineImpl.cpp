@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-FileLogsProducer.cpp
+ * EquinoxLoggerEngineImpl.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,17 +37,4 @@
  *
  */
 
-#include "EquinoxLogger-FileLogsProducer.h"
-
-void equinox::FileLogsProducer::setupFile(std::string logFileName)
-{
-  mFdLogFile_.open (logFileName, std::ofstream::out | std::ofstream::app);
-}
-
-void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
-{
-  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
-  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
-
-  mFdLogFile_ << mMessageBuffer_ << std::endl;
-}
+#include "../include/EquinoxLoggerEngineImpl.h"

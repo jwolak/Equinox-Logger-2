@@ -40,10 +40,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #                                Project options
 #------------------------------------------------------------------------------------------
 
-option(EQUINOX_LOGGER_TESTS         "Build tests"           ON)
-option(EQUINOX_LOGGER_EXAMPLES      "Build examples"        ON)
+option(EQUINOX_LOGGER_TESTS         "Build tests"           OFF)
+option(EQUINOX_LOGGER_EXAMPLES      "Build examples"        OFF)
 option(EQUINOX_LOGGER_BUILD_SHARED  "Build shared lib"      ON)
 option(EQUINOX_LOGGER_BUILD_STATIC  "Build static lib"      OFF)
+
+#------------------------------------------------------------------------------------------
+#                                Project api
+#------------------------------------------------------------------------------------------
+set(EQUINOX_LOGGER_API
+	${CMAKE_CURRENT_SOURCE_DIR}/api
+)
 
 #------------------------------------------------------------------------------------------
 #                                Project include
@@ -56,11 +63,8 @@ set(EQUINOX_LOGGER_INCLUDE
 #                                Project source
 #------------------------------------------------------------------------------------------
 set(EQUINOX_LOGGER_SRC
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LoggerEngine.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-ConsoleLogsProducer.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-FileLogsProducer.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-TimestampProducer.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger-LogsProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLoggerEngine.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLoggerEngineImpl.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/EquinoxLogger.cpp
 )
 
@@ -68,13 +72,13 @@ set(EQUINOX_LOGGER_SRC
 #                                Project target
 #------------------------------------------------------------------------------------------
 if (EQUINOX_LOGGER_BUILD_SHARED)
-	include_directories(EquinoxLogger PRIVATE  ${EQUINOX_LOGGER_INCLUDE} ${EQUINOX_LOGGER_PUBLIC_HEADERS})
+	include_directories(EquinoxLogger PRIVATE  ${EQUINOX_LOGGER_INCLUDE} ${EQUINOX_LOGGER_API})
 	add_library(EquinoxLogger SHARED ${EQUINOX_LOGGER_SRC})
 	target_compile_definitions(EquinoxLogger PUBLIC EQUINOX_SHARED_SHARED_LIB)
 endif()
 
 if (EQUINOX_LOGGER_BUILD_STATIC)
-	include_directories(EquinoxLogger PRIVATE  ${EQUINOX_LOGGER_INCLUDE} ${EQUINOX_LOGGER_PUBLIC_HEADERS})
+	include_directories(EquinoxLogger PRIVATE  ${EQUINOX_LOGGER_INCLUDE} ${EQUINOX_LOGGER_API})
 	add_library(EquinoxLogger STATIC ${EQUINOX_LOGGER_SRC})
 endif()
 
@@ -95,13 +99,9 @@ endif(EQUINOX_LOGGER_EXAMPLES)
 #------------------------------------------------------------------------------------------
 #                                Project install
 #------------------------------------------------------------------------------------------
-install(FILES ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger.h
-              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-Common.h
-              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-LoggerEngine.h
-              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-ConsoleLogsProducer.h
-              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-FileLogsProducer.h
-              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-LogsProducer.h
-              ${EQUINOX_LOGGER_INCLUDE}/EquinoxLogger-TimestampProducer.h
+install(FILES ${EQUINOX_LOGGER_API}/EquinoxLogger.h
+              ${EQUINOX_LOGGER_API}/EquinoxLoggerCommon.h
+              ${EQUINOX_LOGGER_API}/EquinoxLoggerEngine.h
         DESTINATION include)
 
 install(TARGETS EquinoxLogger DESTINATION lib)

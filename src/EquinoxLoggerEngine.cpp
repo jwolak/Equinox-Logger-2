@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-TimestampProducer.h
+ * EquinoxLoggerEngine.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,38 +37,16 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGER_TIMESTAMPPRODUCER_H_
-#define INCLUDE_EQUINOXLOGGER_TIMESTAMPPRODUCER_H_
+#include "EquinoxLoggerEngine.h"
+#include "EquinoxLoggerEngineImpl.h"
 
-#include <string>
+equinox::LoggerEngine& equinox::LoggerEngine::getInstance()
+{
+  static LoggerEngine sLoggerEngine;
+  return sLoggerEngine;
+}
 
-#include "EquinoxLogger-Common.h"
-
-namespace equinox
+void equinox::LoggerEngine::processLogMessage(std::string formatedOutputMessage)
 {
 
-class EQUINOX_API ITimestampProducer
-{
- public:
-  virtual ~ITimestampProducer() = default;
-  virtual std::string getTimestamp() const = 0;
-  virtual std::string getTimestampInUs() = 0;
-};
-
-class EQUINOX_API TimestampProducer : public ITimestampProducer
-{
- public:
-  TimestampProducer()
-  : timestamp_ {}
-  {
-  }
-
-  std::string getTimestamp() const override;
-  std::string getTimestampInUs() override;
-
- private:
-  std::string timestamp_;
-};
-} /*namespace equinox*/
-
-#endif /* INCLUDE_EQUINOXLOGGER_TIMESTAMPPRODUCER_H_ */
+}

@@ -1,5 +1,5 @@
 /*
- * ConsoleLogsProducerMock.h
+ * EquinoxLoggerEngineImpl.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,22 +37,20 @@
  *
  */
 
-#ifndef MOCKS_CONSOLELOGSPRODUCERMOCK_H_
-#define MOCKS_CONSOLELOGSPRODUCERMOCK_H_
+#ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
+#define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
 
-#include <gmock/gmock.h>
-
-#include "EquinoxLogger-ConsoleLogsProducer.h"
-
-namespace equinox_mocks
+namespace equinox
 {
 
-class ConsoleLogsProducerMock : public equinox::IConsoleLogsProducer
+class LoggerEngineImpl
 {
  public:
-  MOCK_METHOD(void, LogMessage, (std::string), (override));
+  LoggerEngineImpl()
+  {
+  }
 };
 
-} /*namespace equinox_mocks*/
+} /*namespace equinox*/
 
-#endif /* MOCKS_CONSOLELOGSPRODUCERMOCK_H_ */
+#endif /* INCLUDE_EQUINOXLOGGERENGINEIMPL_H_ */

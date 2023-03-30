@@ -1,5 +1,5 @@
 /*
- * MultipleThreadsTest.cpp
+ * EquinoxLoggerCommon.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,27 +37,62 @@
  *
  */
 
-#include <iostream>
-#include <future>
+#ifndef API_EQUINOXLOGGERCOMMON_H_
+#define API_EQUINOXLOGGERCOMMON_H_
 
-#include <gtest/gtest.h>
+#include <string>
 
-#include "EquinoxLogger.h"
+#if defined(EQUINOX_SHARED_SHARED_LIB)
+#            undef EQUINOX_HEADER_ONLY
+#            define EQUINOX_API __attribute__((visibility("default")))
+#            define EQUINOX_INLINE
+#else // !defined(EQUINOX_SHARED_SHARED_LIB)
+#    define EQUINOX_API
+#    define EQUINOX_HEADER_ONLY
+#    define EQUINOX_INLINE inline
+#endif // #ifdef EQUINOX_SHARED_SHARED_LIB
 
-void LogTraceInThreadOne()
+#define EQUINOX_LEVEL_TRACE     0
+#define EQUINOX_LEVEL_DEBUG     1
+#define EQUINOX_LEVEL_INFO      2
+#define EQUINOX_LEVEL_WARNING   3
+#define EQUINOX_LEVEL_ERROR     4
+#define EQUINOX_LEVEL_CRITICAL  5
+#define EQUINOX_LEVEL_OFF       6
+
+#define EQUINOX_SINK_CONSOLE            0
+#define EQUINOX_SINK_FILE               1
+#define EQUINOX_SINK_CONSOLE_AND_FILE   2
+
+namespace equinox
 {
-  equinox::trace("%s", "Message in Trace from thread one");
-}
 
-void LogDebugInThreadTwo()
+const std::string kLogFileName = "logs.log";
+
+namespace level
 {
-  equinox::debug("%s", "Message in Debug from thread two");
-}
-
-TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First)
+enum class LOG_LEVEL : int
 {
-  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsTest"), equinox::logs_output::SINK::console);
+    trace    = EQUINOX_LEVEL_TRACE,
+    debug    = EQUINOX_LEVEL_DEBUG,
+    info     = EQUINOX_LEVEL_INFO,
+    warning  = EQUINOX_LEVEL_WARNING,
+    error    = EQUINOX_LEVEL_ERROR,
+    critical = EQUINOX_LEVEL_CRITICAL,
+    off      = EQUINOX_LEVEL_OFF
+};
+} /*namespace level*/
 
-  auto fut1 = std::async(std::launch::async,LogTraceInThreadOne);
-  fut1 = std::async(std::launch::async,LogDebugInThreadTwo);
-}
+namespace logs_output
+{
+enum class SINK : int
+{
+    console          = EQUINOX_SINK_CONSOLE,
+    file             = EQUINOX_SINK_FILE,
+    console_and_file = EQUINOX_SINK_CONSOLE_AND_FILE
+};
+} /*namespace logs_output*/
+
+} /*namespace equinox*/
+
+#endif /* API_EQUINOXLOGGERCOMMON_H_ */

@@ -1,5 +1,5 @@
 /*
- * EquinoxLogger-FileLogsProducer.h
+ * EquinoxLogger.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,59 +37,56 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGER_FILELOGSPRODUCER_H_
-#define INCLUDE_EQUINOXLOGGER_FILELOGSPRODUCER_H_
+#ifndef API_EQUINOXLOGGER_H_
+#define API_EQUINOXLOGGER_H_
 
-#include <string>
-#include <memory>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <mutex>
+#include "EquinoxLoggerCommon.h"
+#include "EquinoxLoggerEngine.h"
 
-#include "EquinoxLogger-Common.h"
-#include "EquinoxLogger-TimestampProducer.h"
+namespace equinox {
 
-namespace equinox
+template<typename... Args>
+inline void trace(std::string format, Args&& ... args)
 {
+  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
+}
 
-class EQUINOX_API IFileLogsProducer
+template<typename... Args>
+inline void debug(std::string format, Args&& ... args)
 {
- public:
-  virtual ~IFileLogsProducer() = default;
-  virtual void LogMessage(std::string messageToLog) = 0;
-};
+  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
+}
 
-class EQUINOX_API FileLogsProducer : public IFileLogsProducer
+template<typename... Args>
+inline void info(std::string format, Args&& ... args)
 {
- public:
-  FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mMessageBuffer_ {}
-  , mMessageBufferAccessLock_ {}
-  , mTimestampProducer { timestampProducer }
-  , mFdLogFile_ {}
-  {
-  }
+  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
+}
 
-  ~FileLogsProducer()
-  {
-    mFdLogFile_.close();
-  }
+template<typename... Args>
+inline void warning(std::string format, Args&& ... args)
+{
+  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
+}
 
-  FileLogsProducer(const FileLogsProducer&) = delete;
-  FileLogsProducer(const FileLogsProducer&&) = delete;
-  FileLogsProducer& operator=(FileLogsProducer&) = delete;
+template<typename... Args>
+inline void error(std::string format, Args&& ... args)
+{
+  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
+}
 
-  void setupFile(std::string logFileName);
-  void LogMessage(std::string messageToLog) override;
+template<typename... Args>
+inline void critical(std::string format, Args&& ... args)
+{
+  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
+}
 
-  std::string mMessageBuffer_;
+EQUINOX_API EQUINOX_INLINE void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName = kLogFileName);
 
- private:
-  std::mutex mMessageBufferAccessLock_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer;
-  std::ofstream mFdLogFile_;
-};
+EQUINOX_API EQUINOX_INLINE void changeLevel(level::LOG_LEVEL logLevel);
+
+EQUINOX_API EQUINOX_INLINE void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+
 } /*namespace equinox*/
 
-#endif /* INCLUDE_EQUINOXLOGGER_FILELOGSPRODUCER_H_ */
+#endif /* API_EQUINOXLOGGER_H_ */
