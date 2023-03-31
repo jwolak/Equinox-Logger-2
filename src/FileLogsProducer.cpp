@@ -1,5 +1,5 @@
 /*
- * EquinoxLoggerEngineImpl.h
+ * FileLogsProducer.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,51 +37,17 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
-#define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
-
-#include <string>
-#include <memory>
-
-#include "EquinoxLoggerCommon.h"
-#include "TimestampProducer.h"
-#include "ConsoleLogsProducer.h"
 #include "FileLogsProducer.h"
 
-namespace equinox
+void equinox::FileLogsProducer::setupFile(std::string logFileName)
 {
+  mFdLogFile_.open (logFileName, std::ofstream::out | std::ofstream::app);
+}
 
-class EquinoxLoggerEngineImpl
+void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
 {
- public:
-  EquinoxLoggerEngineImpl()
-  : mOutputMessage_ {}
-  , mLogPrefix_ {}
-  , mLogLevel_ {}
-  , mLogsOutputSink_ {}
-  , mLogFileName_ {}
-  , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
-  , mConsoleLogsProducer_ { std::make_unique<ConsoleLogsProducer>(mTimestampProducer_) }
-  , mFileLogsProducer_ { std::make_unique<FileLogsProducer>(mTimestampProducer_) }
-  {
-  }
+  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
+  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
 
-  void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
-
- private:
-  std::string mOutputMessage_;
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  logs_output::SINK mLogsOutputSink_;
-  std::string mLogFileName_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
-};
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_EQUINOXLOGGERENGINEIMPL_H_ */
+  mFdLogFile_ << mMessageBuffer_ << std::endl;
+}

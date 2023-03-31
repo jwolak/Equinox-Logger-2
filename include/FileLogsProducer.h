@@ -1,5 +1,5 @@
 /*
- * EquinoxLoggerEngineImpl.h
+ * FileLogsProducer.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,51 +37,59 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
-#define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
+#ifndef INCLUDE_FILELOGSPRODUCER_H_
+#define INCLUDE_FILELOGSPRODUCER_H_
 
 #include <string>
 #include <memory>
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <mutex>
 
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
-#include "ConsoleLogsProducer.h"
-#include "FileLogsProducer.h"
 
 namespace equinox
 {
 
-class EquinoxLoggerEngineImpl
+class EQUINOX_API IFileLogsProducer
 {
  public:
-  EquinoxLoggerEngineImpl()
-  : mOutputMessage_ {}
-  , mLogPrefix_ {}
-  , mLogLevel_ {}
-  , mLogsOutputSink_ {}
-  , mLogFileName_ {}
-  , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
-  , mConsoleLogsProducer_ { std::make_unique<ConsoleLogsProducer>(mTimestampProducer_) }
-  , mFileLogsProducer_ { std::make_unique<FileLogsProducer>(mTimestampProducer_) }
+  virtual ~IFileLogsProducer() = default;
+  virtual void setupFile(std::string logFileName) = 0;
+  virtual void LogMessage(std::string messageToLog) = 0;
+};
+
+class EQUINOX_API FileLogsProducer : public IFileLogsProducer
+{
+ public:
+  FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+  : mMessageBuffer_ {}
+  , mMessageBufferAccessLock_ {}
+  , mTimestampProducer { timestampProducer }
+  , mFdLogFile_ {}
   {
   }
 
-  void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+  ~FileLogsProducer()
+  {
+    mFdLogFile_.close();
+  }
+
+  FileLogsProducer(const FileLogsProducer&) = delete;
+  FileLogsProducer(const FileLogsProducer&&) = delete;
+  FileLogsProducer& operator=(FileLogsProducer&) = delete;
+
+  void setupFile(std::string logFileName) override;
+  void LogMessage(std::string messageToLog) override;
 
  private:
-  std::string mOutputMessage_;
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  logs_output::SINK mLogsOutputSink_;
-  std::string mLogFileName_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
+  std::string mMessageBuffer_;
+  std::mutex mMessageBufferAccessLock_;
+  std::shared_ptr<ITimestampProducer> mTimestampProducer;
+  std::ofstream mFdLogFile_;
 };
-
 } /*namespace equinox*/
 
-#endif /* INCLUDE_EQUINOXLOGGERENGINEIMPL_H_ */
+#endif /* INCLUDE_FILELOGSPRODUCER_H_ */
