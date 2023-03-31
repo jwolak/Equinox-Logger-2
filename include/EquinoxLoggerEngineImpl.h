@@ -40,15 +40,19 @@
 #ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
 #define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
 
+#include "EquinoxLoggerCommon.h"
+
 namespace equinox
 {
 
-class LoggerEngineImpl
+class EquinoxLoggerEngineImpl
 {
  public:
-  LoggerEngineImpl()
+  EquinoxLoggerEngineImpl()
   {
   }
+
+  void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
 };
 
 } /*namespace equinox*/

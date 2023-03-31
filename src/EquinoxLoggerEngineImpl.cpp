@@ -37,4 +37,9 @@
  *
  */
 
-#include "../include/EquinoxLoggerEngineImpl.h"
+#include "EquinoxLoggerEngineImpl.h"
+
+void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage)
+{
+
+}

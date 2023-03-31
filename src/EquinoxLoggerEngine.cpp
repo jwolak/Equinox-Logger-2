@@ -41,7 +41,7 @@
 #include "EquinoxLoggerEngineImpl.h"
 
 equinox::EquinoxLoggerEngine::EquinoxLoggerEngine()
-  : mLoggerEngineImpl { std::make_unique<LoggerEngineImpl>() }
+  : mEquinoxLoggerEngineImpl_ { std::make_unique<EquinoxLoggerEngineImpl>() }
   {
   }
 
@@ -53,5 +53,5 @@ equinox::EquinoxLoggerEngine& equinox::EquinoxLoggerEngine::getInstance()
 
 void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage)
 {
-
+  mEquinoxLoggerEngineImpl_->logMesaage(msgLevel, formatedOutputMessage);
 }

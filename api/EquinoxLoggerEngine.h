@@ -49,7 +49,7 @@
 namespace equinox
 {
 
-class LoggerEngineImpl;
+class EquinoxLoggerEngineImpl;
 
 class EquinoxLoggerEngine
 {
@@ -83,7 +83,7 @@ class EquinoxLoggerEngine
   EquinoxLoggerEngine();
 
  private:
-  std::unique_ptr<LoggerEngineImpl> mLoggerEngineImpl;
+  std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
   void processLogMessage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
 };
 
