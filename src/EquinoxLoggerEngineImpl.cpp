@@ -75,16 +75,16 @@ void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std
     switch(mLogsOutputSink_)
     {
       case logs_output::SINK::console:
-        mConsoleLogsProducer_->LogMessage(mOutputMessage_);
+        mConsoleLogsProducer_->logMessage(mOutputMessage_);
         break;
 
       case logs_output::SINK::file:
-        mFileLogsProducer_->LogMessage(mOutputMessage_);
+        mFileLogsProducer_->logMessage(mOutputMessage_);
         break;
 
       case logs_output::SINK::console_and_file:
-        mConsoleLogsProducer_->LogMessage(mOutputMessage_);
-        mFileLogsProducer_->LogMessage(mOutputMessage_);
+        mConsoleLogsProducer_->logMessage(mOutputMessage_);
+        mFileLogsProducer_->logMessage(mOutputMessage_);
         break;
     }
   }
@@ -99,7 +99,7 @@ void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, std::str
 
   if(equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(logFileName);
+    mFileLogsProducer_->setupFile(mLogFileName_);
   }
 }
 
@@ -111,4 +111,9 @@ void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
 void equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
   mLogsOutputSink_ = logsOutputSink;
+
+  if(equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
+  {
+    mFileLogsProducer_->setupFile(mLogFileName_);
+  }
 }

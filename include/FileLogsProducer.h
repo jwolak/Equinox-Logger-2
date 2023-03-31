@@ -58,7 +58,7 @@ class EQUINOX_API IFileLogsProducer
  public:
   virtual ~IFileLogsProducer() = default;
   virtual void setupFile(std::string logFileName) = 0;
-  virtual void LogMessage(std::string messageToLog) = 0;
+  virtual void logMessage(std::string messageToLog) = 0;
 };
 
 class EQUINOX_API FileLogsProducer : public IFileLogsProducer
@@ -74,7 +74,13 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
 
   ~FileLogsProducer()
   {
-    mFdLogFile_.close();
+    try
+    {
+      mFdLogFile_.close();
+    } catch (std::ofstream::failure &ex)
+    {
+      std::cout << "Exception when closing file" << std::endl;
+    }
   }
 
   FileLogsProducer(const FileLogsProducer&) = delete;
@@ -82,7 +88,7 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   FileLogsProducer& operator=(FileLogsProducer&) = delete;
 
   void setupFile(std::string logFileName) override;
-  void LogMessage(std::string messageToLog) override;
+  void logMessage(std::string messageToLog) override;
 
  private:
   std::string mMessageBuffer_;

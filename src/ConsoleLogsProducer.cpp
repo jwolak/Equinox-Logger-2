@@ -41,7 +41,7 @@
 
 #include "ConsoleLogsProducer.h"
 
-void equinox::ConsoleLogsProducer::LogMessage(std::string messageToLog)
+void equinox::ConsoleLogsProducer::logMessage(std::string messageToLog)
 {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
   mMessageBuffer_ = std::string(mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog);

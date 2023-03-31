@@ -41,13 +41,30 @@
 
 void equinox::FileLogsProducer::setupFile(std::string logFileName)
 {
-  mFdLogFile_.open (logFileName, std::ofstream::out | std::ofstream::app);
+  if (!mFdLogFile_.is_open())
+  {
+    mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try
+    {
+      mFdLogFile_.open(logFileName, std::ofstream::out | std::ofstream::app);
+    } catch (std::ofstream::failure &ex)
+    {
+      std::cout << "Exception when opening file" << std::endl;
+    }
+  }
 }
 
-void equinox::FileLogsProducer::LogMessage(std::string messageToLog)
+void equinox::FileLogsProducer::logMessage(std::string messageToLog)
 {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
   mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
 
-  mFdLogFile_ << mMessageBuffer_ << std::endl;
+  try
+  {
+    mFdLogFile_ << mMessageBuffer_ << std::endl;
+  } catch (std::ofstream::failure &ex)
+  {
+    std::cout << "Exception when write to file" << std::endl;
+  }
 }
