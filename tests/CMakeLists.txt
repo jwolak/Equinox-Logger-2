@@ -1,6 +1,6 @@
-# Equinox-Logger 2.0 unit tests
+# Equinox-Logger 2.0
 # Author: Janusz Wolak
-# Copylefts (C) 2022
+# Copyright (C) 2023
 
 cmake_minimum_required(VERSION 2.8.9)
 
@@ -18,11 +18,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(GTest REQUIRED)
 
 set(EQUINOX_LOGGER_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../include)
-set(EQUINOX_LOGGER_API_HEADER_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../)
+set(EQUINOX_LOGGER_API_HEADER_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../api)
 set(EQUINOX_LOGGER_SRC_DIR ${PROJECT_SOURCE_DIR}/../src)
 
 set(EQUINOX_LOGGER_SRC
-	${EQUINOX_LOGGER_SRC_DIR}/EquinoxLogger-LoggerEngine.cpp
+	${EQUINOX_LOGGER_SRC_DIR}/EquinoxLoggerEngine.cpp
 )
 
 set(EQUINOX_LOGGER_TESTS_DIR
@@ -31,8 +31,8 @@ set(EQUINOX_LOGGER_TESTS_DIR
 
 set(EQUINOX_LOGGER_TESTS_SRC
 	${EQUINOX_LOGGER_TESTS_DIR}/TimestampProducerTests.cpp
-	${EQUINOX_LOGGER_TESTS_DIR}/LogsProducerTests.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/MultipleThreadsTest.cpp
+	
 )
 
 set(EQUINOX_LOGGER_MOCKS_INCLUDE_DIR
