@@ -1,5 +1,5 @@
 /*
- * EquinoxLoggerEngineImpl.h
+ * TimestampProducer.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,48 +37,28 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
-#define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
+#include <chrono>
+#include <ctime>
 
-#include <string>
-#include <memory>
-
-#include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
-#include "ConsoleLogsProducer.h"
 
-namespace equinox
+std::string equinox::TimestampProducer::getTimestamp() const
 {
+  std::chrono::system_clock::time_point sys_clock_time_point;
 
-class EquinoxLoggerEngineImpl
+  sys_clock_time_point = std::chrono::system_clock::now();
+  std::time_t t = std::chrono::system_clock::to_time_t(sys_clock_time_point);
+  std::string timestamp_ = std::ctime(&t);
+  timestamp_.resize(timestamp_.size() - 1);
+  timestamp_ = std::string("[" + timestamp_ + "]");
+
+  return timestamp_;
+}
+
+std::string equinox::TimestampProducer::getTimestampInUs()
 {
- public:
-  EquinoxLoggerEngineImpl()
-  : mOutputMessage_ {}
-  , mLogPrefix_ {}
-  , mLogLevel_ {}
-  , mLogsOutputSink_ {}
-  , mLogFileName_ {}
-  , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
-  , mConsoleLogsProducer_ { std::make_unique<ConsoleLogsProducer>(mTimestampProducer_) }
-  {
-  }
+  uint64_t timestampInUs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+  timestamp_ =  std::string("[" + std::to_string(timestampInUs) + "]");
 
-  void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
-
- private:
-  std::string mOutputMessage_;
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  logs_output::SINK mLogsOutputSink_;
-  std::string mLogFileName_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-};
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_EQUINOXLOGGERENGINEIMPL_H_ */
+  return timestamp_;
+}

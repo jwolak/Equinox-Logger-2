@@ -75,12 +75,14 @@ void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std
     switch(mLogsOutputSink_)
     {
       case logs_output::SINK::console:
+        mConsoleLogsProducer_->LogMessage(mOutputMessage_);
         break;
 
       case logs_output::SINK::file:
         break;
 
       case logs_output::SINK::console_and_file:
+        mConsoleLogsProducer_->LogMessage(mOutputMessage_);
         break;
     }
   }
@@ -89,7 +91,7 @@ void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std
 void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName)
 {
   mLogLevel_ = logLevel;
-  mLogPrefix_ = logPrefix;
+  mLogPrefix_ = std::string("[" + logPrefix + "]");
   mLogsOutputSink_ = logsOutputSink;
   mLogFileName_ = logFileName;
 }

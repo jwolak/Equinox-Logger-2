@@ -1,5 +1,5 @@
 /*
- * EquinoxLoggerEngineImpl.h
+ * ConsoleLogsProducer.cpp
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,48 +37,14 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
-#define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
+#include <iostream>
 
-#include <string>
-#include <memory>
-
-#include "EquinoxLoggerCommon.h"
-#include "TimestampProducer.h"
 #include "ConsoleLogsProducer.h"
 
-namespace equinox
+void equinox::ConsoleLogsProducer::LogMessage(std::string messageToLog)
 {
+  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
+  mMessageBuffer_ = std::string(mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog);
 
-class EquinoxLoggerEngineImpl
-{
- public:
-  EquinoxLoggerEngineImpl()
-  : mOutputMessage_ {}
-  , mLogPrefix_ {}
-  , mLogLevel_ {}
-  , mLogsOutputSink_ {}
-  , mLogFileName_ {}
-  , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
-  , mConsoleLogsProducer_ { std::make_unique<ConsoleLogsProducer>(mTimestampProducer_) }
-  {
-  }
-
-  void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
-
- private:
-  std::string mOutputMessage_;
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  logs_output::SINK mLogsOutputSink_;
-  std::string mLogFileName_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-};
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_EQUINOXLOGGERENGINEIMPL_H_ */
+  std::cout << mMessageBuffer_ << std::endl;
+}

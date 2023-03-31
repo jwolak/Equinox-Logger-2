@@ -1,5 +1,5 @@
 /*
- * EquinoxLoggerEngineImpl.h
+ * ConsoleLogsProducer.h
  *
  *  Created on: 2023
  *      Author: Janusz Wolak
@@ -37,48 +37,44 @@
  *
  */
 
-#ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
-#define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
+#ifndef INCLUDE_CONSOLELOGSPRODUCER_H_
+#define INCLUDE_CONSOLELOGSPRODUCER_H_
 
 #include <string>
 #include <memory>
+#include <mutex>
 
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
-#include "ConsoleLogsProducer.h"
 
 namespace equinox
 {
 
-class EquinoxLoggerEngineImpl
+class EQUINOX_API IConsoleLogsProducer
 {
  public:
-  EquinoxLoggerEngineImpl()
-  : mOutputMessage_ {}
-  , mLogPrefix_ {}
-  , mLogLevel_ {}
-  , mLogsOutputSink_ {}
-  , mLogFileName_ {}
-  , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
-  , mConsoleLogsProducer_ { std::make_unique<ConsoleLogsProducer>(mTimestampProducer_) }
+  virtual ~IConsoleLogsProducer() = default;
+  virtual void LogMessage(std::string) = 0;
+};
+
+class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
+{
+ public:
+  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+  : mMessageBuffer_ {}
+  , mMessageBufferAccessLock_ {}
+  , mTimestampProducer_ { timestampProducer }
   {
   }
 
-  void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+  void LogMessage(std::string format) override;
 
  private:
-  std::string mOutputMessage_;
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  logs_output::SINK mLogsOutputSink_;
-  std::string mLogFileName_;
+  std::string mMessageBuffer_;
+  std::mutex mMessageBufferAccessLock_;
   std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
 };
 
 } /*namespace equinox*/
 
-#endif /* INCLUDE_EQUINOXLOGGERENGINEIMPL_H_ */
+#endif /* INCLUDE_CONSOLELOGSPRODUCER_H_ */
