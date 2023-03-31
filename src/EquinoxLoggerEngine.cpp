@@ -40,13 +40,18 @@
 #include "EquinoxLoggerEngine.h"
 #include "EquinoxLoggerEngineImpl.h"
 
-equinox::LoggerEngine& equinox::LoggerEngine::getInstance()
+equinox::EquinoxLoggerEngine::EquinoxLoggerEngine()
+  : mLoggerEngineImpl { std::make_unique<LoggerEngineImpl>() }
+  {
+  }
+
+equinox::EquinoxLoggerEngine& equinox::EquinoxLoggerEngine::getInstance()
 {
-  static LoggerEngine sLoggerEngine;
-  return sLoggerEngine;
+  static EquinoxLoggerEngine sEquinoxLoggerEngine;
+  return sEquinoxLoggerEngine;
 }
 
-void equinox::LoggerEngine::processLogMessage(std::string formatedOutputMessage)
+void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage)
 {
 
 }

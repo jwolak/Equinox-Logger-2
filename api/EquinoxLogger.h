@@ -48,37 +48,37 @@ namespace equinox {
 template<typename... Args>
 inline void trace(std::string format, Args&& ... args)
 {
-  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
+  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
 inline void debug(std::string format, Args&& ... args)
 {
-  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
+  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
 inline void info(std::string format, Args&& ... args)
 {
-  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
+  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
 inline void warning(std::string format, Args&& ... args)
 {
-  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
+  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
 inline void error(std::string format, Args&& ... args)
 {
-  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
+  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
 inline void critical(std::string format, Args&& ... args)
 {
-  equinox::LoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
+  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
 }
 
 EQUINOX_API EQUINOX_INLINE void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName = kLogFileName);

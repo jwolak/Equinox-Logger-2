@@ -41,6 +41,8 @@
 #define API_EQUINOXLOGGERENGINE_H_
 
 #include <memory>
+#include <iostream>
+#include <string>
 
 #include "EquinoxLoggerCommon.h"
 
@@ -49,31 +51,40 @@ namespace equinox
 
 class LoggerEngineImpl;
 
-class LoggerEngine
+class EquinoxLoggerEngine
 {
  public:
-  static LoggerEngine& getInstance();
+  static EquinoxLoggerEngine& getInstance();
 
-  LoggerEngine(LoggerEngine &) = delete;
-  LoggerEngine(LoggerEngine &&) = delete;
-  void operator=(const LoggerEngine&) = delete;
-  void operator=(const LoggerEngine&&) = delete;
+  EquinoxLoggerEngine(EquinoxLoggerEngine &) = delete;
+  EquinoxLoggerEngine(EquinoxLoggerEngine &&) = delete;
+  void operator=(const EquinoxLoggerEngine&) = delete;
+  void operator=(const EquinoxLoggerEngine&&) = delete;
 
   template<typename ... Args>
   void log(level::LOG_LEVEL msgLevel, std::string msgFormat, Args &&... args)
   {
-    //processLogMessage();
+    const int nullEndCharacter = 1;
+    int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args) ...) + nullEndCharacter;
+    if (numberOfCharacters > 0)
+    {
+      auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
+      auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
+      std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args) ...);
+      std::string mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
+      processLogMessage(msgLevel, mFormatedOutpurMessage_);
+    } else
+    {
+      std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
+    }
   }
 
  protected:
-  LoggerEngine()
-  : mLoggerEngineImpl { std::make_unique<LoggerEngineImpl>() }
-  {
-  }
+  EquinoxLoggerEngine();
 
  private:
   std::unique_ptr<LoggerEngineImpl> mLoggerEngineImpl;
-  void processLogMessage(std::string formatedOutputMessage);
+  void processLogMessage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
 };
 
 } /*namespace equinox*/
