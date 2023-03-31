@@ -1,5 +1,5 @@
-# Equinox logging engine 2.0
-**Thread safety C++ logger version 2.0**
+# Equinox logging engine 2.1
+**Thread safety C++ logger version 2.1**
 
 **Logger with support logging to file, console or both. Six levels available:**
 - Trace 
@@ -42,18 +42,11 @@ int main(void) {
   equinox::error(   "Example error log no:    [%d]" , 5);
   equinox::critical("Example critical log no: [%d]" , 6);
 
-  LOG_TRACE(   "Example LOG_TRACE log no:    [%d]" , 1);
-  LOG_DEBUG(   "Example LOG_DEBUG log no:    [%d]" , 2);
-  LOG_INFO(    "Example LOG_INFO log no:     [%d]" , 3);
-  LOG_WARNING( "Example LOG_WARNING log no:  [%d]" , 4);
-  LOG_ERROR(   "Example LOG_ERROR log no:    [%d]" , 5);
-  LOG_CRITICAL("Example LOG_CRITICAL log no: [%d]" , 6);
-
   return 0;
 }
 ```
 ## License
 
-GNU General Public License v3.0
-***EquinoxLogger 2.0 Copylefts (c) 2023 Janusz Wolak***
+BSD 3-Clause License<br\>
+***EquinoxLogger 2.0 Copyright (c) 2023, Janusz Wolak***
 *Glory for Free Software!*

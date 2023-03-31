@@ -51,7 +51,7 @@
 namespace equinox
 {
 
-class EquinoxLoggerEngineImpl
+class EQUINOX_API EquinoxLoggerEngineImpl
 {
  public:
   EquinoxLoggerEngineImpl()
