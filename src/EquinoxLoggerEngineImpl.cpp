@@ -41,5 +41,65 @@
 
 void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage)
 {
+  if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_))
+  {
+    mOutputMessage_.clear();
 
+    switch (msgLevel)
+    {
+      case level::LOG_LEVEL::critical:
+        mOutputMessage_ = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
+        break;
+
+      case level::LOG_LEVEL::debug:
+        mOutputMessage_ = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
+        break;
+
+      case level::LOG_LEVEL::error:
+        mOutputMessage_ = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
+        break;
+
+      case level::LOG_LEVEL::info:
+        mOutputMessage_ = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
+        break;
+
+      case level::LOG_LEVEL::trace:
+        mOutputMessage_ = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
+        break;
+
+      case level::LOG_LEVEL::warning:
+        mOutputMessage_ = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
+        break;
+    }
+
+    switch(mLogsOutputSink_)
+    {
+      case logs_output::SINK::console:
+        break;
+
+      case logs_output::SINK::file:
+        break;
+
+      case logs_output::SINK::console_and_file:
+        break;
+    }
+  }
+}
+
+void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName)
+{
+  mLogLevel_ = logLevel;
+  mLogPrefix_ = logPrefix;
+  mLogsOutputSink_ = logsOutputSink;
+  mLogFileName_ = logFileName;
+}
+
+void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
+{
+  mLogLevel_ = logLevel;
+}
+
+void equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink)
+{
+  mLogsOutputSink_ = logsOutputSink;
 }

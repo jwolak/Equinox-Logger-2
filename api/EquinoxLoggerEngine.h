@@ -79,6 +79,10 @@ class EquinoxLoggerEngine
     }
   }
 
+  void setup(equinox::level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
+  void changeLevel(level::LOG_LEVEL logLevel);
+  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+
  protected:
   EquinoxLoggerEngine();
 

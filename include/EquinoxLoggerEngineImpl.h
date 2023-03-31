@@ -40,6 +40,8 @@
 #ifndef INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
 #define INCLUDE_EQUINOXLOGGERENGINEIMPL_H_
 
+#include <string>
+
 #include "EquinoxLoggerCommon.h"
 
 namespace equinox
@@ -49,10 +51,25 @@ class EquinoxLoggerEngineImpl
 {
  public:
   EquinoxLoggerEngineImpl()
+  : mOutputMessage_ {}
+  , mLogPrefix_ {}
+  , mLogLevel_ {}
+  , mLogsOutputSink_ {}
+  , mLogFileName_ {}
   {
   }
 
   void logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
+  void setup(level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
+  void changeLevel(level::LOG_LEVEL logLevel);
+  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+
+ private:
+  std::string mOutputMessage_;
+  std::string mLogPrefix_;
+  level::LOG_LEVEL mLogLevel_;
+  logs_output::SINK mLogsOutputSink_;
+  std::string mLogFileName_;
 };
 
 } /*namespace equinox*/

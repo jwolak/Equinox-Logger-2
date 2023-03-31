@@ -41,7 +41,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #------------------------------------------------------------------------------------------
 
 option(EQUINOX_LOGGER_TESTS         "Build tests"           OFF)
-option(EQUINOX_LOGGER_EXAMPLES      "Build examples"        OFF)
+option(EQUINOX_LOGGER_EXAMPLES      "Build examples"        ON)
 option(EQUINOX_LOGGER_BUILD_SHARED  "Build shared lib"      ON)
 option(EQUINOX_LOGGER_BUILD_STATIC  "Build static lib"      OFF)
 

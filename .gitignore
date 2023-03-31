@@ -86,3 +86,4 @@ examples/*.x86
 examples/*.log
 examples/EquinoxLoggerExamples
 
+install_manifest.txt

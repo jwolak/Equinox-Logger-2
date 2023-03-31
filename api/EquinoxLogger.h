@@ -81,11 +81,11 @@ inline void critical(std::string format, Args&& ... args)
   equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
 }
 
-EQUINOX_API EQUINOX_INLINE void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName = kLogFileName);
+EQUINOX_API void setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName = kLogFileName);
 
-EQUINOX_API EQUINOX_INLINE void changeLevel(level::LOG_LEVEL logLevel);
+EQUINOX_API void changeLevel(level::LOG_LEVEL logLevel);
 
-EQUINOX_API EQUINOX_INLINE void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+EQUINOX_API void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
 } /*namespace equinox*/
 
