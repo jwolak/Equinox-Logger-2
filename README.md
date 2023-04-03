@@ -49,6 +49,17 @@ int main(void) {
 
   return 0;
 }
+
+**Output:**
+
+./EquinoxLoggerExamples 
+[Mon Apr  3 15:43:39 2023][1680529419785][equinox-test][TRACE] Example trace log no:    [1]
+[Mon Apr  3 15:43:39 2023][1680529419787][equinox-test][DEBUG] Example debug log no:    [2]
+[Mon Apr  3 15:43:39 2023][1680529419787][equinox-test][INFO] Example info log no:     [3]
+[Mon Apr  3 15:43:39 2023][1680529419788][equinox-test][WARNING] Example warning log no:  [4]
+[Mon Apr  3 15:43:39 2023][1680529419788][equinox-test][ERROR] Example error log no:    [5]
+[Mon Apr  3 15:43:39 2023][1680529419788][equinox-test][CRITICAL] Example critical log no: [6]
+
 ```
 ## License
 
