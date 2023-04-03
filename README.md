@@ -14,13 +14,18 @@
 
 - settable log level
 - settable output direction (console, file or both)
-- powered by C++11/14
 - configured build to shared/static lib
 
 ## Building for source
 ```sh
 cmake CMakeLists.txt
 make
+```
+## Install
+```sh
+$ sudo make install (Ubuntu)
+or
+# make install
 ```
 ## Example:
 
@@ -47,6 +52,6 @@ int main(void) {
 ```
 ## License
 
-BSD 3-Clause License<br\>
-***EquinoxLogger 2.0 Copyright (c) 2023, Janusz Wolak***
-*Glory for Free Software!*
+**BSD 3-Clause License**
+<br/>Copyright (c) 2023, Janusz Wolak
+<br/>All rights reserved.
