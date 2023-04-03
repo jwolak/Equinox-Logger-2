@@ -57,8 +57,8 @@ class EQUINOX_API IFileLogsProducer
 {
  public:
   virtual ~IFileLogsProducer() = default;
-  virtual void setupFile(std::string logFileName) = 0;
-  virtual void logMessage(std::string messageToLog) = 0;
+  virtual void setupFile(const std::string& logFileName) = 0;
+  virtual void logMessage(const std::string& messageToLog) = 0;
 };
 
 class EQUINOX_API FileLogsProducer : public IFileLogsProducer
@@ -87,8 +87,8 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   FileLogsProducer(const FileLogsProducer&&) = delete;
   FileLogsProducer& operator=(FileLogsProducer&) = delete;
 
-  void setupFile(std::string logFileName) override;
-  void logMessage(std::string messageToLog) override;
+  void setupFile(const std::string& logFileName) override;
+  void logMessage(const std::string& messageToLog) override;
 
  private:
   std::string mMessageBuffer_;

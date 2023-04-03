@@ -39,7 +39,7 @@
 
 #include "EquinoxLoggerEngineImpl.h"
 
-void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage)
+void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage)
 {
   if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_))
   {
@@ -90,7 +90,7 @@ void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, std
   }
 }
 
-void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, std::string logPrefix, logs_output::SINK logsOutputSink, std::string logFileName)
+void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, logs_output::SINK logsOutputSink, const std::string& logFileName)
 {
   mLogLevel_ = logLevel;
   mLogPrefix_ = std::string("[" + logPrefix + "]");

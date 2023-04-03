@@ -59,8 +59,7 @@ class EQUINOX_API TimestampProducer : public ITimestampProducer
 {
 public:
   TimestampProducer()
-  : timestamp_
-  {}
+  : timestamp_ {}
   {
   }
 

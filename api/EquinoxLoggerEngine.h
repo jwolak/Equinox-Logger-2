@@ -62,7 +62,7 @@ class EQUINOX_API EquinoxLoggerEngine
   void operator=(const EquinoxLoggerEngine&&) = delete;
 
   template<typename ... Args>
-  void log(level::LOG_LEVEL msgLevel, std::string msgFormat, Args &&... args)
+  void log(level::LOG_LEVEL msgLevel, const std::string& msgFormat, Args &&... args)
   {
     const int nullEndCharacter = 1;
     int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args) ...) + nullEndCharacter;
@@ -79,7 +79,7 @@ class EQUINOX_API EquinoxLoggerEngine
     }
   }
 
-  void setup(equinox::level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName);
+  void setup(equinox::level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName);
   void changeLevel(level::LOG_LEVEL logLevel);
   void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
@@ -88,7 +88,7 @@ class EQUINOX_API EquinoxLoggerEngine
 
  private:
   std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
-  void processLogMessage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage);
+  void processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
 };
 
 } /*namespace equinox*/

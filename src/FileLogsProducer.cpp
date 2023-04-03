@@ -39,7 +39,7 @@
 
 #include "FileLogsProducer.h"
 
-void equinox::FileLogsProducer::setupFile(std::string logFileName)
+void equinox::FileLogsProducer::setupFile(const std::string& logFileName)
 {
   if (!mFdLogFile_.is_open())
   {
@@ -55,7 +55,7 @@ void equinox::FileLogsProducer::setupFile(std::string logFileName)
   }
 }
 
-void equinox::FileLogsProducer::logMessage(std::string messageToLog)
+void equinox::FileLogsProducer::logMessage(const std::string& messageToLog)
 {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
   mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);

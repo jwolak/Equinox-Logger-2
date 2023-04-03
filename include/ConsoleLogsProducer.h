@@ -54,7 +54,7 @@ class EQUINOX_API IConsoleLogsProducer
 {
  public:
   virtual ~IConsoleLogsProducer() = default;
-  virtual void logMessage(std::string) = 0;
+  virtual void logMessage(const std::string&) = 0;
 };
 
 class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
@@ -67,7 +67,7 @@ class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
   {
   }
 
-  void logMessage(std::string format) override;
+  void logMessage(const std::string& format) override;
 
  private:
   std::string mMessageBuffer_;

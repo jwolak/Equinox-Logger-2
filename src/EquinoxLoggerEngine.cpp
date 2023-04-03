@@ -51,12 +51,13 @@ equinox::EquinoxLoggerEngine& equinox::EquinoxLoggerEngine::getInstance()
   return sEquinoxLoggerEngine;
 }
 
-void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, std::string formatedOutputMessage)
+void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage)
 {
   mEquinoxLoggerEngineImpl_->logMesaage(msgLevel, formatedOutputMessage);
 }
 
-void equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, std::string logPrefix, equinox::logs_output::SINK logsOutputSink, std::string logFileName)
+void equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+                                         const std::string &logFileName)
 {
   mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName);
 }
