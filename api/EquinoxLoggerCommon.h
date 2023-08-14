@@ -64,6 +64,8 @@
 #define EQUINOX_SINK_FILE               1
 #define EQUINOX_SINK_CONSOLE_AND_FILE   2
 
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
 namespace equinox
 {
 
