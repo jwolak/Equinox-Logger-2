@@ -129,6 +129,16 @@ EQUINOX_API void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, 
                        const std::string &logFileName = kLogFileName);
 
 /**
+ * Issue #6: "Add log file rotation" by caporalesimone ( https://github.com/caporalesimone )
+ *
+ * @brief multipleLogFiles() function to setup number and maximum size of log files
+ *
+ * @param maxNumberOfFiles   maximum number of log files that can be created
+ * @param maxLogFileSize     maximum size of log file
+ */
+EQUINOX_API void multipleLogFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize);
+
+/**
  * @brief changeLevel() function to change level of logged messages
  *
  * @param logLevel  level of the messages that will be (trace, debug, info, warning, error or critical)

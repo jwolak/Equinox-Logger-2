@@ -44,6 +44,11 @@ void equinox::setup(equinox::level::LOG_LEVEL logLevel, const std::string& logPr
   equinox::EquinoxLoggerEngine::getInstance().setup(logLevel, logPrefix, logsOutputSink, logFileName);
 }
 
+void multipleLogFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize)
+{
+
+}
+
 void equinox::changeLevel(equinox::level::LOG_LEVEL logLevel)
 {
   equinox::EquinoxLoggerEngine::getInstance().changeLevel(logLevel);
