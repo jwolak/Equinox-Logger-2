@@ -71,3 +71,8 @@ void equinox::EquinoxLoggerEngine::changeLogsOutputSink(logs_output::SINK logsOu
 {
   mEquinoxLoggerEngineImpl_->changeLogsOutputSink(logsOutputSink);
 }
+
+void equinox::EquinoxLoggerEngine::multipleLogFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize)
+{
+	mEquinoxLoggerEngineImpl_->multipleLogFiles(maxNumberOfFiles, maxLogFileSize);
+}

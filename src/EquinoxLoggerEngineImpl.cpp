@@ -117,3 +117,7 @@ void equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK lo
     mFileLogsProducer_->setupFile(mLogFileName_);
   }
 }
+
+void equinox::EquinoxLoggerEngineImpl::multipleLogFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize) {
+
+}

@@ -41,6 +41,8 @@
 
 void equinox::FileLogsProducer::setupFile(const std::string& logFileName)
 {
+  logFileName_ = logFileName;
+
   if (!mFdLogFile_.is_open())
   {
     mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -57,14 +59,53 @@ void equinox::FileLogsProducer::setupFile(const std::string& logFileName)
 
 void equinox::FileLogsProducer::logMessage(const std::string& messageToLog)
 {
-  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
-  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
+	if (!mMultipleFilesEnabled_) {
+		std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
+		mMessageBuffer_ = std::string(
+				mTimestampProducer->getTimestamp()
+						+ mTimestampProducer->getTimestampInUs()
+						+ messageToLog);
 
-  try
-  {
-    mFdLogFile_ << mMessageBuffer_ << std::endl;
-  } catch (std::ofstream::failure &ex)
-  {
-    std::cout << "Exception when write to file" << std::endl;
-  }
+		try {
+			mFdLogFile_ << mMessageBuffer_ << std::endl;
+		} catch (std::ofstream::failure &ex) {
+			std::cout << "Exception when write to file" << std::endl;
+		}
+	} else
+	{
+		mAlreadyWrittenSizeToFile_ = mAlreadyWrittenSizeToFile_ + mMessageBuffer_.size();
+		if (mAlreadyWrittenSizeToFile_ >= mMaxFileSize_) {
+			if (mNumberOfAlreadyCreatedFiles_ < mMaxFilesToCreate_) {
+
+				if (!mFdLogFile_.is_open()) {
+					mFdLogFile_.exceptions(
+							std::ifstream::failbit | std::ifstream::badbit);
+
+					try {
+						mFdLogFile_.open(
+								logFileName_
+										+ std::to_string(mNumberOfAlreadyCreatedFiles_),
+								std::ofstream::out | std::ofstream::app);
+					} catch (std::ofstream::failure &ex) {
+						std::cout << "Exception when opening file" << std::endl;
+					}
+				}
+			} else {
+				mFdLogFile_ << "";
+			}
+		}
+
+		try {
+			mFdLogFile_ << mMessageBuffer_ << std::endl;
+			mAlreadyWrittenSizeToFile_ = mMessageBuffer_.size();
+		} catch (std::ofstream::failure &ex) {
+			std::cout << "Exception when write to file" << std::endl;
+		}
+	}
+}
+
+void equinox::FileLogsProducer::setupMultipleFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize) {
+
+	mMaxFilesToCreate_ = maxNumberOfFiles;
+	mMaxFileSize_ = maxLogFileSize;
 }

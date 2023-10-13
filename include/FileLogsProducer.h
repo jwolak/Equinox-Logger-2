@@ -58,6 +58,7 @@ class EQUINOX_API IFileLogsProducer
  public:
   virtual ~IFileLogsProducer() = default;
   virtual void setupFile(const std::string& logFileName) = 0;
+  virtual void setupMultipleFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize) = 0;
   virtual void logMessage(const std::string& messageToLog) = 0;
 };
 
@@ -69,6 +70,13 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   , mMessageBufferAccessLock_ {}
   , mTimestampProducer { timestampProducer }
   , mFdLogFile_ {}
+  , mMultipleFilesEnabled_ { false }
+  , mMaxFilesToCreate_{ 0 }
+  , mMaxFileSize_ { 0 }
+  , mNumberOfAlreadyCreatedFiles_ { 1 }
+  , mAlreadyWrittenSizeToFile_ { 0 }
+  , logFileName_ {}
+
   {
   }
 
@@ -89,12 +97,20 @@ class EQUINOX_API FileLogsProducer : public IFileLogsProducer
 
   void setupFile(const std::string& logFileName) override;
   void logMessage(const std::string& messageToLog) override;
+  void setupMultipleFiles(int32_t maxNumberOfFiles, int32_t maxLogFileSize) override;
 
  private:
   std::string mMessageBuffer_;
   std::mutex mMessageBufferAccessLock_;
   std::shared_ptr<ITimestampProducer> mTimestampProducer;
   std::ofstream mFdLogFile_;
+  bool mMultipleFilesEnabled_;
+  int32_t mMaxFilesToCreate_;
+  int32_t mMaxFileSize_;
+  int32_t mNumberOfAlreadyCreatedFiles_;
+  int32_t mAlreadyWrittenSizeToFile_;
+  std::string logFileName_;
+
 };
 } /*namespace equinox*/
 
