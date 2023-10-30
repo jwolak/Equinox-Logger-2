@@ -67,7 +67,8 @@ class EQUINOX_API EquinoxLoggerEngineImpl
   }
 
   void logMesaage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName);
+  void setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink,
+             const std::string& logFileName, int numberOfLogFiles, int maxLogFileSize);
   void changeLevel(level::LOG_LEVEL logLevel);
   void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 

@@ -126,7 +126,8 @@ inline void critical(const std::string& format, Args&& ... args)
  * @param logFileName     name of file with logs (default: "logs.log")
  */
 EQUINOX_API void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
-                       const std::string &logFileName = kLogFileName);
+                       const std::string &logFileName = kLogFileName, int numberOfLogFiles = kDefaultNumberOfLogFiles,
+					   int maxLogFileSize = kDefaultMaxLogFileSize);
 
 /**
  * @brief changeLevel() function to change level of logged messages

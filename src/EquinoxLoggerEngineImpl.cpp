@@ -90,7 +90,8 @@ void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, con
   }
 }
 
-void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, logs_output::SINK logsOutputSink, const std::string& logFileName)
+void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, logs_output::SINK logsOutputSink,
+                                             const std::string& logFileName, int numberOfLogFiles, int maxLogFileSize)
 {
   mLogLevel_ = logLevel;
   mLogPrefix_ = std::string("[" + logPrefix + "]");

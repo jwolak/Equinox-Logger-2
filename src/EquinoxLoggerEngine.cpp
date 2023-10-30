@@ -57,9 +57,9 @@ void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, 
 }
 
 void equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
-                                         const std::string &logFileName)
+                                         const std::string &logFileName, int numberOfLogFiles, int maxLogFileSize)
 {
-  mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName);
+  mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName, numberOfLogFiles, maxLogFileSize);
 }
 
 void equinox::EquinoxLoggerEngine::changeLevel(level::LOG_LEVEL logLevel)

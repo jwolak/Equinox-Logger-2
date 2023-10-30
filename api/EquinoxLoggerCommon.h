@@ -70,6 +70,8 @@ namespace equinox
 {
 
 const std::string kLogFileName = "logs.log";
+const int kDefaultNumberOfLogFiles = 1;
+const int kDefaultMaxLogFileSize = 0;
 
 namespace level
 {
