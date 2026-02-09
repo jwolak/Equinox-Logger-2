@@ -41,25 +41,25 @@
 #include "EquinoxLoggerEngineImpl.h"
 
 equinox::EquinoxLoggerEngine::EquinoxLoggerEngine()
-  : mEquinoxLoggerEngineImpl_ { std::make_unique<EquinoxLoggerEngineImpl>() }
-  {
-  }
+    : mEquinoxLoggerEngineImpl_{std::make_unique<EquinoxLoggerEngineImpl>()}
+{
+}
 
-equinox::EquinoxLoggerEngine& equinox::EquinoxLoggerEngine::getInstance()
+equinox::EquinoxLoggerEngine &equinox::EquinoxLoggerEngine::getInstance()
 {
   static EquinoxLoggerEngine sEquinoxLoggerEngine;
   return sEquinoxLoggerEngine;
 }
 
-void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage)
+void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
 {
   mEquinoxLoggerEngineImpl_->logMesaage(msgLevel, formatedOutputMessage);
 }
 
 void equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
-                                         const std::string &logFileName)
+                                         const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
 {
-  mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName);
+  mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName, maxLogFileSizeBytes, maxLogFiles);
 }
 
 void equinox::EquinoxLoggerEngine::changeLevel(level::LOG_LEVEL logLevel)

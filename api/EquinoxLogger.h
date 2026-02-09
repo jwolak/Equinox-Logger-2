@@ -43,104 +43,109 @@
 #include "EquinoxLoggerCommon.h"
 #include "EquinoxLoggerEngine.h"
 
-namespace equinox {
-
-/**
- * @brief trace() function to produce message with severity set to 'trace'
- *
- * @param format includes the message, or/and format specifier for the values included in the message
- * @param args variadic number of arguments to be logged
- */
-template<typename... Args>
-inline void trace(const std::string& format, Args&& ... args)
+namespace equinox
 {
-  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
-}
 
-/**
- * @brief debug() function to produce message with severity set to 'debug'
- *
- * @param format includes the message, or/and format specifier for the values included in the message
- * @param args variadic number of arguments to be logged
- */
-template<typename... Args>
-inline void debug(const std::string& format, Args&& ... args)
-{
-  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
-}
+  /**
+   * @brief trace() function to produce message with severity set to 'trace'
+   *
+   * @param format includes the message, or/and format specifier for the values included in the message
+   * @param args variadic number of arguments to be logged
+   */
+  template <typename... Args>
+  inline void trace(const std::string &format, Args &&...args)
+  {
+    equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::trace, format, std::forward<Args>(args)...);
+  }
 
-/**
- * @brief info() function to produce message with severity set to 'info'
- *
- * @param format includes the message, or/and format specifier for the values included in the message
- * @param args variadic number of arguments to be logged
- */
-template<typename... Args>
-inline void info(const std::string& format, Args&& ... args)
-{
-  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
-}
+  /**
+   * @brief debug() function to produce message with severity set to 'debug'
+   *
+   * @param format includes the message, or/and format specifier for the values included in the message
+   * @param args variadic number of arguments to be logged
+   */
+  template <typename... Args>
+  inline void debug(const std::string &format, Args &&...args)
+  {
+    equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::debug, format, std::forward<Args>(args)...);
+  }
 
-/**
- * @brief warning() function to produce message with severity set to 'warning'
- *
- * @param format includes the message, or/and format specifier for the values included in the message
- * @param args variadic number of arguments to be logged
- */
-template<typename... Args>
-inline void warning(const std::string& format, Args&& ... args)
-{
-  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
-}
+  /**
+   * @brief info() function to produce message with severity set to 'info'
+   *
+   * @param format includes the message, or/and format specifier for the values included in the message
+   * @param args variadic number of arguments to be logged
+   */
+  template <typename... Args>
+  inline void info(const std::string &format, Args &&...args)
+  {
+    equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::info, format, std::forward<Args>(args)...);
+  }
 
-/**
- * @brief error() function to produce message with severity set to 'error'
- *
- * @param format includes the message, or/and format specifier for the values included in the message
- * @param args variadic number of arguments to be logged
- */
-template<typename... Args>
-inline void error(const std::string& format, Args&& ... args)
-{
-  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
-}
+  /**
+   * @brief warning() function to produce message with severity set to 'warning'
+   *
+   * @param format includes the message, or/and format specifier for the values included in the message
+   * @param args variadic number of arguments to be logged
+   */
+  template <typename... Args>
+  inline void warning(const std::string &format, Args &&...args)
+  {
+    equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::warning, format, std::forward<Args>(args)...);
+  }
 
-/**
- * @brief critical() function to produce message with severity set to 'critical'
- *
- * @param format includes the message, or/and format specifier for the values included in the message
- * @param args variadic number of arguments to be logged
- */
-template<typename... Args>
-inline void critical(const std::string& format, Args&& ... args)
-{
-  equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
-}
+  /**
+   * @brief error() function to produce message with severity set to 'error'
+   *
+   * @param format includes the message, or/and format specifier for the values included in the message
+   * @param args variadic number of arguments to be logged
+   */
+  template <typename... Args>
+  inline void error(const std::string &format, Args &&...args)
+  {
+    equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::error, format, std::forward<Args>(args)...);
+  }
 
-/**
- * @brief setup() function to setup logger
- *
- * @param logLevel        level of the messages that will be (trace, debug, info, warning, error or critical)
- * @param logPrefix       string with prefix included to each log (f.ex. with application name)
- * @param logsOutputSink  place where logs are printed (console, file or both)
- * @param logFileName     name of file with logs (default: "logs.log")
- */
-EQUINOX_API void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
-                       const std::string &logFileName = kLogFileName);
+  /**
+   * @brief critical() function to produce message with severity set to 'critical'
+   *
+   * @param format includes the message, or/and format specifier for the values included in the message
+   * @param args variadic number of arguments to be logged
+   */
+  template <typename... Args>
+  inline void critical(const std::string &format, Args &&...args)
+  {
+    equinox::EquinoxLoggerEngine::getInstance().log(level::LOG_LEVEL::critical, format, std::forward<Args>(args)...);
+  }
 
-/**
- * @brief changeLevel() function to change level of logged messages
- *
- * @param logLevel  level of the messages that will be (trace, debug, info, warning, error or critical)
- */
-EQUINOX_API void changeLevel(level::LOG_LEVEL logLevel);
+  /**
+   * @brief setup() function to setup logger
+   *
+   * @param logLevel        level of the messages that will be (trace, debug, info, warning, error or critical)
+   * @param logPrefix       string with prefix included to each log (f.ex. with application name)
+   * @param logsOutputSink  place where logs are printed (console, file or both)
+   * @param logFileName            name of file with logs (default: "logs.log")
+   * @param maxLogFileSizeBytes    max size for single log file in bytes (default: 3 MB)
+   * @param maxLogFiles            max number of rotated log files (default: 5)
+   */
+  EQUINOX_API void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
+                         const std::string &logFileName = kLogFileName,
+                         std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
+                         std::size_t maxLogFiles = kDefaultMaxLogFiles);
 
-/**
- * @brief changeLogsOutputSink() function to change logs output
- *
- * @param logsOutputSink  place where logs are printed (console, file or both)
- */
-EQUINOX_API void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+  /**
+   * @brief changeLevel() function to change level of logged messages
+   *
+   * @param logLevel  level of the messages that will be (trace, debug, info, warning, error or critical)
+   */
+  EQUINOX_API void changeLevel(level::LOG_LEVEL logLevel);
+
+  /**
+   * @brief changeLogsOutputSink() function to change logs output
+   *
+   * @param logsOutputSink  place where logs are printed (console, file or both)
+   */
+  EQUINOX_API void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
 } /*namespace equinox*/
 

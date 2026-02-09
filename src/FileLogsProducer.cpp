@@ -39,23 +39,118 @@
 
 #include "FileLogsProducer.h"
 
-void equinox::FileLogsProducer::setupFile(const std::string& logFileName)
-{
-  if (!mFdLogFile_.is_open())
-  {
-    mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+#include <filesystem>
 
+void equinox::FileLogsProducer::setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
+{
+  mLogFileName_ = logFileName;
+  mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
+  mMaxLogFiles_ = maxLogFiles;
+  mNextRotationIndex_ = 1U;
+
+  if (mFdLogFile_.is_open())
+  {
     try
     {
-      mFdLogFile_.open(logFileName, std::ofstream::out | std::ofstream::app);
-    } catch (std::ofstream::failure &ex)
-    {
-      std::cout << "Exception when opening file" << std::endl;
+      mFdLogFile_.close();
     }
+    catch (std::ofstream::failure &ex)
+    {
+      std::cout << "Exception when closing file" << std::endl;
+    }
+  }
+
+  openLogFileAppend();
+}
+
+void equinox::FileLogsProducer::openLogFileAppend()
+{
+  mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+  try
+  {
+    mFdLogFile_.open(mLogFileName_, std::ofstream::out | std::ofstream::app);
+  }
+  catch (std::ofstream::failure &ex)
+  {
+    std::cout << "Exception when opening file" << std::endl;
   }
 }
 
-void equinox::FileLogsProducer::logMessage(const std::string& messageToLog)
+void equinox::FileLogsProducer::openLogFileTruncate()
+{
+  mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+  try
+  {
+    mFdLogFile_.open(mLogFileName_, std::ofstream::out | std::ofstream::trunc);
+  }
+  catch (std::ofstream::failure &ex)
+  {
+    std::cout << "Exception when opening file" << std::endl;
+  }
+}
+
+bool equinox::FileLogsProducer::isRotationEnabled() const
+{
+  return (mMaxLogFileSizeBytes_ > 0U) && (mMaxLogFiles_ > 0U);
+}
+
+std::string equinox::FileLogsProducer::buildRotatedFileName(std::size_t index) const
+{
+  std::filesystem::path basePath(mLogFileName_);
+  std::string rotatedName = basePath.stem().string() + "_" + std::to_string(index) + basePath.extension().string();
+  return (basePath.parent_path() / rotatedName).string();
+}
+
+void equinox::FileLogsProducer::rotateIfNeeded()
+{
+  if (!isRotationEnabled())
+  {
+    return;
+  }
+
+  std::error_code errorCode;
+  std::uintmax_t fileSize = std::filesystem::file_size(mLogFileName_, errorCode);
+  if (errorCode)
+  {
+    return;
+  }
+
+  if (fileSize < mMaxLogFileSizeBytes_)
+  {
+    return;
+  }
+
+  try
+  {
+    mFdLogFile_.close();
+  }
+  catch (std::ofstream::failure &ex)
+  {
+    std::cout << "Exception when closing file" << std::endl;
+  }
+
+  std::string rotatedFileName = buildRotatedFileName(mNextRotationIndex_);
+  std::filesystem::remove(rotatedFileName, errorCode);
+  errorCode.clear();
+  std::filesystem::rename(mLogFileName_, rotatedFileName, errorCode);
+
+  if (errorCode)
+  {
+    openLogFileAppend();
+    return;
+  }
+
+  if (mMaxLogFiles_ > 0U)
+  {
+    mNextRotationIndex_ = (mNextRotationIndex_ % mMaxLogFiles_) + 1U;
+  }
+
+  openLogFileTruncate();
+}
+
+void equinox::FileLogsProducer::logMessage(const std::string &messageToLog)
 {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
   mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
@@ -63,8 +158,13 @@ void equinox::FileLogsProducer::logMessage(const std::string& messageToLog)
   try
   {
     mFdLogFile_ << mMessageBuffer_ << std::endl;
-  } catch (std::ofstream::failure &ex)
+    mFdLogFile_.flush();
+  }
+  catch (std::ofstream::failure &ex)
   {
     std::cout << "Exception when write to file" << std::endl;
+    return;
   }
+
+  rotateIfNeeded();
 }

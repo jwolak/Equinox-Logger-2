@@ -38,7 +38,12 @@ See: examples/src/EquinoxLoggerExamples.cpp
 
 int main(void) {
 
-  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("equinox-test"), equinox::logs_output::SINK::console_and_file, std::string("equinox.log"));
+  equinox::setup(equinox::level::LOG_LEVEL::trace,
+                 std::string("equinox-test"),
+                 equinox::logs_output::SINK::console_and_file,
+                 std::string("equinox.log"),
+                 3U * 1024U * 1024U,
+                 5U);
 
   equinox::trace(   "Example trace log no:    [%d]" , 1);
   equinox::debug(   "Example debug log no:    [%d]" , 2);
@@ -61,6 +66,12 @@ Output:
 
 ```
 ## License
+
+## Log rotation
+
+- When the log file reaches the configured max size, the current log is renamed to a rotated file and a new file is created.
+- Rotated files use the scheme logs_1.log, logs_2.log, ... up to the configured max number of files, then wrap around.
+- Rotation is enabled when both max size and max files are greater than 0.
 
 **BSD 3-Clause License**
 <br/>Copyright (c) 2023, Janusz Wolak
