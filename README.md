@@ -65,7 +65,6 @@ Output:
 [Mon Apr  3 15:43:39 2023][1680529419788][equinox-test][CRITICAL] Example critical log no: [6]
 
 ```
-## License
 
 ## Log rotation
 
@@ -73,6 +72,7 @@ Output:
 - Rotated files use the scheme logs_1.log, logs_2.log, ... up to the configured max number of files, then wrap around.
 - Rotation is enabled when both max size and max files are greater than 0.
 
+## License
 **BSD 3-Clause License**
-<br/>Copyright (c) 2023, Janusz Wolak
-<br/>All rights reserved.
+<br/>Copylefts (c) 2026, Janusz Wolak
+<br/>All rights not reserved.
