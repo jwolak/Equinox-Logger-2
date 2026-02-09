@@ -49,47 +49,51 @@
 namespace equinox
 {
 
-class EquinoxLoggerEngineImpl;
+  class EquinoxLoggerEngineImpl;
 
-class EQUINOX_API EquinoxLoggerEngine
-{
- public:
-  static EquinoxLoggerEngine& getInstance();
-
-  EquinoxLoggerEngine(EquinoxLoggerEngine &) = delete;
-  EquinoxLoggerEngine(EquinoxLoggerEngine &&) = delete;
-  void operator=(const EquinoxLoggerEngine&) = delete;
-  void operator=(const EquinoxLoggerEngine&&) = delete;
-
-  template<typename ... Args>
-  void log(level::LOG_LEVEL msgLevel, const std::string& msgFormat, Args &&... args)
+  class EQUINOX_API EquinoxLoggerEngine
   {
-    const int nullEndCharacter = 1;
-    int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args) ...) + nullEndCharacter;
-    if (numberOfCharacters > 0)
+  public:
+    static EquinoxLoggerEngine &getInstance();
+
+    EquinoxLoggerEngine(EquinoxLoggerEngine &) = delete;
+    EquinoxLoggerEngine(EquinoxLoggerEngine &&) = delete;
+    void operator=(const EquinoxLoggerEngine &) = delete;
+    void operator=(const EquinoxLoggerEngine &&) = delete;
+
+    template <typename... Args>
+    void log(level::LOG_LEVEL msgLevel, const std::string &msgFormat, Args &&...args)
     {
-      auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
-      auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
-      std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args) ...);
-      std::string mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
-      processLogMessage(msgLevel, mFormatedOutpurMessage_);
-    } else
-    {
-      std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
+      const int nullEndCharacter = 1;
+      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args)...) + nullEndCharacter;
+      if (numberOfCharacters > 0)
+      {
+        auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
+        auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
+        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args)...);
+        std::string mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
+        processLogMessage(msgLevel, mFormatedOutpurMessage_);
+      }
+      else
+      {
+        std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
+      }
     }
-  }
 
-  void setup(equinox::level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    void setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+               const std::string &logFileName = kLogFileName,
+               std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
+               std::size_t maxLogFiles = kDefaultMaxLogFiles);
+    void changeLevel(level::LOG_LEVEL logLevel);
+    void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
- protected:
-  EquinoxLoggerEngine();
+  protected:
+    EquinoxLoggerEngine();
 
- private:
-  std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
-  void processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
-};
+  private:
+    std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
+    void processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
+  };
 
 } /*namespace equinox*/
 

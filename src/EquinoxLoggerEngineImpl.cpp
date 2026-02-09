@@ -39,7 +39,7 @@
 
 #include "EquinoxLoggerEngineImpl.h"
 
-void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage)
+void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
 {
   if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_))
   {
@@ -47,59 +47,62 @@ void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, con
 
     switch (msgLevel)
     {
-      case level::LOG_LEVEL::critical:
-        mOutputMessage_ = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
-        break;
+    case level::LOG_LEVEL::critical:
+      mOutputMessage_ = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
+      break;
 
-      case level::LOG_LEVEL::debug:
-        mOutputMessage_ = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
-        break;
+    case level::LOG_LEVEL::debug:
+      mOutputMessage_ = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
+      break;
 
-      case level::LOG_LEVEL::error:
-        mOutputMessage_ = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
-        break;
+    case level::LOG_LEVEL::error:
+      mOutputMessage_ = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
+      break;
 
-      case level::LOG_LEVEL::info:
-        mOutputMessage_ = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
-        break;
+    case level::LOG_LEVEL::info:
+      mOutputMessage_ = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
+      break;
 
-      case level::LOG_LEVEL::trace:
-        mOutputMessage_ = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
-        break;
+    case level::LOG_LEVEL::trace:
+      mOutputMessage_ = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
+      break;
 
-      case level::LOG_LEVEL::warning:
-        mOutputMessage_ = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
-        break;
+    case level::LOG_LEVEL::warning:
+      mOutputMessage_ = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
+      break;
     }
 
-    switch(mLogsOutputSink_)
+    switch (mLogsOutputSink_)
     {
-      case logs_output::SINK::console:
-        mConsoleLogsProducer_->logMessage(mOutputMessage_);
-        break;
+    case logs_output::SINK::console:
+      mConsoleLogsProducer_->logMessage(mOutputMessage_);
+      break;
 
-      case logs_output::SINK::file:
-        mFileLogsProducer_->logMessage(mOutputMessage_);
-        break;
+    case logs_output::SINK::file:
+      mFileLogsProducer_->logMessage(mOutputMessage_);
+      break;
 
-      case logs_output::SINK::console_and_file:
-        mConsoleLogsProducer_->logMessage(mOutputMessage_);
-        mFileLogsProducer_->logMessage(mOutputMessage_);
-        break;
+    case logs_output::SINK::console_and_file:
+      mConsoleLogsProducer_->logMessage(mOutputMessage_);
+      mFileLogsProducer_->logMessage(mOutputMessage_);
+      break;
     }
   }
 }
 
-void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, logs_output::SINK logsOutputSink, const std::string& logFileName)
+void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
+                                             const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
 {
   mLogLevel_ = logLevel;
   mLogPrefix_ = std::string("[" + logPrefix + "]");
   mLogsOutputSink_ = logsOutputSink;
   mLogFileName_ = logFileName;
+  mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
+  mMaxLogFiles_ = maxLogFiles;
 
-  if(equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
+  if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(mLogFileName_);
+    mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
   }
 }
 
@@ -112,8 +115,8 @@ void equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK lo
 {
   mLogsOutputSink_ = logsOutputSink;
 
-  if(equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
+  if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(mLogFileName_);
+    mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
   }
 }

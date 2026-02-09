@@ -51,36 +51,32 @@
 namespace equinox
 {
 
-class EQUINOX_API EquinoxLoggerEngineImpl
-{
- public:
-  EquinoxLoggerEngineImpl()
-  : mOutputMessage_ {}
-  , mLogPrefix_ {}
-  , mLogLevel_ {}
-  , mLogsOutputSink_ {}
-  , mLogFileName_ {}
-  , mTimestampProducer_ { std::make_shared<TimestampProducer>() }
-  , mConsoleLogsProducer_ { std::make_unique<ConsoleLogsProducer>(mTimestampProducer_) }
-  , mFileLogsProducer_ { std::make_unique<FileLogsProducer>(mTimestampProducer_) }
+  class EQUINOX_API EquinoxLoggerEngineImpl
   {
-  }
+  public:
+    EquinoxLoggerEngineImpl()
+        : mOutputMessage_{}, mLogPrefix_{}, mLogLevel_{}, mLogsOutputSink_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes}, mMaxLogFiles_{kDefaultMaxLogFiles}, mTimestampProducer_{std::make_shared<TimestampProducer>()}, mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)}, mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)}
+    {
+    }
 
-  void logMesaage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
-  void setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    void logMesaage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
+    void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+               const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles);
+    void changeLevel(level::LOG_LEVEL logLevel);
+    void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
- private:
-  std::string mOutputMessage_;
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  logs_output::SINK mLogsOutputSink_;
-  std::string mLogFileName_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
-};
+  private:
+    std::string mOutputMessage_;
+    std::string mLogPrefix_;
+    level::LOG_LEVEL mLogLevel_;
+    logs_output::SINK mLogsOutputSink_;
+    std::string mLogFileName_;
+    std::size_t mMaxLogFileSizeBytes_;
+    std::size_t mMaxLogFiles_;
+    std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+    std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
+    std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
+  };
 
 } /*namespace equinox*/
 

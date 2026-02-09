@@ -41,16 +41,22 @@
 
 #include "EquinoxLogger.h"
 
-int main(void) {
+int main(void)
+{
 
-  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("equinox-test"), equinox::logs_output::SINK::console_and_file, std::string("equinox.log"));
+  equinox::setup(equinox::level::LOG_LEVEL::trace,
+                 std::string("equinox-test"),
+                 equinox::logs_output::SINK::console_and_file,
+                 std::string("equinox.log"),
+                 3U * 1024U * 1024U,
+                 5U);
 
-  equinox::trace(   "Example trace log no:    [%d]" , 1);
-  equinox::debug(   "Example debug log no:    [%d]" , 2);
-  equinox::info(    "Example info log no:     [%d]" , 3);
-  equinox::warning( "Example warning log no:  [%d]" , 4);
-  equinox::error(   "Example error log no:    [%d]" , 5);
-  equinox::critical("Example critical log no: [%d]" , 6);
+  equinox::trace("Example trace log no:    [%d]", 1);
+  equinox::debug("Example debug log no:    [%d]", 2);
+  equinox::info("Example info log no:     [%d]", 3);
+  equinox::warning("Example warning log no:  [%d]", 4);
+  equinox::error("Example error log no:    [%d]", 5);
+  equinox::critical("Example critical log no: [%d]", 6);
 
-	return 0;
+  return 0;
 }
