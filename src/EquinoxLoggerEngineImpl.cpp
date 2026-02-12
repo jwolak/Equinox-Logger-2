@@ -39,6 +39,73 @@
 
 #include "EquinoxLoggerEngineImpl.h"
 
+#include <vector>
+
+equinox::EquinoxLoggerEngineImpl::~EquinoxLoggerEngineImpl()
+{
+  stopWorker();
+}
+
+void equinox::EquinoxLoggerEngineImpl::startWorkerIfNeeded()
+{
+  bool expected = false;
+  if (!mWorkerRunning_.compare_exchange_strong(expected, true))
+  {
+    return;
+  }
+
+  mWorkerThread_ = std::thread([this]()
+                               {
+    std::vector<std::string> batch;
+    while (true)
+    {
+      batch.clear();
+      if (!mAsyncQueue_.Dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
+      {
+        break;
+      }
+
+      std::lock_guard<std::mutex> lock(mWorkerMutex_);
+      for (const auto &message : batch)
+      {
+        dispatchMessage(message);
+      }
+    } });
+}
+
+void equinox::EquinoxLoggerEngineImpl::stopWorker()
+{
+  if (!mWorkerRunning_.exchange(false))
+  {
+    return;
+  }
+
+  mAsyncQueue_.Stop();
+  if (mWorkerThread_.joinable())
+  {
+    mWorkerThread_.join();
+  }
+}
+
+void equinox::EquinoxLoggerEngineImpl::dispatchMessage(const std::string &messageToLog)
+{
+  switch (mLogsOutputSink_)
+  {
+  case logs_output::SINK::console:
+    mConsoleLogsProducer_->logMessage(messageToLog);
+    break;
+
+  case logs_output::SINK::file:
+    mFileLogsProducer_->logMessage(messageToLog);
+    break;
+
+  case logs_output::SINK::console_and_file:
+    mConsoleLogsProducer_->logMessage(messageToLog);
+    mFileLogsProducer_->logMessage(messageToLog);
+    break;
+  }
+}
+
 void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
 {
   if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_))
@@ -72,21 +139,8 @@ void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, con
       break;
     }
 
-    switch (mLogsOutputSink_)
-    {
-    case logs_output::SINK::console:
-      mConsoleLogsProducer_->logMessage(mOutputMessage_);
-      break;
-
-    case logs_output::SINK::file:
-      mFileLogsProducer_->logMessage(mOutputMessage_);
-      break;
-
-    case logs_output::SINK::console_and_file:
-      mConsoleLogsProducer_->logMessage(mOutputMessage_);
-      mFileLogsProducer_->logMessage(mOutputMessage_);
-      break;
-    }
+    startWorkerIfNeeded();
+    mAsyncQueue_.Enqueue(mOutputMessage_);
   }
 }
 
@@ -95,15 +149,23 @@ void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const st
 {
   mLogLevel_ = logLevel;
   mLogPrefix_ = std::string("[" + logPrefix + "]");
-  mLogsOutputSink_ = logsOutputSink;
+  {
+    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+    mLogsOutputSink_ = logsOutputSink;
+  }
   mLogFileName_ = logFileName;
   mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
   mMaxLogFiles_ = maxLogFiles;
 
-  if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+    if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
+    {
+      mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    }
   }
+
+  startWorkerIfNeeded();
 }
 
 void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
@@ -113,10 +175,13 @@ void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
 
 void equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
-  mLogsOutputSink_ = logsOutputSink;
-
-  if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+    mLogsOutputSink_ = logsOutputSink;
+
+    if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
+    {
+      mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    }
   }
 }

@@ -42,11 +42,14 @@
 
 #include <string>
 #include <memory>
+#include <thread>
+#include <atomic>
 
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
 #include "ConsoleLogsProducer.h"
 #include "FileLogsProducer.h"
+#include "AsyncLogQueue.h"
 
 namespace equinox
 {
@@ -55,9 +58,11 @@ namespace equinox
   {
   public:
     EquinoxLoggerEngineImpl()
-        : mOutputMessage_{}, mLogPrefix_{}, mLogLevel_{}, mLogsOutputSink_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes}, mMaxLogFiles_{kDefaultMaxLogFiles}, mTimestampProducer_{std::make_shared<TimestampProducer>()}, mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)}, mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)}
+        : mOutputMessage_{}, mLogPrefix_{}, mLogLevel_{}, mLogsOutputSink_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes}, mMaxLogFiles_{kDefaultMaxLogFiles}, mTimestampProducer_{std::make_shared<TimestampProducer>()}, mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)}, mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)}, mAsyncQueue_{kDefaultQueueMaxSize}, mWorkerThread_{}, mWorkerRunning_{false}, mWorkerMutex_{}
     {
     }
+
+    ~EquinoxLoggerEngineImpl();
 
     void logMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
     void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
@@ -66,6 +71,14 @@ namespace equinox
     void changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
   private:
+    void startWorkerIfNeeded();
+    void stopWorker();
+    void dispatchMessage(const std::string &messageToLog);
+
+    static constexpr std::size_t kDefaultQueueMaxSize = 10000U;
+    static constexpr std::size_t kDefaultBatchSize = 64U;
+    static constexpr uint32_t kDefaultDequeueTimeoutMs = 50U;
+
     std::string mOutputMessage_;
     std::string mLogPrefix_;
     level::LOG_LEVEL mLogLevel_;
@@ -76,6 +89,10 @@ namespace equinox
     std::shared_ptr<ITimestampProducer> mTimestampProducer_;
     std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
     std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
+    AsyncLogQueue mAsyncQueue_;
+    std::thread mWorkerThread_;
+    std::atomic<bool> mWorkerRunning_;
+    std::mutex mWorkerMutex_;
   };
 
 } /*namespace equinox*/
