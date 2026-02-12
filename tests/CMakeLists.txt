@@ -1,8 +1,8 @@
-# Equinox-Logger 2.0
+# Equinox-Logger 2.1.1
 # Author: Janusz Wolak
-# Copyright (C) 2023
+# Copyright (C) 2026
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.22.1)
 
 set(PROJECT_NAME EquinoxLoggerTests.x86)
 project(${PROJECT_NAME})
@@ -12,7 +12,7 @@ set(EQUINOX_LOGGER_LIB_DIR ${PROJECT_SOURCE_DIR}/../libEquinoxLogger.so)
 message(STATUS "Processing CMakeLists.txt for: " ${PROJECT_NAME} " " ${LIB_VERSION_STRING})
 message(STATUS "CMAKE_SOURCE_DIR:	" ${CMAKE_SOURCE_DIR})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(GTest REQUIRED)

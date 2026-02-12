@@ -70,15 +70,20 @@ namespace equinox
     {
     }
 
-    ~FileLogsProducer()
+    ~FileLogsProducer() noexcept
     {
-      try
+      if (mFdLogFile_.is_open())
       {
-        mFdLogFile_.close();
-      }
-      catch (std::ofstream::failure &ex)
-      {
-        std::cout << "Exception when closing file" << std::endl;
+        try
+        {
+          mFdLogFile_.close();
+        }
+        catch (std::ofstream::failure &ex)
+        {
+          // Destructor - cannot propagate exception
+          std::cerr << "[EquinoxLogger] Warning: Failed to close log file in destructor: "
+                    << ex.what() << std::endl;
+        }
       }
     }
 
