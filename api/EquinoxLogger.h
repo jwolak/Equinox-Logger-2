@@ -149,6 +149,11 @@ namespace equinox
    */
   EQUINOX_API bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
+  /**
+   * @brief flush() function to force write any pending log messages
+   */
+  EQUINOX_API void flush();
+
 } /*namespace equinox*/
 
 #endif /* API_EQUINOXLOGGER_H_ */

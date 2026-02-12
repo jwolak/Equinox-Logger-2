@@ -55,6 +55,7 @@ namespace equinox
   public:
     virtual ~IConsoleLogsProducer() = default;
     virtual void logMessage(const std::string &) = 0;
+    virtual void flush() = 0;
   };
 
   class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
@@ -66,6 +67,7 @@ namespace equinox
     }
 
     void logMessage(const std::string &format) override;
+    void flush() override;
 
   private:
     std::shared_ptr<ITimestampProducer> mTimestampProducer_;

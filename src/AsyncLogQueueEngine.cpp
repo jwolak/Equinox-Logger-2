@@ -133,4 +133,11 @@ namespace equinox
         std::lock_guard<std::mutex> lock(mWorkerMutex_);
         mLogsOutputSink_ = logsOutputSink;
     }
+
+    void AsyncLogQueueEngine::flush()
+    {
+        std::lock_guard<std::mutex> lock(mWorkerMutex_);
+        mConsoleLogsProducer_.flush();
+        mFileLogsProducer_.flush();
+    }
 } // namespace equinox

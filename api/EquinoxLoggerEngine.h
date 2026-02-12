@@ -92,6 +92,7 @@ namespace equinox
                std::size_t maxLogFiles = kDefaultMaxLogFiles);
     void changeLevel(level::LOG_LEVEL logLevel);
     bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    void flush();
 
   protected:
     EquinoxLoggerEngine();

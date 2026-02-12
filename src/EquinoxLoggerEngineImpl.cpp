@@ -128,3 +128,9 @@ bool equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK lo
   }
   return true;
 }
+
+void equinox::EquinoxLoggerEngineImpl::flush()
+{
+  mAsyncLogQueueEngine_->flush();
+}
+

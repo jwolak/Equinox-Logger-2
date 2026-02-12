@@ -48,3 +48,8 @@ void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
   buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog;
   std::cout << buffer << std::endl;
 }
+
+void equinox::ConsoleLogsProducer::flush()
+{
+  std::cout.flush();
+}

@@ -60,6 +60,7 @@ namespace equinox
     virtual ~IFileLogsProducer() = default;
     virtual void setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) = 0;
     virtual void logMessage(const std::string &messageToLog) = 0;
+    virtual void flush() = 0;
   };
 
   class EQUINOX_API FileLogsProducer : public IFileLogsProducer
@@ -93,6 +94,7 @@ namespace equinox
 
     void setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) override;
     void logMessage(const std::string &messageToLog) override;
+    void flush() override;
 
   private:
     void openLogFileAppend();

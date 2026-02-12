@@ -62,6 +62,7 @@ namespace equinox
         void startWorkerIfNeeded();
         void dispatchMessage(const std::string &messageToLog);
         void setLogsOutputSink(logs_output::SINK logsOutputSink);
+        void flush();
 
     private:
         AsyncLogQueue mAsyncQueue_;

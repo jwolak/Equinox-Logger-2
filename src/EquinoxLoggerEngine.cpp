@@ -75,3 +75,8 @@ bool equinox::EquinoxLoggerEngine::changeLogsOutputSink(logs_output::SINK logsOu
   std::lock_guard<std::mutex> lock(mEngineMutex_);
   return mEquinoxLoggerEngineImpl_->changeLogsOutputSink(logsOutputSink);
 }
+void equinox::EquinoxLoggerEngine::flush()
+{
+  std::lock_guard<std::mutex> lock(mEngineMutex_);
+  mEquinoxLoggerEngineImpl_->flush();
+}

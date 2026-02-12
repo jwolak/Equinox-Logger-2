@@ -194,3 +194,19 @@ void equinox::FileLogsProducer::logMessage(const std::string &messageToLog)
 
   rotateIfNeeded();
 }
+
+void equinox::FileLogsProducer::flush()
+{
+  std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
+  if (mFdLogFile_.is_open())
+  {
+    try
+    {
+      mFdLogFile_.flush();
+    }
+    catch (std::ofstream::failure &ex)
+    {
+      std::cerr << "[EquinoxLogger] Failed to flush log file: " << ex.what() << std::endl;
+    }
+  }
+}

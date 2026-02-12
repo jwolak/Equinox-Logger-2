@@ -54,3 +54,9 @@ bool equinox::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
   return equinox::EquinoxLoggerEngine::getInstance().changeLogsOutputSink(logsOutputSink);
 }
+
+void equinox::flush()
+{
+  equinox::EquinoxLoggerEngine::getInstance().flush();
+}
+

@@ -76,6 +76,7 @@ namespace equinox
                const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles);
     void changeLevel(level::LOG_LEVEL logLevel);
     bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    void flush();
 
   private:
     std::string mLogPrefix_;
