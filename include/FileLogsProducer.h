@@ -66,7 +66,7 @@ namespace equinox
   {
   public:
     FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-        : mMessageBuffer_{}, mMessageBufferAccessLock_{}, mTimestampProducer{timestampProducer}, mFdLogFile_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{0U}, mMaxLogFiles_{0U}, mNextRotationIndex_{1U}
+        : mMessageBufferAccessLock_{}, mTimestampProducer{timestampProducer}, mFdLogFile_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{0U}, mMaxLogFiles_{0U}, mNextRotationIndex_{1U}
     {
     }
 
@@ -101,7 +101,6 @@ namespace equinox
     std::string buildRotatedFileName(std::size_t index) const;
     bool isRotationEnabled() const;
 
-    std::string mMessageBuffer_;
     std::mutex mMessageBufferAccessLock_;
     std::shared_ptr<ITimestampProducer> mTimestampProducer;
     std::ofstream mFdLogFile_;

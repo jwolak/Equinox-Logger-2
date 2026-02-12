@@ -50,30 +50,26 @@
 namespace equinox
 {
 
-class EQUINOX_API IConsoleLogsProducer
-{
- public:
-  virtual ~IConsoleLogsProducer() = default;
-  virtual void logMessage(const std::string&) = 0;
-};
-
-class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
-{
- public:
-  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-  : mMessageBuffer_ {}
-  , mMessageBufferAccessLock_ {}
-  , mTimestampProducer_ { timestampProducer }
+  class EQUINOX_API IConsoleLogsProducer
   {
-  }
+  public:
+    virtual ~IConsoleLogsProducer() = default;
+    virtual void logMessage(const std::string &) = 0;
+  };
 
-  void logMessage(const std::string& format) override;
+  class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
+  {
+  public:
+    ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+        : mTimestampProducer_{timestampProducer}
+    {
+    }
 
- private:
-  std::string mMessageBuffer_;
-  std::mutex mMessageBufferAccessLock_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-};
+    void logMessage(const std::string &format) override;
+
+  private:
+    std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+  };
 
 } /*namespace equinox*/
 

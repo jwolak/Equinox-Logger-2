@@ -177,11 +177,13 @@ void equinox::FileLogsProducer::logMessage(const std::string &messageToLog)
     return;
   }
 
-  mMessageBuffer_ = std::string(mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog);
+  thread_local std::string buffer;
+  buffer.clear();
+  buffer = mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog;
 
   try
   {
-    mFdLogFile_ << mMessageBuffer_ << std::endl;
+    mFdLogFile_ << buffer << std::endl;
     mFdLogFile_.flush();
   }
   catch (std::ofstream::failure &ex)

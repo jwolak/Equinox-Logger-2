@@ -43,37 +43,38 @@ void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, con
 {
   if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_))
   {
-    mOutputMessage_.clear();
+    thread_local std::string outputMessage;
+    outputMessage.clear();
 
     switch (msgLevel)
     {
     case level::LOG_LEVEL::critical:
-      mOutputMessage_ = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
+      outputMessage = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
       break;
 
     case level::LOG_LEVEL::debug:
-      mOutputMessage_ = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
+      outputMessage = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
       break;
 
     case level::LOG_LEVEL::error:
-      mOutputMessage_ = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
+      outputMessage = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
       break;
 
     case level::LOG_LEVEL::info:
-      mOutputMessage_ = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
+      outputMessage = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
       break;
 
     case level::LOG_LEVEL::trace:
-      mOutputMessage_ = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
+      outputMessage = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
       break;
 
     case level::LOG_LEVEL::warning:
-      mOutputMessage_ = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
+      outputMessage = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
       break;
     }
 
     mAsyncLogQueueEngine_->startWorkerIfNeeded();
-    mAsyncLogQueueEngine_->processLogMessage(mOutputMessage_);
+    mAsyncLogQueueEngine_->processLogMessage(outputMessage);
   }
 }
 

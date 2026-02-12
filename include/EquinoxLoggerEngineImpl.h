@@ -59,8 +59,7 @@ namespace equinox
   {
   public:
     EquinoxLoggerEngineImpl()
-        : mOutputMessage_{},
-          mLogPrefix_{},
+        : mLogPrefix_{},
           mLogLevel_{},
           mLogFileName_{},
           mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
@@ -79,7 +78,6 @@ namespace equinox
     bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
   private:
-    std::string mOutputMessage_;
     std::string mLogPrefix_;
     level::LOG_LEVEL mLogLevel_;
     std::string mLogFileName_;
