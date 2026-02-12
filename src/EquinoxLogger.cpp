@@ -39,10 +39,10 @@
 
 #include "EquinoxLogger.h"
 
-void equinox::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+bool equinox::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
                     const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
 {
-  equinox::EquinoxLoggerEngine::getInstance().setup(logLevel, logPrefix, logsOutputSink, logFileName, maxLogFileSizeBytes, maxLogFiles);
+  return equinox::EquinoxLoggerEngine::getInstance().setup(logLevel, logPrefix, logsOutputSink, logFileName, maxLogFileSizeBytes, maxLogFiles);
 }
 
 void equinox::changeLevel(equinox::level::LOG_LEVEL logLevel)
@@ -50,7 +50,13 @@ void equinox::changeLevel(equinox::level::LOG_LEVEL logLevel)
   equinox::EquinoxLoggerEngine::getInstance().changeLevel(logLevel);
 }
 
-void equinox::changeLogsOutputSink(equinox::logs_output::SINK logsOutputSink)
+bool equinox::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
-  equinox::EquinoxLoggerEngine::getInstance().changeLogsOutputSink(logsOutputSink);
+  return equinox::EquinoxLoggerEngine::getInstance().changeLogsOutputSink(logsOutputSink);
 }
+
+void equinox::flush()
+{
+  equinox::EquinoxLoggerEngine::getInstance().flush();
+}
+

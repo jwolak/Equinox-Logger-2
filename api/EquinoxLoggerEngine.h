@@ -43,6 +43,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include "EquinoxLoggerCommon.h"
 
@@ -64,34 +65,41 @@ namespace equinox
     template <typename... Args>
     void log(level::LOG_LEVEL msgLevel, const std::string &msgFormat, Args &&...args)
     {
-      const int nullEndCharacter = 1;
-      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args)...) + nullEndCharacter;
-      if (numberOfCharacters > 0)
-      {
-        auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
-        auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
-        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args)...);
-        std::string mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
-        processLogMessage(msgLevel, mFormatedOutpurMessage_);
-      }
-      else
+      constexpr size_t kMaxMessageSize = 4096;
+      char messageBuffer[kMaxMessageSize];
+
+      int written = std::snprintf(messageBuffer, kMaxMessageSize, msgFormat.c_str(), std::forward<Args>(args)...);
+
+      if (written < 0)
       {
         std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
+        return;
       }
+
+      if (static_cast<size_t>(written) >= kMaxMessageSize)
+      {
+        std::cout << "[EquinoxLoggerEngine] Message truncated (exceeded " << kMaxMessageSize << " bytes)" << std::endl;
+        written = kMaxMessageSize - 1;
+      }
+
+      std::string mFormattedOutputMessage_(messageBuffer, static_cast<size_t>(written));
+      processLogMessage(msgLevel, mFormattedOutputMessage_);
     }
 
-    void setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+    bool setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
                const std::string &logFileName = kLogFileName,
                std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
                std::size_t maxLogFiles = kDefaultMaxLogFiles);
     void changeLevel(level::LOG_LEVEL logLevel);
-    void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    void flush();
 
   protected:
     EquinoxLoggerEngine();
 
   private:
     std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
+    mutable std::mutex mEngineMutex_;
     void processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
   };
 

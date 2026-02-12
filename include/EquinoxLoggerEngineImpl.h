@@ -42,11 +42,15 @@
 
 #include <string>
 #include <memory>
+#include <thread>
+#include <atomic>
 
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
 #include "ConsoleLogsProducer.h"
 #include "FileLogsProducer.h"
+#include "AsyncLogQueue.h"
+#include "AsyncLogQueueEngine.h"
 
 namespace equinox
 {
@@ -55,27 +59,35 @@ namespace equinox
   {
   public:
     EquinoxLoggerEngineImpl()
-        : mOutputMessage_{}, mLogPrefix_{}, mLogLevel_{}, mLogsOutputSink_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes}, mMaxLogFiles_{kDefaultMaxLogFiles}, mTimestampProducer_{std::make_shared<TimestampProducer>()}, mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)}, mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)}
+        : mLogPrefix_{},
+          mLogLevel_{},
+          mLogFileName_{},
+          mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
+          mMaxLogFiles_{kDefaultMaxLogFiles},
+          mTimestampProducer_{std::make_shared<TimestampProducer>()},
+          mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)},
+          mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)},
+          mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(*mConsoleLogsProducer_, *mFileLogsProducer_, logs_output::SINK::console)}
     {
     }
 
-    void logMesaage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
-    void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+    void logMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
+    bool setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
                const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles);
     void changeLevel(level::LOG_LEVEL logLevel);
-    void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    void flush();
 
   private:
-    std::string mOutputMessage_;
     std::string mLogPrefix_;
     level::LOG_LEVEL mLogLevel_;
-    logs_output::SINK mLogsOutputSink_;
     std::string mLogFileName_;
     std::size_t mMaxLogFileSizeBytes_;
     std::size_t mMaxLogFiles_;
     std::shared_ptr<ITimestampProducer> mTimestampProducer_;
     std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
     std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
+    std::unique_ptr<AsyncLogQueueEngine> mAsyncLogQueueEngine_;
   };
 
 } /*namespace equinox*/

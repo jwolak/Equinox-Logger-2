@@ -1,14 +1,14 @@
 /*
- * MultipleThreadsTest.cpp
+ * AsyncLogQueue.h
  *
- *  Created on: 2023
+ *  Created on: 2026
  *      Author: Janusz Wolak
  */
 
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2023, Janusz Wolak
+ * Copyright (c) 2026, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,30 +37,35 @@
  *
  */
 
-#include <iostream>
-#include <future>
+#ifndef INCLUDE_ASYNCLOGQUEUE_H_
+#define INCLUDE_ASYNCLOGQUEUE_H_
 
-#include <gtest/gtest.h>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <string>
+#include <vector>
+#include <mutex>
+#include <condition_variable>
 
-#include "EquinoxLogger.h"
-
-void LogTraceInThreadOne()
+namespace equinox
 {
-  equinox::trace("%s", "Message in Trace from thread one");
-}
+    class AsyncLogQueue
+    {
+    public:
+        explicit AsyncLogQueue(size_t queue_max_size);
+        ~AsyncLogQueue();
+        void Enqueue(const std::string &log_message);
+        bool Dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms);
+        void Stop();
 
-void LogDebugInThreadTwo()
-{
-  equinox::debug("%s", "Message in Debug from thread two");
-}
+    private:
+        size_t queue_max_size_;
+        std::deque<std::string> queue_;
+        std::mutex queue_mutex_;
+        std::condition_variable cv_;
+        bool stop_;
+    };
+} // namespace equinox
 
-TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First)
-{
-  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsTest"), equinox::logs_output::SINK::console);
-
-  auto fut1 = std::async(std::launch::async, LogTraceInThreadOne);
-  auto fut2 = std::async(std::launch::async, LogDebugInThreadTwo);
-
-  fut1.wait();
-  fut2.wait();
-}
+#endif /* INCLUDE_ASYNCLOGQUEUE_H_ */

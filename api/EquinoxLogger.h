@@ -127,8 +127,9 @@ namespace equinox
    * @param logFileName            name of file with logs (default: "logs.log")
    * @param maxLogFileSizeBytes    max size for single log file in bytes (default: 3 MB)
    * @param maxLogFiles            max number of rotated log files (default: 5)
+   * @return true if setup succeeded, false if file setup failed
    */
-  EQUINOX_API void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
+  EQUINOX_API bool setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
                          const std::string &logFileName = kLogFileName,
                          std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
                          std::size_t maxLogFiles = kDefaultMaxLogFiles);
@@ -144,8 +145,14 @@ namespace equinox
    * @brief changeLogsOutputSink() function to change logs output
    *
    * @param logsOutputSink  place where logs are printed (console, file or both)
+   * @return true if change succeeded, false if file setup failed
    */
-  EQUINOX_API void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+  EQUINOX_API bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
+
+  /**
+   * @brief flush() function to force write any pending log messages
+   */
+  EQUINOX_API void flush();
 
 } /*namespace equinox*/
 

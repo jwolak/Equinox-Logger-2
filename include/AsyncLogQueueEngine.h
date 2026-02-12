@@ -1,14 +1,17 @@
 /*
- * MultipleThreadsTest.cpp
+ * AsyncLogQueueEngine.h
  *
- *  Created on: 2023
+ *  Created on: 2026
  *      Author: Janusz Wolak
  */
+
+#ifndef INCLUDE_ASYNCLOGQUEUEENGINE_H_
+#define INCLUDE_ASYNCLOGQUEUEENGINE_H_
 
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2023, Janusz Wolak
+ * Copyright (c) 2026, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,30 +40,40 @@
  *
  */
 
-#include <iostream>
-#include <future>
+#include "AsyncLogQueue.h"
+#include "ConsoleLogsProducer.h"
+#include "FileLogsProducer.h"
 
-#include <gtest/gtest.h>
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <string>
 
-#include "EquinoxLogger.h"
-
-void LogTraceInThreadOne()
+namespace equinox
 {
-  equinox::trace("%s", "Message in Trace from thread one");
-}
 
-void LogDebugInThreadTwo()
-{
-  equinox::debug("%s", "Message in Debug from thread two");
-}
+    class AsyncLogQueueEngine
+    {
+    public:
+        explicit AsyncLogQueueEngine(IConsoleLogsProducer &consoleLogsProducer, IFileLogsProducer &fileLogsProducer, logs_output::SINK logsOutputSink);
+        ~AsyncLogQueueEngine();
+        void processLogMessage(const std::string &messageToProcess);
+        void stopWorker();
+        void startWorkerIfNeeded();
+        void dispatchMessage(const std::string &messageToLog);
+        void setLogsOutputSink(logs_output::SINK logsOutputSink);
+        void flush();
 
-TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First)
-{
-  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsTest"), equinox::logs_output::SINK::console);
+    private:
+        AsyncLogQueue mAsyncQueue_;
+        std::thread mWorkerThread_;
+        std::atomic<bool> mWorkerRunning_;
+        std::mutex mWorkerMutex_;
 
-  auto fut1 = std::async(std::launch::async, LogTraceInThreadOne);
-  auto fut2 = std::async(std::launch::async, LogDebugInThreadTwo);
+        IConsoleLogsProducer &mConsoleLogsProducer_;
+        IFileLogsProducer &mFileLogsProducer_;
+        logs_output::SINK mLogsOutputSink_;
+    };
+} // namespace equinox
 
-  fut1.wait();
-  fut2.wait();
-}
+#endif /* INCLUDE_ASYNCLOGQUEUEENGINE_H_ */

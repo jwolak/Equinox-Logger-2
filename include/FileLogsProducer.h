@@ -60,25 +60,31 @@ namespace equinox
     virtual ~IFileLogsProducer() = default;
     virtual void setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) = 0;
     virtual void logMessage(const std::string &messageToLog) = 0;
+    virtual void flush() = 0;
   };
 
   class EQUINOX_API FileLogsProducer : public IFileLogsProducer
   {
   public:
     FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-        : mMessageBuffer_{}, mMessageBufferAccessLock_{}, mTimestampProducer{timestampProducer}, mFdLogFile_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{0U}, mMaxLogFiles_{0U}, mNextRotationIndex_{1U}
+        : mMessageBufferAccessLock_{}, mTimestampProducer{timestampProducer}, mFdLogFile_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{0U}, mMaxLogFiles_{0U}, mNextRotationIndex_{1U}
     {
     }
 
-    ~FileLogsProducer()
+    ~FileLogsProducer() noexcept
     {
-      try
+      if (mFdLogFile_.is_open())
       {
-        mFdLogFile_.close();
-      }
-      catch (std::ofstream::failure &ex)
-      {
-        std::cout << "Exception when closing file" << std::endl;
+        try
+        {
+          mFdLogFile_.close();
+        }
+        catch (std::ofstream::failure &ex)
+        {
+          // Destructor - cannot propagate exception
+          std::cerr << "[EquinoxLogger] Warning: Failed to close log file in destructor: "
+                    << ex.what() << std::endl;
+        }
       }
     }
 
@@ -88,6 +94,7 @@ namespace equinox
 
     void setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) override;
     void logMessage(const std::string &messageToLog) override;
+    void flush() override;
 
   private:
     void openLogFileAppend();
@@ -96,7 +103,6 @@ namespace equinox
     std::string buildRotatedFileName(std::size_t index) const;
     bool isRotationEnabled() const;
 
-    std::string mMessageBuffer_;
     std::mutex mMessageBufferAccessLock_;
     std::shared_ptr<ITimestampProducer> mTimestampProducer;
     std::ofstream mFdLogFile_;

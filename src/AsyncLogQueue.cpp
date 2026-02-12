@@ -1,14 +1,14 @@
 /*
- * ConsoleLogsProducer.h
+ * AsyncLogQueue.cpp
  *
- *  Created on: 2023
+ *  Created on: 2026
  *      Author: Janusz Wolak
  */
 
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2023, Janusz Wolak
+ * Copyright (c) 2026, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,42 +37,61 @@
  *
  */
 
-#ifndef INCLUDE_CONSOLELOGSPRODUCER_H_
-#define INCLUDE_CONSOLELOGSPRODUCER_H_
+#include "AsyncLogQueue.h"
 
-#include <string>
-#include <memory>
-#include <mutex>
-
-#include "EquinoxLoggerCommon.h"
-#include "TimestampProducer.h"
+#include <chrono>
 
 namespace equinox
 {
-
-  class EQUINOX_API IConsoleLogsProducer
-  {
-  public:
-    virtual ~IConsoleLogsProducer() = default;
-    virtual void logMessage(const std::string &) = 0;
-    virtual void flush() = 0;
-  };
-
-  class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
-  {
-  public:
-    ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-        : mTimestampProducer_{timestampProducer}
+    AsyncLogQueue::AsyncLogQueue(size_t queue_max_size)
+        : queue_max_size_(queue_max_size), queue_mutex_{}, cv_{}, stop_(false)
     {
     }
 
-    void logMessage(const std::string &format) override;
-    void flush() override;
+    AsyncLogQueue::~AsyncLogQueue() = default;
 
-  private:
-    std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  };
+    void AsyncLogQueue::Enqueue(const std::string &log_message)
+    {
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+        if (queue_.size() >= queue_max_size_)
+        {
+            queue_.pop_front(); // Remove the oldest log message to make room for the new one
+        }
+        queue_.push_back(log_message);
+        lock.unlock();
+        cv_.notify_one();
+    }
 
-} /*namespace equinox*/
+    bool AsyncLogQueue::Dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms)
+    {
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+        if (!cv_.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]()
+                          { return !queue_.empty() || stop_; }))
+        {
+            return false;
+        }
 
-#endif /* INCLUDE_CONSOLELOGSPRODUCER_H_ */
+        if (stop_ && queue_.empty())
+        {
+            return false;
+        }
+
+        size_t batch_size = std::min(max_batch_size, queue_.size());
+        out.reserve(batch_size);
+        for (size_t i = 0; i < batch_size; ++i)
+        {
+            out.push_back(std::move(queue_.front()));
+            queue_.pop_front();
+        }
+
+        return true;
+    }
+
+    void AsyncLogQueue::Stop()
+    {
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+        stop_ = true;
+        lock.unlock();
+        cv_.notify_all();
+    }
+} // namespace equinox

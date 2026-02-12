@@ -1,8 +1,8 @@
-# Equinox-Logger 2.0
+# Equinox-Logger 2.1.1
 # Author: Janusz Wolak
-# Copyright (C) 2023
+# Copyright (C) 2026
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.22.1)
 project(EquinoxLoggerExamples)
 
 message(STATUS "Processing CMakeLists.txt for: " ${PROJECT_NAME})
