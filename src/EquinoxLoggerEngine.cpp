@@ -53,21 +53,25 @@ equinox::EquinoxLoggerEngine &equinox::EquinoxLoggerEngine::getInstance()
 
 void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
 {
+  std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->logMesaage(msgLevel, formatedOutputMessage);
 }
 
 void equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
                                          const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
 {
+  std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName, maxLogFileSizeBytes, maxLogFiles);
 }
 
 void equinox::EquinoxLoggerEngine::changeLevel(level::LOG_LEVEL logLevel)
 {
+  std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->changeLevel(logLevel);
 }
 
 void equinox::EquinoxLoggerEngine::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
+  std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->changeLogsOutputSink(logsOutputSink);
 }

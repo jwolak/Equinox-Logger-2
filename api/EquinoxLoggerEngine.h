@@ -43,6 +43,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <mutex>
 
 #include "EquinoxLoggerCommon.h"
 
@@ -92,6 +93,7 @@ namespace equinox
 
   private:
     std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
+    mutable std::mutex mEngineMutex_;
     void processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
   };
 
