@@ -39,7 +39,7 @@
 
 #include "EquinoxLoggerEngineImpl.h"
 
-void equinox::EquinoxLoggerEngineImpl::logMesaage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
+void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
 {
   if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_))
   {
