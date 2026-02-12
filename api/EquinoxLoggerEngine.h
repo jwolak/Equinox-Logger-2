@@ -66,12 +66,12 @@ namespace equinox
     void log(level::LOG_LEVEL msgLevel, const std::string &msgFormat, Args &&...args)
     {
       const int nullEndCharacter = 1;
-      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), std::forward<Args>(args)...) + nullEndCharacter;
+      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), args...) + nullEndCharacter;
       if (numberOfCharacters > 0)
       {
         auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
         auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
-        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), std::forward<Args>(args)...);
+        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), args...);
         std::string mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
         processLogMessage(msgLevel, mFormatedOutpurMessage_);
       }
