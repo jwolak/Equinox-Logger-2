@@ -57,6 +57,7 @@ set(EQUINOX_LOGGER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/TimestampProducer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/ConsoleLogsProducer.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/FileLogsProducer.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/AsyncLogQueueEngine.cpp
 )
 
 #------------------------------------------------------------------------------------------
