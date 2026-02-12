@@ -1,6 +1,6 @@
-# Equinox-Logger 2.0
+# Equinox-Logger 2.1.1
 # Author: Janusz Wolak
-# Copyright (C) 2023
+# Copyright (C) 2026
 
 #------------------------------------------------------------------------------------------
 #                                cmake settings
@@ -12,9 +12,9 @@ cmake_minimum_required(VERSION 3.22.1)
 #------------------------------------------------------------------------------------------
 project(EquinoxLogger)
 
-set(LIB_MAJOR_VERSION "1")
-set(LIB_MINOR_VERSION "0")
-set(LIB_PATCH_VERSION "0")
+set(LIB_MAJOR_VERSION "2")
+set(LIB_MINOR_VERSION "1")
+set(LIB_PATCH_VERSION "1")
 set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
 
 message(STATUS "Processing CMakeLists.txt for: " ${PROJECT_NAME} " " ${LIB_VERSION_STRING})

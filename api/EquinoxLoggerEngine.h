@@ -65,20 +65,25 @@ namespace equinox
     template <typename... Args>
     void log(level::LOG_LEVEL msgLevel, const std::string &msgFormat, Args &&...args)
     {
-      const int nullEndCharacter = 1;
-      int numberOfCharacters = std::snprintf(nullptr, 0, msgFormat.c_str(), args...) + nullEndCharacter;
-      if (numberOfCharacters > 0)
-      {
-        auto messageBufferSize = static_cast<size_t>(numberOfCharacters);
-        auto messageBuffer = std::make_unique<char[]>(messageBufferSize);
-        std::snprintf(messageBuffer.get(), messageBufferSize, msgFormat.c_str(), args...);
-        std::string mFormatedOutpurMessage_ = std::string(messageBuffer.get(), messageBuffer.get() + messageBufferSize - nullEndCharacter);
-        processLogMessage(msgLevel, mFormatedOutpurMessage_);
-      }
-      else
+      constexpr size_t kMaxMessageSize = 4096;
+      char messageBuffer[kMaxMessageSize];
+
+      int written = std::snprintf(messageBuffer, kMaxMessageSize, msgFormat.c_str(), std::forward<Args>(args)...);
+
+      if (written < 0)
       {
         std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
+        return;
       }
+
+      if (static_cast<size_t>(written) >= kMaxMessageSize)
+      {
+        std::cout << "[EquinoxLoggerEngine] Message truncated (exceeded " << kMaxMessageSize << " bytes)" << std::endl;
+        written = kMaxMessageSize - 1;
+      }
+
+      std::string mFormatedOutpurMessage_(messageBuffer, static_cast<size_t>(written));
+      processLogMessage(msgLevel, mFormatedOutpurMessage_);
     }
 
     void setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,

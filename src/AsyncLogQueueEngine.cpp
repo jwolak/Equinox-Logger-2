@@ -80,7 +80,7 @@ namespace equinox
                 batch.clear();
                 if (!mAsyncQueue_.Dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
                 {
-                    if (!mWorkerRunning_)
+                    if (!mWorkerRunning_.load())
                     {
                         break;
                     }

@@ -68,7 +68,7 @@ namespace equinox
         if (!cv_.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]()
                           { return !queue_.empty() || stop_; }))
         {
-            return true;
+            return false;
         }
 
         if (stop_ && queue_.empty())
