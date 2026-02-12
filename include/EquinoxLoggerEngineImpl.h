@@ -62,14 +62,13 @@ namespace equinox
         : mOutputMessage_{},
           mLogPrefix_{},
           mLogLevel_{},
-          mLogsOutputSink_{logs_output::SINK::console},
           mLogFileName_{},
           mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
           mMaxLogFiles_{kDefaultMaxLogFiles},
           mTimestampProducer_{std::make_shared<TimestampProducer>()},
           mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)},
           mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)},
-          mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(*mConsoleLogsProducer_, *mFileLogsProducer_, mLogsOutputSink_)}
+          mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(*mConsoleLogsProducer_, *mFileLogsProducer_, logs_output::SINK::console)}
     {
     }
 
@@ -83,7 +82,6 @@ namespace equinox
     std::string mOutputMessage_;
     std::string mLogPrefix_;
     level::LOG_LEVEL mLogLevel_;
-    logs_output::SINK mLogsOutputSink_;
     std::string mLogFileName_;
     std::size_t mMaxLogFileSizeBytes_;
     std::size_t mMaxLogFiles_;

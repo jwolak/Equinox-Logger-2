@@ -82,7 +82,6 @@ bool equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const st
 {
   mLogLevel_ = logLevel;
   mLogPrefix_ = std::string("[" + logPrefix + "]");
-  mLogsOutputSink_ = logsOutputSink;
   mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
   mLogFileName_ = logFileName;
   mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
@@ -112,7 +111,6 @@ void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
 
 bool equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
-  mLogsOutputSink_ = logsOutputSink;
   mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
 
   if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
