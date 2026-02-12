@@ -77,8 +77,8 @@ void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, con
   }
 }
 
-void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
-                                             const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
+bool equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, logs_output::SINK logsOutputSink,
+                                              const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
 {
   mLogLevel_ = logLevel;
   mLogPrefix_ = std::string("[" + logPrefix + "]");
@@ -90,10 +90,19 @@ void equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const st
 
   if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    try
+    {
+      mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    }
+    catch (const std::exception &ex)
+    {
+      std::cerr << "[EquinoxLogger] Failed to setup log file: " << ex.what() << std::endl;
+      return false;
+    }
   }
 
   mAsyncLogQueueEngine_->startWorkerIfNeeded();
+  return true;
 }
 
 void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
@@ -101,14 +110,22 @@ void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel)
   mLogLevel_ = logLevel;
 }
 
-void equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink)
+bool equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink)
 {
-
   mLogsOutputSink_ = logsOutputSink;
   mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
 
   if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink)
   {
-    mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    try
+    {
+      mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+    }
+    catch (const std::exception &ex)
+    {
+      std::cerr << "[EquinoxLogger] Failed to switch to file output: " << ex.what() << std::endl;
+      return false;
+    }
   }
+  return true;
 }

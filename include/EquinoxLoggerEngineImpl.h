@@ -74,10 +74,10 @@ namespace equinox
     }
 
     void logMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
-    void setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+    bool setup(level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
                const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles);
     void changeLevel(level::LOG_LEVEL logLevel);
-    void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
   private:
     std::string mOutputMessage_;

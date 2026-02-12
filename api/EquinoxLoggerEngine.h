@@ -82,16 +82,16 @@ namespace equinox
         written = kMaxMessageSize - 1;
       }
 
-      std::string mFormatedOutpurMessage_(messageBuffer, static_cast<size_t>(written));
-      processLogMessage(msgLevel, mFormatedOutpurMessage_);
+      std::string mFormattedOutputMessage_(messageBuffer, static_cast<size_t>(written));
+      processLogMessage(msgLevel, mFormattedOutputMessage_);
     }
 
-    void setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
+    bool setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
                const std::string &logFileName = kLogFileName,
                std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
                std::size_t maxLogFiles = kDefaultMaxLogFiles);
     void changeLevel(level::LOG_LEVEL logLevel);
-    void changeLogsOutputSink(logs_output::SINK logsOutputSink);
+    bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
 
   protected:
     EquinoxLoggerEngine();
