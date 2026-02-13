@@ -86,7 +86,7 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
 
             for (const auto &message : batch)
             {
-                dispatchMessage(message);
+                dispatchLogMessage(message);
             }
         } });
 }
@@ -105,7 +105,7 @@ void equinox::AsyncLogQueueEngine::stopWorker()
     }
 }
 
-void equinox::AsyncLogQueueEngine::dispatchMessage(const std::string &messageToLog)
+void equinox::AsyncLogQueueEngine::dispatchLogMessage(const std::string &messageToLog)
 {
     std::lock_guard<std::mutex> lock(mWorkerMutex_);
     switch (mLogsOutputSink_)

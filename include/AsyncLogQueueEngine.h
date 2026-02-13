@@ -60,7 +60,7 @@ namespace equinox
         void processLogMessage(const std::string &messageToProcess);
         void stopWorker();
         void startWorkerIfNeeded();
-        void dispatchMessage(const std::string &messageToLog);
+        void dispatchLogMessage(const std::string &messageToLog);
         void setLogsOutputSink(logs_output::SINK logsOutputSink);
         void flush();
 
