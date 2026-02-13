@@ -47,7 +47,7 @@ namespace
 }
 
 equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(IConsoleLogsProducer &consoleLogsProducer, IFileLogsProducer &fileLogsProducer, logs_output::SINK logsOutputSink)
-    : mAsyncQueue_(kDefaultQueueMaxSize), mWorkerThread_{}, mWorkerRunning_(false), mWorkerMutex_{}, mConsoleLogsProducer_(consoleLogsProducer), mFileLogsProducer_(fileLogsProducer), mLogsOutputSink_(logsOutputSink)
+    : mLogMessageQueue_(kDefaultQueueMaxSize), mWorkerThread_{}, mIsWorkerRunning_(false), mOutputMutex_{}, mConsoleLogsProducer_(consoleLogsProducer), mFileLogsProducer_(fileLogsProducer), mLogsOutputSink_(logsOutputSink)
 {
 }
 
@@ -58,13 +58,13 @@ equinox::AsyncLogQueueEngine::~AsyncLogQueueEngine()
 
 void equinox::AsyncLogQueueEngine::processLogMessage(const std::string &messageToProcess)
 {
-    mAsyncQueue_.enqueue(messageToProcess);
+    mLogMessageQueue_.enqueue(messageToProcess);
 }
 
 void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
 {
     bool expected = false;
-    if (!mWorkerRunning_.compare_exchange_strong(expected, true))
+    if (!mIsWorkerRunning_.compare_exchange_strong(expected, true))
     {
         return;
     }
@@ -75,9 +75,9 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
         while (true)
         {
             batch.clear();
-            if (!mAsyncQueue_.dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
+            if (!mLogMessageQueue_.dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
             {
-                if (!mWorkerRunning_.load())
+                if (!mIsWorkerRunning_.load())
                 {
                     break;
                 }
@@ -87,7 +87,7 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
             for (const auto &message : batch)
             {
                 {
-                    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+                    std::lock_guard<std::mutex> lock(mOutputMutex_);
                     switch (mLogsOutputSink_)
                     {
                     case logs_output::SINK::console:
@@ -110,12 +110,12 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
 
 void equinox::AsyncLogQueueEngine::stopWorker()
 {
-    if (!mWorkerRunning_.exchange(false))
+    if (!mIsWorkerRunning_.exchange(false))
     {
         return;
     }
 
-    mAsyncQueue_.stop();
+    mLogMessageQueue_.stop();
     if (mWorkerThread_.joinable())
     {
         mWorkerThread_.join();
@@ -124,13 +124,13 @@ void equinox::AsyncLogQueueEngine::stopWorker()
 
 void equinox::AsyncLogQueueEngine::setLogsOutputSink(logs_output::SINK logsOutputSink)
 {
-    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+    std::lock_guard<std::mutex> lock(mOutputMutex_);
     mLogsOutputSink_ = logsOutputSink;
 }
 
 void equinox::AsyncLogQueueEngine::flush()
 {
-    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+    std::lock_guard<std::mutex> lock(mOutputMutex_);
     mConsoleLogsProducer_.flush();
     mFileLogsProducer_.flush();
 }
