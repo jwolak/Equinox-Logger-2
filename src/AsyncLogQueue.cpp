@@ -44,7 +44,7 @@
 namespace equinox
 {
     AsyncLogQueue::AsyncLogQueue(size_t queue_max_size)
-        : queue_max_size_(queue_max_size), queue_mutex_{}, cv_{}, stop_(false)
+        : queue_max_size_(queue_max_size), queue_mutex_{}, data_in_queue_available_condition_variable_{}, stop_requested_(false)
     {
     }
 
@@ -53,35 +53,35 @@ namespace equinox
     void AsyncLogQueue::Enqueue(const std::string &log_message)
     {
         std::unique_lock<std::mutex> lock(queue_mutex_);
-        if (queue_.size() >= queue_max_size_)
+        if (log_messages_queue_.size() >= queue_max_size_)
         {
-            queue_.pop_front(); // Remove the oldest log message to make room for the new one
+            log_messages_queue_.pop_front(); // Remove the oldest log message to make room for the new one
         }
-        queue_.push_back(log_message);
+        log_messages_queue_.push_back(log_message);
         lock.unlock();
-        cv_.notify_one();
+        data_in_queue_available_condition_variable_.notify_one();
     }
 
     bool AsyncLogQueue::Dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms)
     {
         std::unique_lock<std::mutex> lock(queue_mutex_);
-        if (!cv_.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]()
-                          { return !queue_.empty() || stop_; }))
+        if (!data_in_queue_available_condition_variable_.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]()
+                                                                  { return !log_messages_queue_.empty() || stop_requested_; }))
         {
             return false;
         }
 
-        if (stop_ && queue_.empty())
+        if (stop_requested_ && log_messages_queue_.empty())
         {
             return false;
         }
 
-        size_t batch_size = std::min(max_batch_size, queue_.size());
+        size_t batch_size = std::min(max_batch_size, log_messages_queue_.size());
         out.reserve(batch_size);
         for (size_t i = 0; i < batch_size; ++i)
         {
-            out.push_back(std::move(queue_.front()));
-            queue_.pop_front();
+            out.push_back(std::move(log_messages_queue_.front()));
+            log_messages_queue_.pop_front();
         }
 
         return true;
@@ -90,8 +90,8 @@ namespace equinox
     void AsyncLogQueue::Stop()
     {
         std::unique_lock<std::mutex> lock(queue_mutex_);
-        stop_ = true;
+        stop_requested_ = true;
         lock.unlock();
-        cv_.notify_all();
+        data_in_queue_available_condition_variable_.notify_all();
     }
 } // namespace equinox

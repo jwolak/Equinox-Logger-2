@@ -61,10 +61,10 @@ namespace equinox
 
     private:
         size_t queue_max_size_;
-        std::deque<std::string> queue_;
+        std::deque<std::string> log_messages_queue_;
         std::mutex queue_mutex_;
-        std::condition_variable cv_;
-        bool stop_;
+        std::condition_variable data_in_queue_available_condition_variable_;
+        bool stop_requested_;
     };
 } // namespace equinox
 
