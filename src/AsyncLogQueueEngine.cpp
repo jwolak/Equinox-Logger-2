@@ -86,7 +86,24 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
 
             for (const auto &message : batch)
             {
-                dispatchLogMessage(message);
+                {
+                    std::lock_guard<std::mutex> lock(mWorkerMutex_);
+                    switch (mLogsOutputSink_)
+                    {
+                    case logs_output::SINK::console:
+                        mConsoleLogsProducer_.logMessage(message);
+                        break;
+
+                    case logs_output::SINK::file:
+                        mFileLogsProducer_.logMessage(message);
+                        break;
+
+                    case logs_output::SINK::console_and_file:
+                        mConsoleLogsProducer_.logMessage(message);
+                        mFileLogsProducer_.logMessage(message);
+                        break;
+                    }
+                }
             }
         } });
 }
@@ -102,26 +119,6 @@ void equinox::AsyncLogQueueEngine::stopWorker()
     if (mWorkerThread_.joinable())
     {
         mWorkerThread_.join();
-    }
-}
-
-void equinox::AsyncLogQueueEngine::dispatchLogMessage(const std::string &messageToLog)
-{
-    std::lock_guard<std::mutex> lock(mWorkerMutex_);
-    switch (mLogsOutputSink_)
-    {
-    case logs_output::SINK::console:
-        mConsoleLogsProducer_.logMessage(messageToLog);
-        break;
-
-    case logs_output::SINK::file:
-        mFileLogsProducer_.logMessage(messageToLog);
-        break;
-
-    case logs_output::SINK::console_and_file:
-        mConsoleLogsProducer_.logMessage(messageToLog);
-        mFileLogsProducer_.logMessage(messageToLog);
-        break;
     }
 }
 
