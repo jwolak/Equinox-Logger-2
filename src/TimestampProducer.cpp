@@ -58,7 +58,7 @@ std::string equinox::TimestampProducer::getTimestamp() const
 std::string equinox::TimestampProducer::getTimestampInUs()
 {
   uint64_t timestampInUs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-  timestamp_ =  std::string("[" + std::to_string(timestampInUs) + "]");
+  mTimestamp_ = std::string("[" + std::to_string(timestampInUs) + "]");
 
-  return timestamp_;
+  return mTimestamp_;
 }

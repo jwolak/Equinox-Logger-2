@@ -41,57 +41,54 @@
 
 #include <chrono>
 
-namespace equinox
+equinox::AsyncLogQueue::AsyncLogQueue(size_t queue_max_size)
+    : mQueueMaxSize_(queue_max_size), mLogMessagesQueueMutex_{}, mDataInQueueAvailableConditionVariable_{}, mStopRequested_(false)
 {
-    AsyncLogQueue::AsyncLogQueue(size_t queue_max_size)
-        : queue_max_size_(queue_max_size), queue_mutex_{}, data_in_queue_available_condition_variable_{}, stop_requested_(false)
+}
+
+equinox::AsyncLogQueue::~AsyncLogQueue() = default;
+
+void equinox::AsyncLogQueue::enqueue(const std::string &log_message)
+{
+    std::unique_lock<std::mutex> lock(mLogMessagesQueueMutex_);
+    if (mLogMessagesQueue_.size() >= mQueueMaxSize_)
     {
+        mLogMessagesQueue_.pop_front(); // Remove the oldest log message to make room for the new one
+    }
+    mLogMessagesQueue_.push_back(log_message);
+    lock.unlock();
+    mDataInQueueAvailableConditionVariable_.notify_one();
+}
+
+bool equinox::AsyncLogQueue::dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms)
+{
+    std::unique_lock<std::mutex> lock(mLogMessagesQueueMutex_);
+    if (!mDataInQueueAvailableConditionVariable_.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]()
+                                                          { return !mLogMessagesQueue_.empty() || mStopRequested_; }))
+    {
+        return false;
     }
 
-    AsyncLogQueue::~AsyncLogQueue() = default;
-
-    void AsyncLogQueue::Enqueue(const std::string &log_message)
+    if (mStopRequested_ && mLogMessagesQueue_.empty())
     {
-        std::unique_lock<std::mutex> lock(queue_mutex_);
-        if (log_messages_queue_.size() >= queue_max_size_)
-        {
-            log_messages_queue_.pop_front(); // Remove the oldest log message to make room for the new one
-        }
-        log_messages_queue_.push_back(log_message);
-        lock.unlock();
-        data_in_queue_available_condition_variable_.notify_one();
+        return false;
     }
 
-    bool AsyncLogQueue::Dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms)
+    size_t batch_size = std::min(max_batch_size, mLogMessagesQueue_.size());
+    out.reserve(batch_size);
+    for (size_t i = 0; i < batch_size; ++i)
     {
-        std::unique_lock<std::mutex> lock(queue_mutex_);
-        if (!data_in_queue_available_condition_variable_.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]()
-                                                                  { return !log_messages_queue_.empty() || stop_requested_; }))
-        {
-            return false;
-        }
-
-        if (stop_requested_ && log_messages_queue_.empty())
-        {
-            return false;
-        }
-
-        size_t batch_size = std::min(max_batch_size, log_messages_queue_.size());
-        out.reserve(batch_size);
-        for (size_t i = 0; i < batch_size; ++i)
-        {
-            out.push_back(std::move(log_messages_queue_.front()));
-            log_messages_queue_.pop_front();
-        }
-
-        return true;
+        out.push_back(std::move(mLogMessagesQueue_.front()));
+        mLogMessagesQueue_.pop_front();
     }
 
-    void AsyncLogQueue::Stop()
-    {
-        std::unique_lock<std::mutex> lock(queue_mutex_);
-        stop_requested_ = true;
-        lock.unlock();
-        data_in_queue_available_condition_variable_.notify_all();
-    }
-} // namespace equinox
+    return true;
+}
+
+void equinox::AsyncLogQueue::stop()
+{
+    std::unique_lock<std::mutex> lock(mLogMessagesQueueMutex_);
+    mStopRequested_ = true;
+    lock.unlock();
+    mDataInQueueAvailableConditionVariable_.notify_all();
+}
