@@ -55,16 +55,16 @@ namespace equinox
     public:
         explicit AsyncLogQueue(size_t queue_max_size);
         ~AsyncLogQueue();
-        void Enqueue(const std::string &log_message);
-        bool Dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms);
-        void Stop();
+        void enqueue(const std::string &log_message);
+        bool dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms);
+        void stop();
 
     private:
-        size_t queue_max_size_;
-        std::deque<std::string> queue_;
-        std::mutex queue_mutex_;
-        std::condition_variable cv_;
-        bool stop_;
+        size_t mQueueMaxSize_;
+        std::deque<std::string> mLogMessagesQueue_;
+        std::mutex mLogMessagesQueueMutex_;
+        std::condition_variable mDataInQueueAvailableConditionVariable_;
+        bool mStopRequested_;
     };
 } // namespace equinox
 

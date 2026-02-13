@@ -39,105 +39,98 @@
 
 #include "AsyncLogQueueEngine.h"
 
-namespace equinox
+namespace
 {
+    static constexpr std::size_t kDefaultQueueMaxSize = 10000U;
+    static constexpr std::size_t kDefaultBatchSize = 64U;
+    static constexpr uint32_t kDefaultDequeueTimeoutMs = 50U;
+}
 
-    namespace
+equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(IConsoleLogsProducer &consoleLogsProducer, IFileLogsProducer &fileLogsProducer, logs_output::SINK logsOutputSink)
+    : mLogMessageQueue_(kDefaultQueueMaxSize), mWorkerThread_{}, mIsWorkerRunning_(false), mOutputMutex_{}, mConsoleLogsProducer_(consoleLogsProducer), mFileLogsProducer_(fileLogsProducer), mLogsOutputSink_(logsOutputSink)
+{
+}
+
+equinox::AsyncLogQueueEngine::~AsyncLogQueueEngine()
+{
+    stopWorker();
+}
+
+void equinox::AsyncLogQueueEngine::processLogMessage(const std::string &messageToProcess)
+{
+    mLogMessageQueue_.enqueue(messageToProcess);
+}
+
+void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
+{
+    bool expected = false;
+    if (!mIsWorkerRunning_.compare_exchange_strong(expected, true))
     {
-        static constexpr std::size_t kDefaultQueueMaxSize = 10000U;
-        static constexpr std::size_t kDefaultBatchSize = 64U;
-        static constexpr uint32_t kDefaultDequeueTimeoutMs = 50U;
+        return;
     }
 
-    AsyncLogQueueEngine::AsyncLogQueueEngine(IConsoleLogsProducer &consoleLogsProducer, IFileLogsProducer &fileLogsProducer, logs_output::SINK logsOutputSink)
-        : mAsyncQueue_(kDefaultQueueMaxSize), mWorkerThread_{}, mWorkerRunning_(false), mWorkerMutex_{}, mConsoleLogsProducer_(consoleLogsProducer), mFileLogsProducer_(fileLogsProducer), mLogsOutputSink_(logsOutputSink)
-    {
-    }
-
-    AsyncLogQueueEngine::~AsyncLogQueueEngine()
-    {
-        stopWorker();
-    }
-
-    void AsyncLogQueueEngine::processLogMessage(const std::string &messageToProcess)
-    {
-        mAsyncQueue_.Enqueue(messageToProcess);
-    }
-
-    void AsyncLogQueueEngine::startWorkerIfNeeded()
-    {
-        bool expected = false;
-        if (!mWorkerRunning_.compare_exchange_strong(expected, true))
+    mWorkerThread_ = std::thread([this]()
+                                 {
+        std::vector<std::string> batch;
+        while (true)
         {
-            return;
-        }
-
-        mWorkerThread_ = std::thread([this]()
-                                     {
-            std::vector<std::string> batch;
-            while (true)
+            batch.clear();
+            if (!mLogMessageQueue_.dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
             {
-                batch.clear();
-                if (!mAsyncQueue_.Dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
+                if (!mIsWorkerRunning_.load())
                 {
-                    if (!mWorkerRunning_.load())
+                    break;
+                }
+                continue;
+            }
+
+            for (const auto &message : batch)
+            {
+                {
+                    std::lock_guard<std::mutex> lock(mOutputMutex_);
+                    switch (mLogsOutputSink_)
                     {
+                    case logs_output::SINK::console:
+                        mConsoleLogsProducer_.logMessage(message);
+                        break;
+
+                    case logs_output::SINK::file:
+                        mFileLogsProducer_.logMessage(message);
+                        break;
+
+                    case logs_output::SINK::console_and_file:
+                        mConsoleLogsProducer_.logMessage(message);
+                        mFileLogsProducer_.logMessage(message);
                         break;
                     }
-                    continue;
                 }
+            }
+        } });
+}
 
-                for (const auto &message : batch)
-                {
-                    dispatchMessage(message);
-                }
-            } });
-    }
-
-    void AsyncLogQueueEngine::stopWorker()
+void equinox::AsyncLogQueueEngine::stopWorker()
+{
+    if (!mIsWorkerRunning_.exchange(false))
     {
-        if (!mWorkerRunning_.exchange(false))
-        {
-            return;
-        }
-
-        mAsyncQueue_.Stop();
-        if (mWorkerThread_.joinable())
-        {
-            mWorkerThread_.join();
-        }
+        return;
     }
 
-    void AsyncLogQueueEngine::dispatchMessage(const std::string &messageToLog)
+    mLogMessageQueue_.stop();
+    if (mWorkerThread_.joinable())
     {
-        std::lock_guard<std::mutex> lock(mWorkerMutex_);
-        switch (mLogsOutputSink_)
-        {
-        case logs_output::SINK::console:
-            mConsoleLogsProducer_.logMessage(messageToLog);
-            break;
-
-        case logs_output::SINK::file:
-            mFileLogsProducer_.logMessage(messageToLog);
-            break;
-
-        case logs_output::SINK::console_and_file:
-            mConsoleLogsProducer_.logMessage(messageToLog);
-            mFileLogsProducer_.logMessage(messageToLog);
-            break;
-        }
+        mWorkerThread_.join();
     }
+}
 
-    void AsyncLogQueueEngine::setLogsOutputSink(logs_output::SINK logsOutputSink)
-    {
-        std::lock_guard<std::mutex> lock(mWorkerMutex_);
-        mLogsOutputSink_ = logsOutputSink;
-    }
+void equinox::AsyncLogQueueEngine::setLogsOutputSink(logs_output::SINK logsOutputSink)
+{
+    std::lock_guard<std::mutex> lock(mOutputMutex_);
+    mLogsOutputSink_ = logsOutputSink;
+}
 
-    void AsyncLogQueueEngine::flush()
-    {
-        std::lock_guard<std::mutex> lock(mWorkerMutex_);
-        mConsoleLogsProducer_.flush();
-        mFileLogsProducer_.flush();
-    }
-} // namespace equinox
+void equinox::AsyncLogQueueEngine::flush()
+{
+    std::lock_guard<std::mutex> lock(mOutputMutex_);
+    mConsoleLogsProducer_.flush();
+    mFileLogsProducer_.flush();
+}

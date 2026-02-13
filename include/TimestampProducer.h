@@ -47,29 +47,29 @@
 namespace equinox
 {
 
-class EQUINOX_API ITimestampProducer
-{
-public:
-  virtual ~ITimestampProducer() = default;
-  virtual std::string getTimestamp() const = 0;
-  virtual std::string getTimestampInUs() = 0;
-};
-
-class EQUINOX_API TimestampProducer : public ITimestampProducer
-{
-public:
-  TimestampProducer()
-  : timestamp_ {}
+  class EQUINOX_API ITimestampProducer
   {
-  }
+  public:
+    virtual ~ITimestampProducer() = default;
+    virtual std::string getTimestamp() const = 0;
+    virtual std::string getTimestampInUs() = 0;
+  };
 
-  std::string getTimestamp() const override;
-  std::string getTimestampInUs() override;
+  class EQUINOX_API TimestampProducer : public ITimestampProducer
+  {
+  public:
+    TimestampProducer()
+        : mTimestamp_{}
+    {
+    }
 
-private:
-  std::string timestamp_;
-};
+    std::string getTimestamp() const override;
+    std::string getTimestampInUs() override;
 
-}/*namespace equinox*/
+  private:
+    std::string mTimestamp_;
+  };
+
+} /*namespace equinox*/
 
 #endif /* INCLUDE_TIMESTAMPPRODUCER_H_ */

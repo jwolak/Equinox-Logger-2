@@ -60,15 +60,14 @@ namespace equinox
         void processLogMessage(const std::string &messageToProcess);
         void stopWorker();
         void startWorkerIfNeeded();
-        void dispatchMessage(const std::string &messageToLog);
         void setLogsOutputSink(logs_output::SINK logsOutputSink);
         void flush();
 
     private:
-        AsyncLogQueue mAsyncQueue_;
+        AsyncLogQueue mLogMessageQueue_;
         std::thread mWorkerThread_;
-        std::atomic<bool> mWorkerRunning_;
-        std::mutex mWorkerMutex_;
+        std::atomic<bool> mIsWorkerRunning_;
+        std::mutex mOutputMutex_;
 
         IConsoleLogsProducer &mConsoleLogsProducer_;
         IFileLogsProducer &mFileLogsProducer_;
