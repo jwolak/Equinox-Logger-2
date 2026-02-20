@@ -30,6 +30,8 @@
  *
  */
 
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include "AsyncLogQueue.h"
@@ -38,7 +40,8 @@ namespace async_log_queue_test
 {
     namespace
     {
-        constexpr size_t kTestQueueMaxSize = 100;
+        constexpr size_t kTestQueueMaxSize = 10;
+        constexpr const char *testMessage = "Test log message";
     }
 
     class AsyncLogQueueForTests : public ::equinox::AsyncLogQueue
@@ -57,11 +60,73 @@ namespace async_log_queue_test
         AsyncLogQueueForTests asyncLogQueue;
     };
 
-    TEST_F(AsyncLogQueueTest, EnqueueAndDequeueSingleMessage)
+    TEST_F(AsyncLogQueueTest, Queue_Is_Full_And_Oldest_Message_Is_Removed)
     {
-        std::string testMessage = "Test log message";
+        for (size_t i = 0; i < kTestQueueMaxSize; ++i)
+        {
+            asyncLogQueue.enqueue("Log message " + std::to_string(i));
+        }
+        ASSERT_EQ(asyncLogQueue.getInternalQueue().size(), kTestQueueMaxSize);
+        asyncLogQueue.enqueue(testMessage);
+
+        ASSERT_EQ(asyncLogQueue.getInternalQueue().size(), kTestQueueMaxSize);
+    }
+
+    TEST_F(AsyncLogQueueTest, Queue_Is_Empty_And_After_Enqueue_Size_Is_One)
+    {
+        ASSERT_EQ(asyncLogQueue.getInternalQueue().size(), 0);
         asyncLogQueue.enqueue(testMessage);
 
         ASSERT_EQ(asyncLogQueue.getInternalQueue().size(), 1);
+    }
+
+    TEST_F(AsyncLogQueueTest, Run_Enqueue_From_Two_Thread_And_Queue_Size_Is_Correct)
+    {
+        std::thread t1([this]()
+                       {
+                           for (size_t i = 0; i < kTestQueueMaxSize / 2; ++i)
+                           {
+                               asyncLogQueue.enqueue("Thread 1 - Log message " + std::to_string(i));
+                           } });
+
+        std::thread t2([this]()
+                       {
+                           for (size_t i = 0; i < kTestQueueMaxSize / 2; ++i)
+                           {
+                               asyncLogQueue.enqueue("Thread 2 - Log message " + std::to_string(i));
+                           } });
+
+        t1.join();
+        t2.join();
+
+        ASSERT_EQ(asyncLogQueue.getInternalQueue().size(), kTestQueueMaxSize);
+    }
+
+    TEST_F(AsyncLogQueueTest, Run_Enqueue_From_Two_Thread_And_Messages_Are_Correctly_Added_To_Queue)
+    {
+
+        std::thread t1([this]()
+                       {
+                           for (size_t i = 0; i < kTestQueueMaxSize / 2; ++i)
+                           {
+                               asyncLogQueue.enqueue("Thread 1 - Log message " + std::to_string(i));
+                           } });
+
+        std::thread t2([this]()
+                       {
+                           for (size_t i = 0; i < kTestQueueMaxSize / 2; ++i)
+                           {
+                               asyncLogQueue.enqueue("Thread 2 - Log message " + std::to_string(i));
+                           } });
+
+        t1.join();
+        t2.join();
+
+        const auto &queue = asyncLogQueue.getInternalQueue();
+        for (size_t i = 0; i < kTestQueueMaxSize / 2; ++i)
+        {
+            ASSERT_TRUE(std::find(queue.begin(), queue.end(), "Thread 1 - Log message " + std::to_string(i)) != queue.end());
+            ASSERT_TRUE(std::find(queue.begin(), queue.end(), "Thread 2 - Log message " + std::to_string(i)) != queue.end());
+        }
     }
 }
