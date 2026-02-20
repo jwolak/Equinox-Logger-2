@@ -50,13 +50,20 @@ namespace equinox
     {
     public:
         /**
-         * Formats a log message with ANSI color codes based on the log level
+         * Extracts the log level from a formatted message (looks for [TRACE], [DEBUG], etc.)
          *
-         * @param logLevel The log level (trace, debug, info, warning, error, critical)
-         * @param message The message to be colored
+         * @param message The formatted message containing the level prefix
+         * @return The extracted LOG_LEVEL or info if not found
+         */
+        static level::LOG_LEVEL extractLevelFromMessage(const std::string &message);
+
+        /**
+         * Applies ANSI color codes to a message based on its log level prefix
+         *
+         * @param message The message containing [LEVEL] prefix
          * @return The message wrapped with appropriate ANSI color codes
          */
-        static std::string formatWithColor(level::LOG_LEVEL logLevel, const std::string &message);
+        static std::string applyConsoleColors(const std::string &message);
 
     private:
         // ANSI color codes

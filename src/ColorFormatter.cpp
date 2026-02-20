@@ -64,9 +64,30 @@ namespace equinox
         }
     }
 
-    std::string ColorFormatter::formatWithColor(level::LOG_LEVEL logLevel, const std::string &message)
+    level::LOG_LEVEL ColorFormatter::extractLevelFromMessage(const std::string &message)
     {
-        const char *color = getColorForLevel(logLevel);
+        // Look for [TRACE], [DEBUG], [INFO], [WARNING], [ERROR], [CRITICAL] in the message
+        if (message.find("[TRACE]") != std::string::npos)
+            return level::LOG_LEVEL::trace;
+        if (message.find("[DEBUG]") != std::string::npos)
+            return level::LOG_LEVEL::debug;
+        if (message.find("[INFO]") != std::string::npos)
+            return level::LOG_LEVEL::info;
+        if (message.find("[WARNING]") != std::string::npos)
+            return level::LOG_LEVEL::warning;
+        if (message.find("[ERROR]") != std::string::npos)
+            return level::LOG_LEVEL::error;
+        if (message.find("[CRITICAL]") != std::string::npos)
+            return level::LOG_LEVEL::critical;
+
+        // Default to info if not found
+        return level::LOG_LEVEL::info;
+    }
+
+    std::string ColorFormatter::applyConsoleColors(const std::string &message)
+    {
+        level::LOG_LEVEL level = extractLevelFromMessage(message);
+        const char *color = getColorForLevel(level);
 
         // If color is empty (default), return message as-is
         if (color[0] == '\0')

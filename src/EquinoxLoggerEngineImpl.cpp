@@ -73,9 +73,6 @@ void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, con
       break;
     }
 
-    // Apply colors based on log level
-    outputMessage = ColorFormatter::formatWithColor(msgLevel, outputMessage);
-
     mAsyncLogQueueEngine_->startWorkerIfNeeded();
     mAsyncLogQueueEngine_->processLogMessage(outputMessage);
   }

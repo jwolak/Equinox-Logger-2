@@ -40,12 +40,14 @@
 #include <iostream>
 
 #include "ConsoleLogsProducer.h"
+#include "ColorFormatter.h"
 
 void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
 {
   thread_local std::string buffer;
   buffer.clear();
-  buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog;
+  std::string coloredMessage = ColorFormatter::applyConsoleColors(messageToLog);
+  buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + coloredMessage;
   std::cout << buffer << std::endl;
 }
 
