@@ -51,6 +51,7 @@
 #include "FileLogsProducer.h"
 #include "AsyncLogQueue.h"
 #include "AsyncLogQueueEngine.h"
+#include "ColorFormatter.h"
 
 namespace equinox
 {
