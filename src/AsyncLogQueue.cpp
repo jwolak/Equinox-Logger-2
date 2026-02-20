@@ -92,3 +92,9 @@ void equinox::AsyncLogQueue::stop()
     lock.unlock();
     mDataInQueueAvailableConditionVariable_.notify_all();
 }
+
+const std::deque<std::string> &equinox::AsyncLogQueue::getLogMessagesQueue()
+{
+    std::lock_guard<std::mutex> lock(mLogMessagesQueueMutex_);
+    return mLogMessagesQueue_;
+}

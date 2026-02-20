@@ -59,6 +59,9 @@ namespace equinox
         bool dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms);
         void stop();
 
+    protected:
+        const std::deque<std::string> &getLogMessagesQueue();
+
     private:
         size_t mQueueMaxSize_;
         std::deque<std::string> mLogMessagesQueue_;

@@ -40,11 +40,28 @@ namespace async_log_queue_test
     {
         constexpr size_t kTestQueueMaxSize = 100;
     }
+
+    class AsyncLogQueueForTests : public ::equinox::AsyncLogQueue
+    {
+    public:
+        explicit AsyncLogQueueForTests(size_t queue_max_size) : AsyncLogQueue(queue_max_size) {}
+
+        const std::deque<std::string> &getInternalQueue() { return getLogMessagesQueue(); }
+    };
+
     class AsyncLogQueueTest : public ::testing::Test
     {
     public:
         AsyncLogQueueTest() : asyncLogQueue{kTestQueueMaxSize} {}
 
-        equinox::AsyncLogQueue asyncLogQueue;
+        AsyncLogQueueForTests asyncLogQueue;
     };
+
+    TEST_F(AsyncLogQueueTest, EnqueueAndDequeueSingleMessage)
+    {
+        std::string testMessage = "Test log message";
+        asyncLogQueue.enqueue(testMessage);
+
+        ASSERT_EQ(asyncLogQueue.getInternalQueue().size(), 1);
+    }
 }
