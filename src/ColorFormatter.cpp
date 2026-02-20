@@ -44,14 +44,13 @@ namespace equinox
 
     namespace
     {
-        // ANSI color codes
-        static constexpr const char *COLOR_RESET = "\033[0m";
-        static constexpr const char *COLOR_CYAN = "\033[36m";
-        static constexpr const char *COLOR_GREEN = "\033[32m";
-        static constexpr const char *COLOR_YELLOW = "\033[33m";
-        static constexpr const char *COLOR_RED = "\033[31m";
-        static constexpr const char *COLOR_MAGENTA = "\033[35m";
-        static constexpr const char *COLOR_DEFAULT = "";
+        static constexpr std::string_view kColorReset = "\033[0m";
+        static constexpr std::string_view kColorCyan = "\033[36m";
+        static constexpr std::string_view kColorGreen = "\033[32m";
+        static constexpr std::string_view kColorYellow = "\033[33m";
+        static constexpr std::string_view kColorRed = "\033[31m";
+        static constexpr std::string_view kColorMagenta = "\033[35m";
+        static constexpr std::string_view kColorDefault = "";
     }
 
     std::string_view ColorFormatter::getColorForLevel(level::LOG_LEVEL logLevel)
@@ -59,26 +58,25 @@ namespace equinox
         switch (logLevel)
         {
         case level::LOG_LEVEL::trace:
-            return COLOR_CYAN;
+            return kColorCyan;
         case level::LOG_LEVEL::debug:
-            return COLOR_GREEN;
+            return kColorGreen;
         case level::LOG_LEVEL::info:
-            return COLOR_DEFAULT;
+            return kColorDefault;
         case level::LOG_LEVEL::warning:
-            return COLOR_YELLOW;
+            return kColorYellow;
         case level::LOG_LEVEL::error:
-            return COLOR_RED;
+            return kColorRed;
         case level::LOG_LEVEL::critical:
-            return COLOR_MAGENTA;
+            return kColorMagenta;
         case level::LOG_LEVEL::off:
         default:
-            return COLOR_DEFAULT;
+            return kColorDefault;
         }
     }
 
     level::LOG_LEVEL ColorFormatter::extractLevelFromMessage(const std::string &message)
     {
-        // Look for [TRACE], [DEBUG], [INFO], [WARNING], [ERROR], [CRITICAL] in the message
         if (message.find("[TRACE]") != std::string::npos)
             return level::LOG_LEVEL::trace;
         if (message.find("[DEBUG]") != std::string::npos)
@@ -104,8 +102,7 @@ namespace equinox
             return message;
         }
 
-        // Return message wrapped with color code and reset code
-        return std::string(color) + message + std::string(COLOR_RESET);
+        return std::string(color) + message + std::string(kColorReset);
     }
 
 } /*namespace equinox*/
