@@ -49,7 +49,9 @@ namespace async_log_queue_test
     public:
         explicit AsyncLogQueueForTests(size_t queue_max_size) : AsyncLogQueue(queue_max_size) {}
 
-        const std::deque<std::string> &getInternalQueue() { return getLogMessagesQueue(); }
+        std::deque<std::string> &getInternalQueue() { return getLogMessagesQueue(); }
+        void setStopRequested(bool stopRequested) { AsyncLogQueue::setStopRequested(stopRequested); }
+        bool getStopRequested() { return AsyncLogQueue::getStopRequested(); }
     };
 
     class AsyncLogQueueTest : public ::testing::Test
@@ -128,5 +130,112 @@ namespace async_log_queue_test
             ASSERT_TRUE(std::find(queue.begin(), queue.end(), "Thread 1 - Log message " + std::to_string(i)) != queue.end());
             ASSERT_TRUE(std::find(queue.begin(), queue.end(), "Thread 2 - Log message " + std::to_string(i)) != queue.end());
         }
+    }
+
+    TEST_F(AsyncLogQueueTest, Try_Dequeue_From_Empty_Queue_And_Return_False)
+    {
+        std::vector<std::string> out;
+
+        ASSERT_FALSE(asyncLogQueue.dequeue(out, 5, 100));
+    }
+
+    TEST_F(AsyncLogQueueTest, Try_Dequeue_When_Stop_Is_Requested_And_Return_False)
+    {
+        asyncLogQueue.setStopRequested(true);
+        std::vector<std::string> out;
+
+        ASSERT_FALSE(asyncLogQueue.dequeue(out, 5, 100));
+    }
+
+    TEST_F(AsyncLogQueueTest, Enqueue_And_Dequeue_Messages_And_Check_If_Dequeued_Messages_Are_Correct)
+    {
+        std::vector<std::string> messagesToEnqueue = {"Message 1", "Message 2", "Message 3"};
+        for (const auto &msg : messagesToEnqueue)
+        {
+            asyncLogQueue.getInternalQueue().push_back(msg);
+        }
+
+        std::vector<std::string> out;
+        ASSERT_TRUE(asyncLogQueue.dequeue(out, 5, 100));
+        ASSERT_EQ(out.size(), messagesToEnqueue.size());
+        for (const auto &msg : messagesToEnqueue)
+        {
+            ASSERT_TRUE(std::find(out.begin(), out.end(), msg) != out.end());
+        }
+    }
+
+    TEST_F(AsyncLogQueueTest, Enqueue_More_Messages_Than_Max_Batch_Size_And_Check_If_Dequeued_Messages_Are_Correct)
+    {
+        std::vector<std::string> messagesToEnqueue = {"Message 1", "Message 2", "Message 3", "Message 4", "Message 5"};
+        for (const auto &msg : messagesToEnqueue)
+        {
+            asyncLogQueue.getInternalQueue().push_back(msg);
+        }
+
+        std::vector<std::string> out;
+        ASSERT_TRUE(asyncLogQueue.dequeue(out, 3, 100));
+        ASSERT_EQ(out.size(), 3);
+        for (size_t i = 0; i < 3; ++i)
+        {
+            ASSERT_TRUE(std::find(out.begin(), out.end(), messagesToEnqueue[i]) != out.end());
+        }
+    }
+
+    TEST_F(AsyncLogQueueTest, Dequeue_From_Two_Threads_And_Check_If_Messages_Are_Correctly_Dequeued)
+    {
+        std::vector<std::string> messagesToEnqueue = {"Message 1", "Message 2", "Message 3", "Message 4", "Message 5"};
+        for (const auto &msg : messagesToEnqueue)
+        {
+            asyncLogQueue.getInternalQueue().push_back(msg);
+        }
+
+        std::vector<std::string> out1, out2;
+        std::thread t1([this, &out1]()
+                       {
+                           bool result = asyncLogQueue.dequeue(out1, 3, 100);
+                           ASSERT_TRUE(result); });
+
+        std::thread t2([this, &out2]()
+                       {
+                           bool result = asyncLogQueue.dequeue(out2, 3, 100);
+                           ASSERT_TRUE(result); });
+
+        t1.join();
+        t2.join();
+
+        std::vector<std::string> allDequeuedMessages;
+        allDequeuedMessages.insert(allDequeuedMessages.end(), out1.begin(), out1.end());
+        allDequeuedMessages.insert(allDequeuedMessages.end(), out2.begin(), out2.end());
+
+        for (const auto &msg : messagesToEnqueue)
+        {
+            ASSERT_TRUE(std::find(allDequeuedMessages.begin(), allDequeuedMessages.end(), msg) != allDequeuedMessages.end());
+        }
+    }
+
+    TEST_F(AsyncLogQueueTest, Dequeue_All_Messages_And_Check_If_Queue_Is_Empty)
+    {
+        std::vector<std::string> messagesToEnqueue = {"Message 1", "Message 2", "Message 3"};
+        for (const auto &msg : messagesToEnqueue)
+        {
+            asyncLogQueue.getInternalQueue().push_back(msg);
+        }
+
+        std::vector<std::string> out;
+        asyncLogQueue.dequeue(out, 5, 100);
+
+        ASSERT_TRUE(asyncLogQueue.getInternalQueue().empty());
+    }
+
+    TEST_F(AsyncLogQueueTest, Stop_Queue_And_Check_If_Dequeue_Returns_False)
+    {
+        asyncLogQueue.stop();
+
+        ASSERT_TRUE(asyncLogQueue.getStopRequested());
+    }
+
+    TEST_F(AsyncLogQueueTest, Check_If_Stop_Request_Set_To_False_By_Default)
+    {
+        ASSERT_FALSE(asyncLogQueue.getStopRequested());
     }
 }

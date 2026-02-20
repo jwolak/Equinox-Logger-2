@@ -60,7 +60,9 @@ namespace equinox
         void stop();
 
     protected:
-        const std::deque<std::string> &getLogMessagesQueue();
+        std::deque<std::string> &getLogMessagesQueue();
+        void setStopRequested(bool stopRequested);
+        bool getStopRequested();
 
     private:
         size_t mQueueMaxSize_;
