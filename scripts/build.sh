@@ -31,6 +31,7 @@ SKIP_TESTS=false
 BUILD_SHARED=true
 BUILD_STATIC=false
 BUILD_BOTH=false
+ENABLE_COVERAGE=false
 SHOW_HELP=false
 
 ################################################################################
@@ -81,6 +82,7 @@ OPTIONS:
     --shared            Build shared library (default)
     --static            Build static library instead of shared library
     --both              Build both shared and static libraries
+    --coverage          Generate LCOV coverage report (requires tests)
     --clean             Explicit clean flag (cleaning is always performed)
     --skip-tests        Build tests but do not run them
     --help              Display this help message
@@ -111,6 +113,9 @@ EXAMPLES:
     # Build release with static library and examples
     ./scripts/build.sh release --static examples
 
+    # Build debug with tests and generate coverage report
+    ./scripts/build.sh debug tests --coverage
+
 BUILD DIRECTORY STRUCTURE:
     
     After building, the structure will be:
@@ -139,6 +144,7 @@ DEFAULT BEHAVIOR:
     - Shared library is built by default
     - Use '--static' for static library only
     - Use '--both' to build both shared and static libraries simultaneously
+    - Coverage requires tests to run and uses Debug build flags
 
 EOF
 }
@@ -165,6 +171,25 @@ check_compiler() {
     else
         local compiler_version=$(clang++ --version | head -n 1)
         print_info "Using compiler: $compiler_version"
+    fi
+}
+
+check_lcov() {
+    if [ "$ENABLE_COVERAGE" = true ]; then
+        if ! command -v lcov &> /dev/null || ! command -v genhtml &> /dev/null; then
+            print_warning "lcov/genhtml not found. Attempting to install..."
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update
+                sudo apt-get install -y lcov
+            else
+                print_error "Automatic install only supports apt-get. Please install lcov manually."
+                exit 1
+            fi
+        fi
+        if ! command -v lcov &> /dev/null || ! command -v genhtml &> /dev/null; then
+            print_error "lcov/genhtml still not available after install attempt."
+            exit 1
+        fi
     fi
 }
 
@@ -207,38 +232,43 @@ configure_cmake() {
     # Create build directory
     mkdir -p "$build_dir"
     
-    # Prepare CMake flags
-    local cmake_flags="-DCMAKE_BUILD_TYPE=$build_type"
+        # Prepare CMake arguments
+        local cmake_args=("-S" "$PROJECT_ROOT" "-B" "$build_dir" "-DCMAKE_BUILD_TYPE=$build_type")
     
     # Add optional flags
     if [ "$BUILD_EXAMPLES" = true ]; then
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_EXAMPLES=ON"
+           cmake_args+=("-DEQUINOX_LOGGER_EXAMPLES=ON")
     else
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_EXAMPLES=OFF"
+           cmake_args+=("-DEQUINOX_LOGGER_EXAMPLES=OFF")
     fi
     
     if [ "$BUILD_TESTS" = true ]; then
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_TESTS=ON"
+           cmake_args+=("-DEQUINOX_LOGGER_TESTS=ON")
     else
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_TESTS=OFF"
+           cmake_args+=("-DEQUINOX_LOGGER_TESTS=OFF")
+    fi
+
+    if [ "$ENABLE_COVERAGE" = true ]; then
+           cmake_args+=("-DCMAKE_CXX_FLAGS=--coverage -O0 -g")
+           cmake_args+=("-DCMAKE_EXE_LINKER_FLAGS=--coverage")
     fi
     
     # Handle library type configuration
     if [ "$BUILD_BOTH" = true ]; then
         # Build both shared and static libraries
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_BUILD_SHARED=ON -DEQUINOX_LOGGER_BUILD_STATIC=ON"
+           cmake_args+=("-DEQUINOX_LOGGER_BUILD_SHARED=ON" "-DEQUINOX_LOGGER_BUILD_STATIC=ON")
     elif [ "$BUILD_STATIC" = true ]; then
         # Build only static library
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_BUILD_STATIC=ON -DEQUINOX_LOGGER_BUILD_SHARED=OFF"
+           cmake_args+=("-DEQUINOX_LOGGER_BUILD_STATIC=ON" "-DEQUINOX_LOGGER_BUILD_SHARED=OFF")
     else
         # Build only shared library (default)
-        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_BUILD_SHARED=ON -DEQUINOX_LOGGER_BUILD_STATIC=OFF"
+           cmake_args+=("-DEQUINOX_LOGGER_BUILD_SHARED=ON" "-DEQUINOX_LOGGER_BUILD_STATIC=OFF")
     fi
     
-    print_info "CMake flags: $cmake_flags"
+        print_info "CMake args: ${cmake_args[*]}"
     
     # Run CMake with explicit source and build directories
-    if cmake -S "$PROJECT_ROOT" -B "$build_dir" $cmake_flags; then
+        if cmake "${cmake_args[@]}"; then
         print_success "CMake configuration successful"
     else
         print_error "CMake configuration failed"
@@ -293,6 +323,40 @@ run_tests() {
     fi
 }
 
+generate_coverage() {
+    local build_dir="$1"
+
+    if [ "$ENABLE_COVERAGE" = false ]; then
+        return 0
+    fi
+
+    if [ "$BUILD_TESTS" = false ] || [ "$SKIP_TESTS" = true ]; then
+        print_warning "Coverage requested but tests were not executed"
+        return 0
+    fi
+
+    print_header "Generating Coverage Report (LCOV)"
+    cd "$build_dir"
+
+    local coverage_dir="$build_dir/coverage"
+    local coverage_info="$coverage_dir/coverage.info"
+
+    mkdir -p "$coverage_dir"
+
+    # Capture coverage data
+    lcov --directory "$build_dir" --capture --output-file "$coverage_info" \
+        --rc geninfo_unexecuted_blocks=1 \
+        --ignore-errors mismatch
+
+    # Remove system and test files from report
+    lcov --remove "$coverage_info" "/usr/*" "*/tests/*" --output-file "$coverage_info"
+
+    # Generate HTML report
+    genhtml "$coverage_info" --output-directory "$coverage_dir/html"
+
+    print_success "Coverage report generated: $coverage_dir/html/index.html"
+}
+
 display_build_summary() {
     local build_type="$1"
     local build_dir="$2"
@@ -307,6 +371,7 @@ display_build_summary() {
     echo "Build Examples:          $BUILD_EXAMPLES"
     echo "Build Tests:             $BUILD_TESTS"
     echo "Skip Running Tests:      $SKIP_TESTS"
+    echo "Coverage (LCOV):         $ENABLE_COVERAGE"
     
     print_success "Build configuration set up"
 }
@@ -348,6 +413,10 @@ parse_arguments() {
                 BUILD_SHARED=true
                 BUILD_STATIC=true
                 BUILD_BOTH=true
+                ;;
+            --coverage|--lcov)
+                ENABLE_COVERAGE=true
+                BUILD_TESTS=true
                 ;;
             --clean)
                 # Always clean anyway, so this is just for clarity
@@ -408,6 +477,9 @@ perform_build() {
     
     # Run tests if applicable
     run_tests "$BUILD_DIR"
+
+    # Generate coverage report if requested
+    generate_coverage "$BUILD_DIR"
     
     # Restore previous values
     BUILD_SHARED=$PREV_SHARED
@@ -440,8 +512,14 @@ main() {
     print_header "Pre-flight Checks"
     check_cmake
     check_compiler
+    check_lcov
     if [ "$BUILD_TESTS" = true ]; then
         check_gtest
+    fi
+
+    if [ "$ENABLE_COVERAGE" = true ] && [ "$BUILD_TYPE" = "Release" ]; then
+        print_warning "Coverage enabled; switching build type to Debug for accurate results"
+        BUILD_TYPE="Debug"
     fi
     
     # Handle --both option: build shared and static separately
