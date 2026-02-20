@@ -62,11 +62,10 @@ namespace equinox
          * Applies ANSI color codes to a message based on its log level prefix
          *
          * @param message The message containing [LEVEL] prefix
-         * @param level The log level
          * @param color The ANSI color code
          * @return The message wrapped with appropriate ANSI color codes
          */
-        std::string applyConsoleColors(const std::string &message, level::LOG_LEVEL level, std::string_view color);
+        std::string applyConsoleColors(const std::string &message, std::string_view color);
 
         /**
          * Gets the ANSI color code for the given log level
