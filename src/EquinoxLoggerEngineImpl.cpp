@@ -71,6 +71,10 @@ void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, con
     case level::LOG_LEVEL::warning:
       outputMessage = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
       break;
+
+    case level::LOG_LEVEL::off:
+      // Should not reach here due to the check above, but included for completeness
+      break;
     }
 
     mAsyncLogQueueEngine_->startWorkerIfNeeded();
