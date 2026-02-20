@@ -54,7 +54,7 @@ namespace equinox
         static constexpr const char *COLOR_DEFAULT = "";
     }
 
-    const char *ColorFormatter::getColorForLevel(level::LOG_LEVEL logLevel)
+    std::string_view ColorFormatter::getColorForLevel(level::LOG_LEVEL logLevel)
     {
         switch (logLevel)
         {
@@ -96,10 +96,10 @@ namespace equinox
         return level::LOG_LEVEL::info;
     }
 
-    std::string ColorFormatter::applyConsoleColors(const std::string &message, level::LOG_LEVEL level, const char *color)
+    std::string ColorFormatter::applyConsoleColors(const std::string &message, level::LOG_LEVEL level, std::string_view color)
     {
         // If color is empty (default), return message as-is
-        if (color[0] == '\0')
+        if (color.empty())
         {
             return message;
         }

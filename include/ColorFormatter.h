@@ -41,6 +41,7 @@
 #define INCLUDE_COLORFORMATTER_H_
 
 #include <string>
+#include <string_view>
 #include "EquinoxLoggerCommon.h"
 
 namespace equinox
@@ -61,9 +62,11 @@ namespace equinox
          * Applies ANSI color codes to a message based on its log level prefix
          *
          * @param message The message containing [LEVEL] prefix
+         * @param level The log level
+         * @param color The ANSI color code
          * @return The message wrapped with appropriate ANSI color codes
          */
-        std::string applyConsoleColors(const std::string &message, level::LOG_LEVEL level, const char *color);
+        std::string applyConsoleColors(const std::string &message, level::LOG_LEVEL level, std::string_view color);
 
         /**
          * Gets the ANSI color code for the given log level
@@ -71,7 +74,7 @@ namespace equinox
          * @param logLevel The log level
          * @return The ANSI color code string
          */
-        const char *getColorForLevel(level::LOG_LEVEL logLevel);
+        std::string_view getColorForLevel(level::LOG_LEVEL logLevel);
     };
 
 } /*namespace equinox*/

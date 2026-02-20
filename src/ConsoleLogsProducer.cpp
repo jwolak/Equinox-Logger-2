@@ -38,6 +38,7 @@
  */
 
 #include <iostream>
+#include <string_view>
 
 #include "ConsoleLogsProducer.h"
 #include "ColorFormatter.h"
@@ -48,7 +49,7 @@ void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
   buffer.clear();
 
   level::LOG_LEVEL level = mColorFormatter_->extractLevelFromMessage(messageToLog);
-  const char *color = mColorFormatter_->getColorForLevel(level);
+  std::string_view color = mColorFormatter_->getColorForLevel(level);
 
   std::string coloredMessage = mColorFormatter_->applyConsoleColors(messageToLog, level, color);
   buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + coloredMessage;
