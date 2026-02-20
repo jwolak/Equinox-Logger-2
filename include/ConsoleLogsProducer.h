@@ -46,6 +46,7 @@
 
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
+#include "ColorFormatter.h"
 
 namespace equinox
 {
@@ -62,7 +63,7 @@ namespace equinox
   {
   public:
     ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-        : mTimestampProducer_{timestampProducer}
+        : mTimestampProducer_{timestampProducer}, mColorFormatter_{std::make_shared<ColorFormatter>()}
     {
     }
 
@@ -71,6 +72,7 @@ namespace equinox
 
   private:
     std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+    std::shared_ptr<ColorFormatter> mColorFormatter_;
   };
 
 } /*namespace equinox*/

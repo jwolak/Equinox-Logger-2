@@ -46,7 +46,11 @@ void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
 {
   thread_local std::string buffer;
   buffer.clear();
-  std::string coloredMessage = ColorFormatter::applyConsoleColors(messageToLog);
+
+  level::LOG_LEVEL level = mColorFormatter_->extractLevelFromMessage(messageToLog);
+  const char *color = mColorFormatter_->getColorForLevel(level);
+
+  std::string coloredMessage = mColorFormatter_->applyConsoleColors(messageToLog, level, color);
   buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + coloredMessage;
   std::cout << buffer << std::endl;
 }

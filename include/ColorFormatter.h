@@ -55,7 +55,7 @@ namespace equinox
          * @param message The formatted message containing the level prefix
          * @return The extracted LOG_LEVEL or info if not found
          */
-        static level::LOG_LEVEL extractLevelFromMessage(const std::string &message);
+        level::LOG_LEVEL extractLevelFromMessage(const std::string &message);
 
         /**
          * Applies ANSI color codes to a message based on its log level prefix
@@ -63,17 +63,7 @@ namespace equinox
          * @param message The message containing [LEVEL] prefix
          * @return The message wrapped with appropriate ANSI color codes
          */
-        static std::string applyConsoleColors(const std::string &message);
-
-    private:
-        // ANSI color codes
-        static constexpr const char *COLOR_RESET = "\033[0m";
-        static constexpr const char *COLOR_CYAN = "\033[36m";
-        static constexpr const char *COLOR_GREEN = "\033[32m";
-        static constexpr const char *COLOR_YELLOW = "\033[33m";
-        static constexpr const char *COLOR_RED = "\033[31m";
-        static constexpr const char *COLOR_MAGENTA = "\033[35m";
-        static constexpr const char *COLOR_DEFAULT = "";
+        std::string applyConsoleColors(const std::string &message, level::LOG_LEVEL level, const char *color);
 
         /**
          * Gets the ANSI color code for the given log level
@@ -81,7 +71,7 @@ namespace equinox
          * @param logLevel The log level
          * @return The ANSI color code string
          */
-        static const char *getColorForLevel(level::LOG_LEVEL logLevel);
+        const char *getColorForLevel(level::LOG_LEVEL logLevel);
     };
 
 } /*namespace equinox*/

@@ -42,6 +42,18 @@
 namespace equinox
 {
 
+    namespace
+    {
+        // ANSI color codes
+        static constexpr const char *COLOR_RESET = "\033[0m";
+        static constexpr const char *COLOR_CYAN = "\033[36m";
+        static constexpr const char *COLOR_GREEN = "\033[32m";
+        static constexpr const char *COLOR_YELLOW = "\033[33m";
+        static constexpr const char *COLOR_RED = "\033[31m";
+        static constexpr const char *COLOR_MAGENTA = "\033[35m";
+        static constexpr const char *COLOR_DEFAULT = "";
+    }
+
     const char *ColorFormatter::getColorForLevel(level::LOG_LEVEL logLevel)
     {
         switch (logLevel)
@@ -84,11 +96,8 @@ namespace equinox
         return level::LOG_LEVEL::info;
     }
 
-    std::string ColorFormatter::applyConsoleColors(const std::string &message)
+    std::string ColorFormatter::applyConsoleColors(const std::string &message, level::LOG_LEVEL level, const char *color)
     {
-        level::LOG_LEVEL level = extractLevelFromMessage(message);
-        const char *color = getColorForLevel(level);
-
         // If color is empty (default), return message as-is
         if (color[0] == '\0')
         {
