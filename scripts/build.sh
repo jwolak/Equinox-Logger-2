@@ -1,0 +1,471 @@
+#!/bin/bash
+
+################################################################################
+# Equinox Logger Build Script
+# 
+# Usage: ./scripts/build.sh [OPTIONS] [TARGETS]
+#
+# This script handles building the Equinox Logger project with support for
+# different build types (Debug/Release) and optional targets (examples, tests).
+################################################################################
+
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Script configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+BUILD_BASE_DIR="$PROJECT_ROOT/build"
+
+# Default values
+BUILD_TYPE="Debug"
+BUILD_EXAMPLES=false
+BUILD_TESTS=false
+SKIP_TESTS=false
+BUILD_SHARED=true
+BUILD_STATIC=false
+BUILD_BOTH=false
+SHOW_HELP=false
+
+################################################################################
+# Helper Functions
+################################################################################
+
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[✓]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+print_header() {
+    echo ""
+    echo "================================================================================"
+    echo -e "${BLUE}$1${NC}"
+    echo "================================================================================"
+    echo ""
+}
+
+show_help() {
+    cat << 'EOF'
+
+Equinox Logger Build Script
+============================
+
+USAGE:
+    ./scripts/build.sh [OPTIONS] [TARGETS]
+
+TARGETS:
+    debug               Build library in Debug mode (default if no type specified)
+    release             Build library in Release mode
+    examples            Build example applications
+    tests               Build and run unit tests (added to current build type)
+    unit                Alias for 'tests'
+
+OPTIONS:
+    --shared            Build shared library (default)
+    --static            Build static library instead of shared library
+    --both              Build both shared and static libraries
+    --clean             Explicit clean flag (cleaning is always performed)
+    --skip-tests        Build tests but do not run them
+    --help              Display this help message
+
+EXAMPLES:
+    # Display this help
+    ./scripts/build.sh
+    ./scripts/build.sh --help
+
+    # Build debug library only (default)
+    ./scripts/build.sh debug
+
+    # Build release library with examples and tests
+    ./scripts/build.sh release examples tests
+
+    # Build debug library and examples
+    ./scripts/build.sh debug examples
+
+    # Build debug library with tests (skip running them)
+    ./scripts/build.sh debug tests --skip-tests
+
+    # Build release with static library
+    ./scripts/build.sh release --static
+
+    # Build debug with both shared and static libraries
+    ./scripts/build.sh debug --both
+
+    # Build release with static library and examples
+    ./scripts/build.sh release --static examples
+
+BUILD DIRECTORY STRUCTURE:
+    
+    After building, the structure will be:
+    
+    build/
+├── Debug/              (created with 'debug' target)
+│   ├── libEquinoxLogger.so   (if --shared or default)
+│   ├── libEquinoxLogger.a    (if --static or --both)
+│   ├── Makefile
+│   ├── CMakeCache.txt
+│   ├── examples/
+│   ├── tests/
+│   └── ...
+└── Release/            (created with 'release' target)
+    ├── libEquinoxLogger.so   (if --shared or default)
+    ├── libEquinoxLogger.a    (if --static or --both)
+    ├── Makefile
+    ├── CMakeCache.txt
+        ├── tests/
+        └── ...
+
+DEFAULT BEHAVIOR:
+    - If no build type is specified, 'debug' is used
+    - The build directory is always cleaned before building
+    - Unit tests are automatically run after building if '--skip-tests' is not set
+    - Shared library is built by default
+    - Use '--static' for static library only
+    - Use '--both' to build both shared and static libraries simultaneously
+
+EOF
+}
+
+check_cmake() {
+    if ! command -v cmake &> /dev/null; then
+        print_error "CMake is not installed. Please install CMake 3.22.1 or later."
+        exit 1
+    fi
+    
+    local cmake_version=$(cmake --version | head -n 1 | grep -oP '\d+\.\d+\.\d+')
+    print_info "Using CMake version: $cmake_version"
+}
+
+check_compiler() {
+    if ! command -v g++ &> /dev/null && ! command -v clang++ &> /dev/null; then
+        print_error "No C++ compiler found. Please install g++ or clang++."
+        exit 1
+    fi
+    
+    if command -v g++ &> /dev/null; then
+        local compiler_version=$(g++ --version | head -n 1)
+        print_info "Using compiler: $compiler_version"
+    else
+        local compiler_version=$(clang++ --version | head -n 1)
+        print_info "Using compiler: $compiler_version"
+    fi
+}
+
+check_gtest() {
+    if [ "$BUILD_TESTS" = true ]; then
+        # Try to check with pkg-config if available
+        if command -v pkg-config &> /dev/null; then
+            if ! pkg-config --exists gtest gtest_main gmock 2>/dev/null; then
+                print_error "Google Test (GTest) is not found on this system."
+                print_error "Please install GTest first using: Setup-Environment-Scripts/gtest_install_script.sh"
+                exit 1
+            fi
+        else
+            # Fallback: check for common GTest library locations
+            if [ ! -f "/usr/lib/libgtest.a" ] && [ ! -f "/usr/local/lib/libgtest.a" ] && \
+               [ ! -f "/usr/lib/x86_64-linux-gnu/libgtest.a" ]; then
+                print_warning "Cannot verify GTest installation (pkg-config not available)"
+                print_warning "If GTest is not installed, the build will fail"
+                print_warning "Install GTest using: Setup-Environment-Scripts/gtest_install_script.sh"
+            fi
+        fi
+    fi
+}
+
+clean_build_dir() {
+    local build_dir="$1"
+    
+    if [ -d "$build_dir" ]; then
+        print_info "Cleaning build directory: $build_dir"
+        rm -rf "$build_dir"
+    fi
+}
+
+configure_cmake() {
+    local build_dir="$1"
+    local build_type="$2"
+    
+    print_header "Configuring CMake for $build_type build"
+    
+    # Create build directory
+    mkdir -p "$build_dir"
+    
+    # Prepare CMake flags
+    local cmake_flags="-DCMAKE_BUILD_TYPE=$build_type"
+    
+    # Add optional flags
+    if [ "$BUILD_EXAMPLES" = true ]; then
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_EXAMPLES=ON"
+    else
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_EXAMPLES=OFF"
+    fi
+    
+    if [ "$BUILD_TESTS" = true ]; then
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_TESTS=ON"
+    else
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_TESTS=OFF"
+    fi
+    
+    # Handle library type configuration
+    if [ "$BUILD_BOTH" = true ]; then
+        # Build both shared and static libraries
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_BUILD_SHARED=ON -DEQUINOX_LOGGER_BUILD_STATIC=ON"
+    elif [ "$BUILD_STATIC" = true ]; then
+        # Build only static library
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_BUILD_STATIC=ON -DEQUINOX_LOGGER_BUILD_SHARED=OFF"
+    else
+        # Build only shared library (default)
+        cmake_flags="$cmake_flags -DEQUINOX_LOGGER_BUILD_SHARED=ON -DEQUINOX_LOGGER_BUILD_STATIC=OFF"
+    fi
+    
+    print_info "CMake flags: $cmake_flags"
+    
+    # Run CMake with explicit source and build directories
+    if cmake -S "$PROJECT_ROOT" -B "$build_dir" $cmake_flags; then
+        print_success "CMake configuration successful"
+    else
+        print_error "CMake configuration failed"
+        exit 1
+    fi
+}
+
+build_project() {
+    local build_dir="$1"
+    local build_type="$2"
+    
+    print_header "Building $build_type"
+    
+    cd "$build_dir"
+    
+    # Determine number of jobs to use
+    local num_jobs=$(nproc)
+    print_info "Using $num_jobs parallel jobs for build"
+    
+    # Run make
+    if make -j "$num_jobs"; then
+        print_success "Build completed successfully"
+    else
+        print_error "Build failed"
+        exit 1
+    fi
+}
+
+run_tests() {
+    local build_dir="$1"
+    
+    if [ "$BUILD_TESTS" = false ] || [ "$SKIP_TESTS" = true ]; then
+        return 0
+    fi
+    
+    print_header "Running Unit Tests"
+    
+    if [ ! -f "$build_dir/tests/EquinoxLoggerTests.x86" ]; then
+        print_warning "Test executable not found at $build_dir/tests/EquinoxLoggerTests.x86"
+        return 1
+    fi
+    
+    cd "$build_dir"
+    
+    # Run the tests
+    if ./tests/EquinoxLoggerTests.x86; then
+        print_success "All tests passed"
+        return 0
+    else
+        print_error "Some tests failed"
+        return 1
+    fi
+}
+
+display_build_summary() {
+    local build_type="$1"
+    local build_dir="$2"
+    
+    print_header "Build Summary"
+    
+    echo "Build Type:              $build_type"
+    echo "Build Directory:         $build_dir"
+    echo "Build Shared:            $BUILD_SHARED"
+    echo "Build Static:            $BUILD_STATIC"
+    echo "Build Both:              $BUILD_BOTH"
+    echo "Build Examples:          $BUILD_EXAMPLES"
+    echo "Build Tests:             $BUILD_TESTS"
+    echo "Skip Running Tests:      $SKIP_TESTS"
+    
+    print_success "Build configuration set up"
+}
+
+################################################################################
+# Parse Arguments
+################################################################################
+
+parse_arguments() {
+    local args_provided=false
+    
+    for arg in "$@"; do
+        args_provided=true
+        
+        case "$arg" in
+            debug)
+                BUILD_TYPE="Debug"
+                ;;
+            release)
+                BUILD_TYPE="Release"
+                ;;
+            examples)
+                BUILD_EXAMPLES=true
+                ;;
+            tests|unit)
+                BUILD_TESTS=true
+                ;;
+            --shared)
+                BUILD_SHARED=true
+                BUILD_STATIC=false
+                BUILD_BOTH=false
+                ;;
+            --static)
+                BUILD_SHARED=false
+                BUILD_STATIC=true
+                BUILD_BOTH=false
+                ;;
+            --both)
+                BUILD_SHARED=true
+                BUILD_STATIC=true
+                BUILD_BOTH=true
+                ;;
+            --clean)
+                # Always clean anyway, so this is just for clarity
+                ;;
+            --skip-tests)
+                SKIP_TESTS=true
+                ;;
+            --help|-h)
+                SHOW_HELP=true
+                ;;
+            *)
+                print_error "Unknown argument: $arg"
+                SHOW_HELP=true
+                ;;
+        esac
+    done
+    
+    # If no args provided, show help
+    if [ "$args_provided" = false ]; then
+        SHOW_HELP=true
+    fi
+}
+
+################################################################################
+# Main Execution
+################################################################################
+
+perform_build() {
+    local build_type="$1"
+    local build_shared="$2"
+    local build_static="$3"
+    local build_suffix="$4"
+    
+    # Determine build directory with optional suffix
+    local BUILD_DIR="$BUILD_BASE_DIR/$build_type$build_suffix"
+    
+    # Display build configuration
+    display_build_summary "$build_type" "$BUILD_DIR"
+    
+    # Clean build directory
+    print_header "Cleaning"
+    clean_build_dir "$BUILD_DIR"
+    print_success "Clean completed"
+    
+    # Temporarily update global variables for this build
+    local PREV_SHARED=$BUILD_SHARED
+    local PREV_STATIC=$BUILD_STATIC
+    local PREV_BOTH=$BUILD_BOTH
+    BUILD_SHARED=$build_shared
+    BUILD_STATIC=$build_static
+    BUILD_BOTH=false  # Important: disable BUILD_BOTH so configure_cmake() uses correct logic
+    
+    # Configure with CMake
+    configure_cmake "$BUILD_DIR" "$build_type"
+    
+    # Build the project
+    build_project "$BUILD_DIR" "$build_type"
+    
+    # Run tests if applicable
+    run_tests "$BUILD_DIR"
+    
+    # Restore previous values
+    BUILD_SHARED=$PREV_SHARED
+    BUILD_STATIC=$PREV_STATIC
+    BUILD_BOTH=$PREV_BOTH
+    
+    # Final summary
+    print_header "Build Complete"
+    print_success "Build succeeded!"
+    echo ""
+    echo "Build artifacts located in: $BUILD_DIR"
+    echo ""
+}
+
+main() {
+    # Parse command line arguments
+    parse_arguments "$@"
+    
+    # Show help if requested or no arguments
+    if [ "$SHOW_HELP" = true ]; then
+        show_help
+        exit 0
+    fi
+    
+    # Print project info
+    print_header "Equinox Logger Build System"
+    print_info "Project Root: $PROJECT_ROOT"
+    
+    # Pre-flight checks
+    print_header "Pre-flight Checks"
+    check_cmake
+    check_compiler
+    if [ "$BUILD_TESTS" = true ]; then
+        check_gtest
+    fi
+    
+    # Handle --both option: build shared and static separately
+    if [ "$BUILD_BOTH" = true ]; then
+        print_header "Building Both Shared and Static Libraries"
+        
+        # Build shared version
+        perform_build "$BUILD_TYPE" true false "-shared"
+        
+        # Build static version
+        perform_build "$BUILD_TYPE" false true "-static"
+        
+        # Final combined summary
+        print_header "All Builds Complete"
+        print_success "Both shared and static libraries built successfully!"
+        echo ""
+        echo "Shared library:  $BUILD_BASE_DIR/$BUILD_TYPE-shared/"
+        echo "Static library:  $BUILD_BASE_DIR/$BUILD_TYPE-static/"
+        echo ""
+    else
+        # Normal single build
+        perform_build "$BUILD_TYPE" "$BUILD_SHARED" "$BUILD_STATIC" ""
+    fi
+}
+
+# Execute main function with all arguments
+main "$@"

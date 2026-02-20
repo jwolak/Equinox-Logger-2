@@ -33,6 +33,28 @@ option(EQUINOX_LOGGER_BUILD_SHARED  "Build shared lib"      ON)
 option(EQUINOX_LOGGER_BUILD_STATIC  "Build static lib"      OFF)
 
 #------------------------------------------------------------------------------------------
+#                                Compiler flags
+#------------------------------------------------------------------------------------------
+
+# Set default build type to Release if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    message(STATUS "Build type not specified. Defaulting to Release")
+endif()
+
+# Debug flags: Include symbols, no optimization, extra warnings
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -pedantic"
+    CACHE STRING "Debug C++ compiler flags" FORCE)
+
+# Release flags: Optimize for performance, strip symbols, extra warnings
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG -Wall -Wextra"
+    CACHE STRING "Release C++ compiler flags" FORCE)
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "C++ compiler flags (Debug):   ${CMAKE_CXX_FLAGS_DEBUG}")
+message(STATUS "C++ compiler flags (Release): ${CMAKE_CXX_FLAGS_RELEASE}")
+
+#------------------------------------------------------------------------------------------
 #                                Project api
 #------------------------------------------------------------------------------------------
 set(EQUINOX_LOGGER_API
