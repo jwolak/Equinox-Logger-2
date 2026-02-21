@@ -1,10 +1,3 @@
-/*
- * AsyncLogQueue.h
- *
- *  Created on: 2026
- *      Author: Janusz Wolak
- */
-
 /*-
  * BSD 3-Clause License
  *
@@ -37,42 +30,20 @@
  *
  */
 
-#ifndef INCLUDE_ASYNCLOGQUEUE_H_
-#define INCLUDE_ASYNCLOGQUEUE_H_
+#pragma once
 
-#include "IAsyncLogQueue.h"
-
-#include <cstddef>
-#include <cstdint>
-#include <deque>
 #include <string>
 #include <vector>
-#include <mutex>
-#include <condition_variable>
+#include <cstdint>
 
 namespace equinox
 {
-    class AsyncLogQueue : public IAsyncLogQueue
+    class IAsyncLogQueue
     {
     public:
-        explicit AsyncLogQueue(size_t queue_max_size);
-        ~AsyncLogQueue();
-        void enqueue(const std::string &log_message) override;
-        bool dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms) override;
-        void stop() override;
-
-    protected:
-        std::deque<std::string> &getLogMessagesQueue();
-        void setStopRequested(bool stopRequested);
-        bool getStopRequested();
-
-    private:
-        size_t mQueueMaxSize_;
-        std::deque<std::string> mLogMessagesQueue_;
-        std::mutex mLogMessagesQueueMutex_;
-        std::condition_variable mDataInQueueAvailableConditionVariable_;
-        bool mStopRequested_;
+        virtual ~IAsyncLogQueue() = default;
+        virtual void enqueue(const std::string &log_message) = 0;
+        virtual bool dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms) = 0;
+        virtual void stop() = 0;
     };
-} // namespace equinox
-
-#endif /* INCLUDE_ASYNCLOGQUEUE_H_ */
+}

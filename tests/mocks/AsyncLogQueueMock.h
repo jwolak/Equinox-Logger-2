@@ -1,10 +1,3 @@
-/*
- * AsyncLogQueue.h
- *
- *  Created on: 2026
- *      Author: Janusz Wolak
- */
-
 /*-
  * BSD 3-Clause License
  *
@@ -37,42 +30,19 @@
  *
  */
 
-#ifndef INCLUDE_ASYNCLOGQUEUE_H_
-#define INCLUDE_ASYNCLOGQUEUE_H_
+#pragma once
 
 #include "IAsyncLogQueue.h"
 
-#include <cstddef>
-#include <cstdint>
-#include <deque>
-#include <string>
-#include <vector>
-#include <mutex>
-#include <condition_variable>
+#include <gmock/gmock.h>
 
-namespace equinox
+namespace mocks
 {
-    class AsyncLogQueue : public IAsyncLogQueue
+    class AsyncLogQueueMock : public equinox::IAsyncLogQueue
     {
     public:
-        explicit AsyncLogQueue(size_t queue_max_size);
-        ~AsyncLogQueue();
-        void enqueue(const std::string &log_message) override;
-        bool dequeue(std::vector<std::string> &out, size_t max_batch_size, uint32_t timeout_ms) override;
-        void stop() override;
-
-    protected:
-        std::deque<std::string> &getLogMessagesQueue();
-        void setStopRequested(bool stopRequested);
-        bool getStopRequested();
-
-    private:
-        size_t mQueueMaxSize_;
-        std::deque<std::string> mLogMessagesQueue_;
-        std::mutex mLogMessagesQueueMutex_;
-        std::condition_variable mDataInQueueAvailableConditionVariable_;
-        bool mStopRequested_;
+        MOCK_METHOD(void, enqueue, (const std::string &log_message), (override));
+        MOCK_METHOD(bool, dequeue, (std::vector<std::string> & out, size_t max_batch_size, uint32_t timeout_ms), (override));
+        MOCK_METHOD(void, stop, (), (override));
     };
-} // namespace equinox
-
-#endif /* INCLUDE_ASYNCLOGQUEUE_H_ */
+}
