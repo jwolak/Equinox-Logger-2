@@ -33,6 +33,8 @@ BUILD_STATIC=false
 BUILD_BOTH=false
 ENABLE_COVERAGE=false
 SHOW_HELP=false
+RUN_FORMAT=false
+FORMAT_ONLY=false
 
 ################################################################################
 # Helper Functions
@@ -77,6 +79,7 @@ TARGETS:
     examples            Build example applications
     tests               Build and run unit tests (added to current build type)
     unit                Alias for 'tests'
+    format              Format all source files using .clang-format
 
 OPTIONS:
     --shared            Build shared library (default)
@@ -85,6 +88,8 @@ OPTIONS:
     --coverage          Generate LCOV coverage report (requires tests)
     --clean             Explicit clean flag (cleaning is always performed)
     --skip-tests        Build tests but do not run them
+    --format            Format all source files using .clang-format
+    --format-only       Format all source files and exit
     --help              Display this help message
 
 EXAMPLES:
@@ -115,6 +120,9 @@ EXAMPLES:
 
     # Build debug with tests and generate coverage report
     ./scripts/build.sh debug tests --coverage
+
+    # Format all source files
+    ./scripts/build.sh --format-only
 
 BUILD DIRECTORY STRUCTURE:
     
@@ -190,6 +198,13 @@ check_lcov() {
             print_error "lcov/genhtml still not available after install attempt."
             exit 1
         fi
+    fi
+}
+
+check_clang_format() {
+    if ! command -v clang-format &> /dev/null; then
+        print_error "clang-format is not installed. Please install clang-format to format code."
+        exit 1
     fi
 }
 
@@ -357,6 +372,38 @@ generate_coverage() {
     print_success "Coverage report generated: $coverage_dir/html/index.html"
 }
 
+format_code() {
+    print_header "Formatting Source Code"
+
+    local search_dirs=(
+        "$PROJECT_ROOT/src"
+        "$PROJECT_ROOT/include"
+        "$PROJECT_ROOT/api"
+        "$PROJECT_ROOT/tests"
+        "$PROJECT_ROOT/examples"
+    )
+
+    local existing_dirs=()
+    local dir
+    for dir in "${search_dirs[@]}"; do
+        if [ -d "$dir" ]; then
+            existing_dirs+=("$dir")
+        fi
+    done
+
+    if [ ${#existing_dirs[@]} -eq 0 ]; then
+        print_warning "No source directories found to format"
+        return 0
+    fi
+
+    find "${existing_dirs[@]}" -type f \( \
+        -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" -o \
+        -name "*.h" -o -name "*.hpp" \
+    \) -print0 | xargs -0 -r clang-format -i -style=file
+
+    print_success "Formatting complete"
+}
+
 display_build_summary() {
     local build_type="$1"
     local build_dir="$2"
@@ -399,6 +446,10 @@ parse_arguments() {
             tests|unit)
                 BUILD_TESTS=true
                 ;;
+            format)
+                RUN_FORMAT=true
+                FORMAT_ONLY=true
+                ;;
             --shared)
                 BUILD_SHARED=true
                 BUILD_STATIC=false
@@ -423,6 +474,13 @@ parse_arguments() {
                 ;;
             --skip-tests)
                 SKIP_TESTS=true
+                ;;
+            --format)
+                RUN_FORMAT=true
+                ;;
+            --format-only)
+                RUN_FORMAT=true
+                FORMAT_ONLY=true
                 ;;
             --help|-h)
                 SHOW_HELP=true
@@ -503,6 +561,12 @@ main() {
         show_help
         exit 0
     fi
+
+    if [ "$FORMAT_ONLY" = true ]; then
+        check_clang_format
+        format_code
+        exit 0
+    fi
     
     # Print project info
     print_header "Equinox Logger Build System"
@@ -515,6 +579,11 @@ main() {
     check_lcov
     if [ "$BUILD_TESTS" = true ]; then
         check_gtest
+    fi
+
+    if [ "$RUN_FORMAT" = true ]; then
+        check_clang_format
+        format_code
     fi
 
     if [ "$ENABLE_COVERAGE" = true ] && [ "$BUILD_TYPE" = "Release" ]; then

@@ -40,40 +40,35 @@
 #ifndef INCLUDE_CONSOLELOGSPRODUCER_H_
 #define INCLUDE_CONSOLELOGSPRODUCER_H_
 
-#include <string>
 #include <memory>
 #include <mutex>
+#include <string>
 
+#include "ColorFormatter.h"
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
-#include "ColorFormatter.h"
 
-namespace equinox
-{
+namespace equinox {
 
-  class EQUINOX_API IConsoleLogsProducer
-  {
-  public:
-    virtual ~IConsoleLogsProducer() = default;
-    virtual void logMessage(const std::string &) = 0;
-    virtual void flush() = 0;
-  };
+class EQUINOX_API IConsoleLogsProducer {
+ public:
+  virtual ~IConsoleLogsProducer() = default;
+  virtual void logMessage(const std::string&) = 0;
+  virtual void flush() = 0;
+};
 
-  class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer
-  {
-  public:
-    ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-        : mTimestampProducer_{timestampProducer}, mColorFormatter_{std::make_shared<ColorFormatter>()}
-    {
-    }
+class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer {
+ public:
+  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+      : mTimestampProducer_{timestampProducer}, mColorFormatter_{std::make_shared<ColorFormatter>()} {}
 
-    void logMessage(const std::string &format) override;
-    void flush() override;
+  void logMessage(const std::string& format) override;
+  void flush() override;
 
-  private:
-    std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-    std::shared_ptr<ColorFormatter> mColorFormatter_;
-  };
+ private:
+  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+  std::shared_ptr<ColorFormatter> mColorFormatter_;
+};
 
 } /*namespace equinox*/
 

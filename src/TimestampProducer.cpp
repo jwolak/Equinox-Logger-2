@@ -37,13 +37,12 @@
  *
  */
 
+#include "TimestampProducer.h"
+
 #include <chrono>
 #include <ctime>
 
-#include "TimestampProducer.h"
-
-std::string equinox::TimestampProducer::getTimestamp() const
-{
+std::string equinox::TimestampProducer::getTimestamp() const {
   std::chrono::system_clock::time_point sys_clock_time_point;
 
   sys_clock_time_point = std::chrono::system_clock::now();
@@ -55,8 +54,7 @@ std::string equinox::TimestampProducer::getTimestamp() const
   return timestamp_;
 }
 
-std::string equinox::TimestampProducer::getTimestampInUs()
-{
+std::string equinox::TimestampProducer::getTimestampInUs() {
   uint64_t timestampInUs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   mTimestamp_ = std::string("[" + std::to_string(timestampInUs) + "]");
 

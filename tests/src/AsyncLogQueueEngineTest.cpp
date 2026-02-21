@@ -32,11 +32,9 @@
 
 #include <gtest/gtest.h>
 
-namespace async_log_queue_engine_test
-{
-    class AsyncLogQueueEngineTest : public ::testing::Test
-    {
-    public:
-        AsyncLogQueueEngineTest() {}
-    };
-}
+namespace async_log_queue_engine_test {
+class AsyncLogQueueEngineTest : public ::testing::Test {
+ public:
+  AsyncLogQueueEngineTest() {}
+};
+}  // namespace async_log_queue_engine_test

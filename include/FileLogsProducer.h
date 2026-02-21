@@ -41,76 +41,71 @@
 #define INCLUDE_FILELOGSPRODUCER_H_
 
 #include <cstddef>
-#include <string>
-#include <memory>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <memory>
 #include <mutex>
+#include <sstream>
+#include <string>
 
 #include "EquinoxLoggerCommon.h"
 #include "TimestampProducer.h"
 
-namespace equinox
-{
+namespace equinox {
 
-  class EQUINOX_API IFileLogsProducer
-  {
-  public:
-    virtual ~IFileLogsProducer() = default;
-    virtual void setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) = 0;
-    virtual void logMessage(const std::string &messageToLog) = 0;
-    virtual void flush() = 0;
-  };
+class EQUINOX_API IFileLogsProducer {
+ public:
+  virtual ~IFileLogsProducer() = default;
+  virtual void setupFile(const std::string& logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) = 0;
+  virtual void logMessage(const std::string& messageToLog) = 0;
+  virtual void flush() = 0;
+};
 
-  class EQUINOX_API FileLogsProducer : public IFileLogsProducer
-  {
-  public:
-    FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-        : mMessageBufferAccessLock_{}, mTimestampProducer{timestampProducer}, mFdLogFile_{}, mLogFileName_{}, mMaxLogFileSizeBytes_{0U}, mMaxLogFiles_{0U}, mNextRotationIndex_{1U}
-    {
-    }
+class EQUINOX_API FileLogsProducer : public IFileLogsProducer {
+ public:
+  FileLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+      : mMessageBufferAccessLock_{},
+        mTimestampProducer{timestampProducer},
+        mFdLogFile_{},
+        mLogFileName_{},
+        mMaxLogFileSizeBytes_{0U},
+        mMaxLogFiles_{0U},
+        mNextRotationIndex_{1U} {}
 
-    ~FileLogsProducer() noexcept
-    {
-      if (mFdLogFile_.is_open())
-      {
-        try
-        {
-          mFdLogFile_.close();
-        }
-        catch (std::ofstream::failure &ex)
-        {
-          // Destructor - cannot propagate exception
-          std::cerr << "[EquinoxLogger] Warning: Failed to close log file in destructor: "
-                    << ex.what() << std::endl;
-        }
+  ~FileLogsProducer() noexcept {
+    if (mFdLogFile_.is_open()) {
+      try {
+        mFdLogFile_.close();
+      } catch (std::ofstream::failure& ex) {
+        // Destructor - cannot propagate exception
+        std::cerr << "[EquinoxLogger] Warning: Failed to close log file in destructor: " << ex.what() << std::endl;
       }
     }
+  }
 
-    FileLogsProducer(const FileLogsProducer &) = delete;
-    FileLogsProducer(const FileLogsProducer &&) = delete;
-    FileLogsProducer &operator=(FileLogsProducer &) = delete;
+  FileLogsProducer(const FileLogsProducer&) = delete;
+  FileLogsProducer(const FileLogsProducer&&) = delete;
+  FileLogsProducer& operator=(FileLogsProducer&) = delete;
 
-    void setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) override;
-    void logMessage(const std::string &messageToLog) override;
-    void flush() override;
+  void setupFile(const std::string& logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) override;
+  void logMessage(const std::string& messageToLog) override;
+  void flush() override;
 
-  private:
-    void openLogFileAppend();
-    void openLogFileTruncate();
-    void rotateIfNeeded();
-    std::string buildRotatedFileName(std::size_t index) const;
-    bool isRotationEnabled() const;
+ private:
+  void openLogFileAppend();
+  void openLogFileTruncate();
+  void rotateIfNeeded();
+  std::string buildRotatedFileName(std::size_t index) const;
+  bool isRotationEnabled() const;
 
-    std::mutex mMessageBufferAccessLock_;
-    std::shared_ptr<ITimestampProducer> mTimestampProducer;
-    std::ofstream mFdLogFile_;
-    std::string mLogFileName_;
-    std::size_t mMaxLogFileSizeBytes_;
-    std::size_t mMaxLogFiles_;
-    std::size_t mNextRotationIndex_;
-  };
+  std::mutex mMessageBufferAccessLock_;
+  std::shared_ptr<ITimestampProducer> mTimestampProducer;
+  std::ofstream mFdLogFile_;
+  std::string mLogFileName_;
+  std::size_t mMaxLogFileSizeBytes_;
+  std::size_t mMaxLogFiles_;
+  std::size_t mNextRotationIndex_;
+};
 } /*namespace equinox*/
 
 #endif /* INCLUDE_FILELOGSPRODUCER_H_ */

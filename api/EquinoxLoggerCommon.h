@@ -47,11 +47,11 @@
 #undef EQUINOX_HEADER_ONLY
 #define EQUINOX_API __attribute__((visibility("default")))
 #define EQUINOX_INLINE
-#else // !defined(EQUINOX_SHARED_SHARED_LIB)
+#else  // !defined(EQUINOX_SHARED_SHARED_LIB)
 #define EQUINOX_API
 #define EQUINOX_HEADER_ONLY
 #define EQUINOX_INLINE inline
-#endif // #ifdef EQUINOX_SHARED_SHARED_LIB
+#endif  // #ifdef EQUINOX_SHARED_SHARED_LIB
 
 #define EQUINOX_LEVEL_TRACE 0
 #define EQUINOX_LEVEL_DEBUG 1
@@ -67,36 +67,27 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-namespace equinox
-{
+namespace equinox {
 
-    const std::string kLogFileName = "logs.log";
-    const std::size_t kDefaultMaxLogFileSizeBytes = 3U * 1024U * 1024U;
-    const std::size_t kDefaultMaxLogFiles = 5U;
+const std::string kLogFileName = "logs.log";
+const std::size_t kDefaultMaxLogFileSizeBytes = 3U * 1024U * 1024U;
+const std::size_t kDefaultMaxLogFiles = 5U;
 
-    namespace level
-    {
-        enum class LOG_LEVEL : int
-        {
-            trace = EQUINOX_LEVEL_TRACE,
-            debug = EQUINOX_LEVEL_DEBUG,
-            info = EQUINOX_LEVEL_INFO,
-            warning = EQUINOX_LEVEL_WARNING,
-            error = EQUINOX_LEVEL_ERROR,
-            critical = EQUINOX_LEVEL_CRITICAL,
-            off = EQUINOX_LEVEL_OFF
-        };
-    } /*namespace level*/
+namespace level {
+enum class LOG_LEVEL : int {
+  trace = EQUINOX_LEVEL_TRACE,
+  debug = EQUINOX_LEVEL_DEBUG,
+  info = EQUINOX_LEVEL_INFO,
+  warning = EQUINOX_LEVEL_WARNING,
+  error = EQUINOX_LEVEL_ERROR,
+  critical = EQUINOX_LEVEL_CRITICAL,
+  off = EQUINOX_LEVEL_OFF
+};
+} /*namespace level*/
 
-    namespace logs_output
-    {
-        enum class SINK : int
-        {
-            console = EQUINOX_SINK_CONSOLE,
-            file = EQUINOX_SINK_FILE,
-            console_and_file = EQUINOX_SINK_CONSOLE_AND_FILE
-        };
-    } /*namespace logs_output*/
+namespace logs_output {
+enum class SINK : int { console = EQUINOX_SINK_CONSOLE, file = EQUINOX_SINK_FILE, console_and_file = EQUINOX_SINK_CONSOLE_AND_FILE };
+} /*namespace logs_output*/
 
 } /*namespace equinox*/
 

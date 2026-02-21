@@ -32,17 +32,15 @@
 
 #pragma once
 
-#include "IAsyncLogQueue.h"
-
 #include <gmock/gmock.h>
 
-namespace mocks
-{
-    class AsyncLogQueueMock : public equinox::IAsyncLogQueue
-    {
-    public:
-        MOCK_METHOD(void, enqueue, (const std::string &log_message), (override));
-        MOCK_METHOD(bool, dequeue, (std::vector<std::string> & out, size_t max_batch_size, uint32_t timeout_ms), (override));
-        MOCK_METHOD(void, stop, (), (override));
-    };
-}
+#include "IAsyncLogQueue.h"
+
+namespace mocks {
+class AsyncLogQueueMock : public equinox::IAsyncLogQueue {
+ public:
+  MOCK_METHOD(void, enqueue, (const std::string& log_message), (override));
+  MOCK_METHOD(bool, dequeue, (std::vector<std::string> & out, size_t max_batch_size, uint32_t timeout_ms), (override));
+  MOCK_METHOD(void, stop, (), (override));
+};
+}  // namespace mocks

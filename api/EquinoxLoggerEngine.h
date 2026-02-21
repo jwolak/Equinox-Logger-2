@@ -40,68 +40,62 @@
 #ifndef API_EQUINOXLOGGERENGINE_H_
 #define API_EQUINOXLOGGERENGINE_H_
 
-#include <memory>
 #include <iostream>
-#include <string>
+#include <memory>
 #include <mutex>
+#include <string>
 
 #include "EquinoxLoggerCommon.h"
 
-namespace equinox
-{
+namespace equinox {
 
-  class EquinoxLoggerEngineImpl;
+class EquinoxLoggerEngineImpl;
 
-  class EQUINOX_API EquinoxLoggerEngine
-  {
-  public:
-    static EquinoxLoggerEngine &getInstance();
+class EQUINOX_API EquinoxLoggerEngine {
+ public:
+  static EquinoxLoggerEngine& getInstance();
 
-    EquinoxLoggerEngine(EquinoxLoggerEngine &) = delete;
-    EquinoxLoggerEngine(EquinoxLoggerEngine &&) = delete;
-    void operator=(const EquinoxLoggerEngine &) = delete;
-    void operator=(const EquinoxLoggerEngine &&) = delete;
+  EquinoxLoggerEngine(EquinoxLoggerEngine&) = delete;
+  EquinoxLoggerEngine(EquinoxLoggerEngine&&) = delete;
+  void operator=(const EquinoxLoggerEngine&) = delete;
+  void operator=(const EquinoxLoggerEngine&&) = delete;
 
-    template <typename... Args>
-    void log(level::LOG_LEVEL msgLevel, const std::string &msgFormat, Args &&...args)
-    {
-      constexpr size_t kMaxMessageSize = 4096;
-      char messageBuffer[kMaxMessageSize];
+  template <typename... Args>
+  void log(level::LOG_LEVEL msgLevel, const std::string& msgFormat, Args&&... args) {
+    constexpr size_t kMaxMessageSize = 4096;
+    char messageBuffer[kMaxMessageSize];
 
-      int written = std::snprintf(messageBuffer, kMaxMessageSize, msgFormat.c_str(), std::forward<Args>(args)...);
+    int written = std::snprintf(messageBuffer, kMaxMessageSize, msgFormat.c_str(), std::forward<Args>(args)...);
 
-      if (written < 0)
-      {
-        std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
-        return;
-      }
-
-      if (static_cast<size_t>(written) >= kMaxMessageSize)
-      {
-        std::cout << "[EquinoxLoggerEngine] Message truncated (exceeded " << kMaxMessageSize << " bytes)" << std::endl;
-        written = kMaxMessageSize - 1;
-      }
-
-      std::string mFormattedOutputMessage_(messageBuffer, static_cast<size_t>(written));
-      processLogMessage(msgLevel, mFormattedOutputMessage_);
+    if (written < 0) {
+      std::cout << "[EquinoxLoggerEngine] Message formatting error" << std::endl;
+      return;
     }
 
-    bool setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
-               const std::string &logFileName = kLogFileName,
-               std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
-               std::size_t maxLogFiles = kDefaultMaxLogFiles);
-    void changeLevel(level::LOG_LEVEL logLevel);
-    bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
-    void flush();
+    if (static_cast<size_t>(written) >= kMaxMessageSize) {
+      std::cout << "[EquinoxLoggerEngine] Message truncated (exceeded " << kMaxMessageSize << " bytes)" << std::endl;
+      written = kMaxMessageSize - 1;
+    }
 
-  protected:
-    EquinoxLoggerEngine();
+    std::string mFormattedOutputMessage_(messageBuffer, static_cast<size_t>(written));
+    processLogMessage(msgLevel, mFormattedOutputMessage_);
+  }
 
-  private:
-    std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
-    mutable std::mutex mEngineMutex_;
-    void processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage);
-  };
+  bool setup(equinox::level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink,
+             const std::string& logFileName = kLogFileName, std::size_t maxLogFileSizeBytes = kDefaultMaxLogFileSizeBytes,
+             std::size_t maxLogFiles = kDefaultMaxLogFiles);
+  void changeLevel(level::LOG_LEVEL logLevel);
+  bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
+  void flush();
+
+ protected:
+  EquinoxLoggerEngine();
+
+ private:
+  std::unique_ptr<EquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
+  mutable std::mutex mEngineMutex_;
+  void processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
+};
 
 } /*namespace equinox*/
 

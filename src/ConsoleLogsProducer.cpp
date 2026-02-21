@@ -37,14 +37,14 @@
  *
  */
 
+#include "ConsoleLogsProducer.h"
+
 #include <iostream>
 #include <string_view>
 
-#include "ConsoleLogsProducer.h"
 #include "ColorFormatter.h"
 
-void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
-{
+void equinox::ConsoleLogsProducer::logMessage(const std::string& messageToLog) {
   thread_local std::string buffer;
   buffer.clear();
 
@@ -56,7 +56,6 @@ void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
   std::cout << buffer << std::endl;
 }
 
-void equinox::ConsoleLogsProducer::flush()
-{
+void equinox::ConsoleLogsProducer::flush() {
   std::cout.flush();
 }

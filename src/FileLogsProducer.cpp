@@ -42,21 +42,16 @@
 #include <filesystem>
 #include <iostream>
 
-void equinox::FileLogsProducer::setupFile(const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
-{
+void equinox::FileLogsProducer::setupFile(const std::string& logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) {
   mLogFileName_ = logFileName;
   mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
   mMaxLogFiles_ = maxLogFiles;
   mNextRotationIndex_ = 1U;
 
-  if (mFdLogFile_.is_open())
-  {
-    try
-    {
+  if (mFdLogFile_.is_open()) {
+    try {
       mFdLogFile_.close();
-    }
-    catch (std::ofstream::failure &ex)
-    {
+    } catch (std::ofstream::failure& ex) {
       std::cerr << "[EquinoxLogger] Exception when closing file: " << ex.what() << std::endl;
     }
   }
@@ -64,86 +59,65 @@ void equinox::FileLogsProducer::setupFile(const std::string &logFileName, std::s
   openLogFileAppend();
 }
 
-void equinox::FileLogsProducer::openLogFileAppend()
-{
-  if (mFdLogFile_.is_open())
-  {
+void equinox::FileLogsProducer::openLogFileAppend() {
+  if (mFdLogFile_.is_open()) {
     return;
   }
 
   mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-  try
-  {
+  try {
     mFdLogFile_.open(mLogFileName_, std::ofstream::out | std::ofstream::app);
-  }
-  catch (std::ofstream::failure &ex)
-  {
-    std::cerr << "[EquinoxLogger] Failed to open log file: " << mLogFileName_
-              << " - " << ex.what() << std::endl;
+  } catch (std::ofstream::failure& ex) {
+    std::cerr << "[EquinoxLogger] Failed to open log file: " << mLogFileName_ << " - " << ex.what() << std::endl;
     mFdLogFile_.clear();
   }
 }
 
-void equinox::FileLogsProducer::openLogFileTruncate()
-{
-  if (mFdLogFile_.is_open())
-  {
+void equinox::FileLogsProducer::openLogFileTruncate() {
+  if (mFdLogFile_.is_open()) {
     return;
   }
 
   mFdLogFile_.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-  try
-  {
+  try {
     mFdLogFile_.open(mLogFileName_, std::ofstream::out | std::ofstream::trunc);
-  }
-  catch (std::ofstream::failure &ex)
-  {
-    std::cerr << "[EquinoxLogger] Failed to open log file: " << mLogFileName_
-              << " - " << ex.what() << std::endl;
+  } catch (std::ofstream::failure& ex) {
+    std::cerr << "[EquinoxLogger] Failed to open log file: " << mLogFileName_ << " - " << ex.what() << std::endl;
     mFdLogFile_.clear();
   }
 }
 
-bool equinox::FileLogsProducer::isRotationEnabled() const
-{
+bool equinox::FileLogsProducer::isRotationEnabled() const {
   return (mMaxLogFileSizeBytes_ > 0U) && (mMaxLogFiles_ > 0U);
 }
 
-std::string equinox::FileLogsProducer::buildRotatedFileName(std::size_t index) const
-{
+std::string equinox::FileLogsProducer::buildRotatedFileName(std::size_t index) const {
   std::filesystem::path basePath(mLogFileName_);
   std::string rotatedName = basePath.stem().string() + "_" + std::to_string(index) + basePath.extension().string();
   return (basePath.parent_path() / rotatedName).string();
 }
 
-void equinox::FileLogsProducer::rotateIfNeeded()
-{
-  if (!isRotationEnabled())
-  {
+void equinox::FileLogsProducer::rotateIfNeeded() {
+  if (!isRotationEnabled()) {
     return;
   }
 
   std::error_code errorCode;
   std::uintmax_t fileSize = std::filesystem::file_size(mLogFileName_, errorCode);
-  if (errorCode)
-  {
+  if (errorCode) {
     std::cerr << "[EquinoxLogger] Failed to check file size: " << errorCode.message() << std::endl;
     return;
   }
 
-  if (fileSize < mMaxLogFileSizeBytes_)
-  {
+  if (fileSize < mMaxLogFileSizeBytes_) {
     return;
   }
 
-  try
-  {
+  try {
     mFdLogFile_.close();
-  }
-  catch (std::ofstream::failure &ex)
-  {
+  } catch (std::ofstream::failure& ex) {
     std::cerr << "[EquinoxLogger] Exception when closing file during rotation: " << ex.what() << std::endl;
   }
 
@@ -152,27 +126,23 @@ void equinox::FileLogsProducer::rotateIfNeeded()
   errorCode.clear();
   std::filesystem::rename(mLogFileName_, rotatedFileName, errorCode);
 
-  if (errorCode)
-  {
+  if (errorCode) {
     std::cerr << "[EquinoxLogger] Failed to rotate log file: " << errorCode.message() << std::endl;
     openLogFileAppend();
     return;
   }
 
-  if (mMaxLogFiles_ > 0U)
-  {
+  if (mMaxLogFiles_ > 0U) {
     mNextRotationIndex_ = (mNextRotationIndex_ % mMaxLogFiles_) + 1U;
   }
 
   openLogFileTruncate();
 }
 
-void equinox::FileLogsProducer::logMessage(const std::string &messageToLog)
-{
+void equinox::FileLogsProducer::logMessage(const std::string& messageToLog) {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
 
-  if (!mFdLogFile_.is_open())
-  {
+  if (!mFdLogFile_.is_open()) {
     std::cerr << "[EquinoxLogger] Log file is not open, cannot write message" << std::endl;
     return;
   }
@@ -181,13 +151,10 @@ void equinox::FileLogsProducer::logMessage(const std::string &messageToLog)
   buffer.clear();
   buffer = mTimestampProducer->getTimestamp() + mTimestampProducer->getTimestampInUs() + messageToLog;
 
-  try
-  {
+  try {
     mFdLogFile_ << buffer << std::endl;
     mFdLogFile_.flush();
-  }
-  catch (std::ofstream::failure &ex)
-  {
+  } catch (std::ofstream::failure& ex) {
     std::cerr << "[EquinoxLogger] Failed to write to log file: " << ex.what() << std::endl;
     return;
   }
@@ -195,17 +162,12 @@ void equinox::FileLogsProducer::logMessage(const std::string &messageToLog)
   rotateIfNeeded();
 }
 
-void equinox::FileLogsProducer::flush()
-{
+void equinox::FileLogsProducer::flush() {
   std::lock_guard<std::mutex> lock(mMessageBufferAccessLock_);
-  if (mFdLogFile_.is_open())
-  {
-    try
-    {
+  if (mFdLogFile_.is_open()) {
+    try {
       mFdLogFile_.flush();
-    }
-    catch (std::ofstream::failure &ex)
-    {
+    } catch (std::ofstream::failure& ex) {
       std::cerr << "[EquinoxLogger] Failed to flush log file: " << ex.what() << std::endl;
     }
   }

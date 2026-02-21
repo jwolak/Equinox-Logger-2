@@ -37,25 +37,22 @@
  *
  */
 
-#include <iostream>
-#include <future>
-
 #include <gtest/gtest.h>
+
+#include <future>
+#include <iostream>
 
 #include "EquinoxLogger.h"
 
-void LogTraceInThreadOne()
-{
+void LogTraceInThreadOne() {
   equinox::trace("%s", "Message in Trace from thread one");
 }
 
-void LogDebugInThreadTwo()
-{
+void LogDebugInThreadTwo() {
   equinox::debug("%s", "Message in Debug from thread two");
 }
 
-TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First)
-{
+TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First) {
   equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsTest"), equinox::logs_output::SINK::console);
 
   auto fut1 = std::async(std::launch::async, LogTraceInThreadOne);
