@@ -47,7 +47,7 @@ namespace
 }
 
 equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(IConsoleLogsProducer &consoleLogsProducer, IFileLogsProducer &fileLogsProducer, logs_output::SINK logsOutputSink)
-    : mLogMessageQueue_(kDefaultQueueMaxSize), mWorkerThread_{}, mIsWorkerRunning_(false), mOutputMutex_{}, mConsoleLogsProducer_(consoleLogsProducer), mFileLogsProducer_(fileLogsProducer), mLogsOutputSink_(logsOutputSink)
+    : mLogMessageQueue_(std::make_unique<AsyncLogQueue>(kDefaultQueueMaxSize)), mWorkerThread_{}, mIsWorkerRunning_(false), mOutputMutex_{}, mConsoleLogsProducer_(consoleLogsProducer), mFileLogsProducer_(fileLogsProducer), mLogsOutputSink_(logsOutputSink)
 {
 }
 
@@ -58,7 +58,7 @@ equinox::AsyncLogQueueEngine::~AsyncLogQueueEngine()
 
 void equinox::AsyncLogQueueEngine::processLogMessage(const std::string &messageToProcess)
 {
-    mLogMessageQueue_.enqueue(messageToProcess);
+    mLogMessageQueue_->enqueue(messageToProcess);
 }
 
 void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
@@ -75,7 +75,7 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded()
         while (true)
         {
             batch.clear();
-            if (!mLogMessageQueue_.dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
+            if (!mLogMessageQueue_->dequeue(batch, kDefaultBatchSize, kDefaultDequeueTimeoutMs))
             {
                 if (!mIsWorkerRunning_.load())
                 {
@@ -115,7 +115,7 @@ void equinox::AsyncLogQueueEngine::stopWorker()
         return;
     }
 
-    mLogMessageQueue_.stop();
+    mLogMessageQueue_->stop();
     if (mWorkerThread_.joinable())
     {
         mWorkerThread_.join();

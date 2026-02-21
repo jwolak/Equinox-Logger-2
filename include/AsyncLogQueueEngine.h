@@ -64,7 +64,7 @@ namespace equinox
         void flush();
 
     private:
-        AsyncLogQueue mLogMessageQueue_;
+        std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
         std::thread mWorkerThread_;
         std::atomic<bool> mIsWorkerRunning_;
         std::mutex mOutputMutex_;
