@@ -40,39 +40,37 @@
  *
  */
 
+#include <atomic>
+#include <mutex>
+#include <string>
+#include <thread>
+
 #include "AsyncLogQueue.h"
 #include "ConsoleLogsProducer.h"
 #include "FileLogsProducer.h"
 
-#include <thread>
-#include <atomic>
-#include <mutex>
-#include <string>
+namespace equinox {
 
-namespace equinox
-{
+class AsyncLogQueueEngine {
+ public:
+  explicit AsyncLogQueueEngine(IConsoleLogsProducer& consoleLogsProducer, IFileLogsProducer& fileLogsProducer, logs_output::SINK logsOutputSink);
+  ~AsyncLogQueueEngine();
+  void processLogMessage(const std::string& messageToProcess);
+  void stopWorker();
+  void startWorkerIfNeeded();
+  void setLogsOutputSink(logs_output::SINK logsOutputSink);
+  void flush();
 
-    class AsyncLogQueueEngine
-    {
-    public:
-        explicit AsyncLogQueueEngine(IConsoleLogsProducer &consoleLogsProducer, IFileLogsProducer &fileLogsProducer, logs_output::SINK logsOutputSink);
-        ~AsyncLogQueueEngine();
-        void processLogMessage(const std::string &messageToProcess);
-        void stopWorker();
-        void startWorkerIfNeeded();
-        void setLogsOutputSink(logs_output::SINK logsOutputSink);
-        void flush();
+ private:
+  std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
+  std::thread mWorkerThread_;
+  std::atomic<bool> mIsWorkerRunning_;
+  std::mutex mOutputMutex_;
 
-    private:
-        std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
-        std::thread mWorkerThread_;
-        std::atomic<bool> mIsWorkerRunning_;
-        std::mutex mOutputMutex_;
-
-        IConsoleLogsProducer &mConsoleLogsProducer_;
-        IFileLogsProducer &mFileLogsProducer_;
-        logs_output::SINK mLogsOutputSink_;
-    };
-} // namespace equinox
+  IConsoleLogsProducer& mConsoleLogsProducer_;
+  IFileLogsProducer& mFileLogsProducer_;
+  logs_output::SINK mLogsOutputSink_;
+};
+}  // namespace equinox
 
 #endif /* INCLUDE_ASYNCLOGQUEUEENGINE_H_ */
