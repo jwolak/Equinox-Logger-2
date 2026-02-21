@@ -61,6 +61,11 @@ class AsyncLogQueueEngine {
   void setLogsOutputSink(logs_output::SINK logsOutputSink);
   void flush();
 
+ protected:
+  /* For tests purpose */
+  AsyncLogQueueEngine(IConsoleLogsProducer& consoleLogsProducer, IFileLogsProducer& fileLogsProducer, logs_output::SINK logsOutputSink,
+                      std::unique_ptr<IAsyncLogQueue> logMessageQueue);
+
  private:
   std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
   std::thread mWorkerThread_;
