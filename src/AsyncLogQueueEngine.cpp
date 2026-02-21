@@ -45,19 +45,23 @@ static constexpr std::size_t kDefaultBatchSize = 64U;
 static constexpr uint32_t kDefaultDequeueTimeoutMs = 50U;
 }  // namespace
 
-equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(IConsoleLogsProducer& consoleLogsProducer, IFileLogsProducer& fileLogsProducer,
-                                                  logs_output::SINK logsOutputSink)
-    : AsyncLogQueueEngine(consoleLogsProducer, fileLogsProducer, logsOutputSink, std::make_unique<AsyncLogQueue>(kDefaultQueueMaxSize)) {}
+equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(logs_output::SINK logsOutputSink)
+    : AsyncLogQueueEngine((mTimestampProducer_ = std::make_shared<TimestampProducer>(), mTimestampProducer_),
+                          std::make_unique<ConsoleLogsProducer>(mTimestampProducer_), std::make_unique<FileLogsProducer>(mTimestampProducer_), logsOutputSink,
+                          std::make_unique<AsyncLogQueue>(kDefaultQueueMaxSize)) {}
 
 /* For tests purpose */
-equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(IConsoleLogsProducer& consoleLogsProducer, IFileLogsProducer& fileLogsProducer,
-                                                  logs_output::SINK logsOutputSink, std::unique_ptr<IAsyncLogQueue> logMessageQueue)
+equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer,
+                                                  std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
+                                                  std::unique_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink,
+                                                  std::unique_ptr<IAsyncLogQueue> logMessageQueue)
     : mLogMessageQueue_(std::move(logMessageQueue)),
       mWorkerThread_{},
       mIsWorkerRunning_(false),
       mOutputMutex_{},
-      mConsoleLogsProducer_(consoleLogsProducer),
-      mFileLogsProducer_(fileLogsProducer),
+      mTimestampProducer_(timestamp_procducer),
+      mConsoleLogsProducer_(std::move(consoleLogsProducer)),
+      mFileLogsProducer_(std::move(fileLogsProducer)),
       mLogsOutputSink_(logsOutputSink) {}
 
 equinox::AsyncLogQueueEngine::~AsyncLogQueueEngine() {
@@ -90,16 +94,16 @@ void equinox::AsyncLogQueueEngine::startWorkerIfNeeded() {
           std::lock_guard<std::mutex> lock(mOutputMutex_);
           switch (mLogsOutputSink_) {
             case logs_output::SINK::console:
-              mConsoleLogsProducer_.logMessage(message);
+              mConsoleLogsProducer_->logMessage(message);
               break;
 
             case logs_output::SINK::file:
-              mFileLogsProducer_.logMessage(message);
+              mFileLogsProducer_->logMessage(message);
               break;
 
             case logs_output::SINK::console_and_file:
-              mConsoleLogsProducer_.logMessage(message);
-              mFileLogsProducer_.logMessage(message);
+              mConsoleLogsProducer_->logMessage(message);
+              mFileLogsProducer_->logMessage(message);
               break;
           }
         }
@@ -126,6 +130,6 @@ void equinox::AsyncLogQueueEngine::setLogsOutputSink(logs_output::SINK logsOutpu
 
 void equinox::AsyncLogQueueEngine::flush() {
   std::lock_guard<std::mutex> lock(mOutputMutex_);
-  mConsoleLogsProducer_.flush();
-  mFileLogsProducer_.flush();
+  mConsoleLogsProducer_->flush();
+  mFileLogsProducer_->flush();
 }
