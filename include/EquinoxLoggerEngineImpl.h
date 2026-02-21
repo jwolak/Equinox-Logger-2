@@ -64,9 +64,8 @@ class EQUINOX_API EquinoxLoggerEngineImpl {
         mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
         mMaxLogFiles_{kDefaultMaxLogFiles},
         mTimestampProducer_{std::make_shared<TimestampProducer>()},
-        mConsoleLogsProducer_{std::make_unique<ConsoleLogsProducer>(mTimestampProducer_)},
-        mFileLogsProducer_{std::make_unique<FileLogsProducer>(mTimestampProducer_)},
-        mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(logs_output::SINK::console)} {}
+        mFileLogsProducer_{std::make_shared<FileLogsProducer>(mTimestampProducer_)},
+        mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(mTimestampProducer_, mFileLogsProducer_, logs_output::SINK::console)} {}
 
   void logMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
   bool setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName,
@@ -82,8 +81,7 @@ class EQUINOX_API EquinoxLoggerEngineImpl {
   std::size_t mMaxLogFileSizeBytes_;
   std::size_t mMaxLogFiles_;
   std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
+  std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
   std::unique_ptr<AsyncLogQueueEngine> mAsyncLogQueueEngine_;
 };
 

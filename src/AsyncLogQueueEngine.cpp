@@ -45,15 +45,15 @@ static constexpr std::size_t kDefaultBatchSize = 64U;
 static constexpr uint32_t kDefaultDequeueTimeoutMs = 50U;
 }  // namespace
 
-equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(logs_output::SINK logsOutputSink)
-    : AsyncLogQueueEngine((mTimestampProducer_ = std::make_shared<TimestampProducer>(), mTimestampProducer_),
-                          std::make_unique<ConsoleLogsProducer>(mTimestampProducer_), std::make_unique<FileLogsProducer>(mTimestampProducer_), logsOutputSink,
+equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
+                                                  logs_output::SINK logsOutputSink)
+    : AsyncLogQueueEngine(timestamp_procducer, std::make_unique<ConsoleLogsProducer>(mTimestampProducer_), fileLogsProducer, logsOutputSink,
                           std::make_unique<AsyncLogQueue>(kDefaultQueueMaxSize)) {}
 
 /* For tests purpose */
 equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer,
                                                   std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
-                                                  std::unique_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink,
+                                                  std::shared_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink,
                                                   std::unique_ptr<IAsyncLogQueue> logMessageQueue)
     : mLogMessageQueue_(std::move(logMessageQueue)),
       mWorkerThread_{},
@@ -61,7 +61,7 @@ equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(std::shared_ptr<ITimestampProd
       mOutputMutex_{},
       mTimestampProducer_(timestamp_procducer),
       mConsoleLogsProducer_(std::move(consoleLogsProducer)),
-      mFileLogsProducer_(std::move(fileLogsProducer)),
+      mFileLogsProducer_(fileLogsProducer),
       mLogsOutputSink_(logsOutputSink) {}
 
 equinox::AsyncLogQueueEngine::~AsyncLogQueueEngine() {

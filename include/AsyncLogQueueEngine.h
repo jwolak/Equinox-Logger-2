@@ -54,7 +54,8 @@ namespace equinox {
 
 class AsyncLogQueueEngine {
  public:
-  explicit AsyncLogQueueEngine(logs_output::SINK logsOutputSink);
+  explicit AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
+                               logs_output::SINK logsOutputSink);
   ~AsyncLogQueueEngine();
   void processLogMessage(const std::string& messageToProcess);
   void stopWorker();
@@ -65,7 +66,7 @@ class AsyncLogQueueEngine {
  protected:
   /* For tests purpose */
   AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
-                      std::unique_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink, std::unique_ptr<IAsyncLogQueue> logMessageQueue);
+                      std::shared_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink, std::unique_ptr<IAsyncLogQueue> logMessageQueue);
 
  private:
   std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
@@ -75,7 +76,7 @@ class AsyncLogQueueEngine {
 
   std::shared_ptr<ITimestampProducer> mTimestampProducer_;
   std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::unique_ptr<IFileLogsProducer> mFileLogsProducer_;
+  std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
   logs_output::SINK mLogsOutputSink_;
 };
 }  // namespace equinox
