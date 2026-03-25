@@ -1,13 +1,3 @@
-/*
- * AsyncLogQueueEngine.h
- *
- *  Created on: 2026
- *      Author: Janusz Wolak
- */
-
-#ifndef INCLUDE_ASYNCLOGQUEUEENGINE_H_
-#define INCLUDE_ASYNCLOGQUEUEENGINE_H_
-
 /*-
  * BSD 3-Clause License
  *
@@ -40,45 +30,18 @@
  *
  */
 
-#include <atomic>
-#include <mutex>
-#include <string>
-#include <thread>
+#pragma once
 
-#include "AsyncLogQueue.h"
-#include "ConsoleLogsProducer.h"
-#include "FileLogsProducer.h"
-#include "TimestampProducer.h"
+#include <cstdint>
+#include <string>
+#include <vector>
 
 namespace equinox {
-
-class AsyncLogQueueEngine {
+class IAsyncLogQueue {
  public:
-  explicit AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
-                               logs_output::SINK logsOutputSink);
-  ~AsyncLogQueueEngine();
-  void processLogMessage(const std::string& messageToProcess);
-  void stopWorker();
-  void startWorkerIfNeeded();
-  void setLogsOutputSink(logs_output::SINK logsOutputSink);
-  void flush();
-
- protected:
-  /* For tests purpose */
-  AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
-                      std::shared_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink, std::unique_ptr<IAsyncLogQueue> logMessageQueue);
-
- private:
-  std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
-  std::thread mWorkerThread_;
-  std::atomic<bool> mIsWorkerRunning_;
-  std::mutex mOutputMutex_;
-
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
-  logs_output::SINK mLogsOutputSink_;
+  virtual ~IAsyncLogQueue() = default;
+  virtual void enqueue(const std::string& log_message) = 0;
+  virtual bool dequeue(std::vector<std::string>& out, size_t max_batch_size, uint32_t timeout_ms) = 0;
+  virtual void stop() = 0;
 };
 }  // namespace equinox
-
-#endif /* INCLUDE_ASYNCLOGQUEUEENGINE_H_ */

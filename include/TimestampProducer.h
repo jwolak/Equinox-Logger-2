@@ -44,31 +44,25 @@
 
 #include "EquinoxLoggerCommon.h"
 
-namespace equinox
-{
+namespace equinox {
 
-  class EQUINOX_API ITimestampProducer
-  {
-  public:
-    virtual ~ITimestampProducer() = default;
-    virtual std::string getTimestamp() const = 0;
-    virtual std::string getTimestampInUs() = 0;
-  };
+class EQUINOX_API ITimestampProducer {
+ public:
+  virtual ~ITimestampProducer() = default;
+  virtual std::string getTimestamp() const = 0;
+  virtual std::string getTimestampInUs() = 0;
+};
 
-  class EQUINOX_API TimestampProducer : public ITimestampProducer
-  {
-  public:
-    TimestampProducer()
-        : mTimestamp_{}
-    {
-    }
+class EQUINOX_API TimestampProducer : public ITimestampProducer {
+ public:
+  TimestampProducer() : mTimestamp_{} {}
 
-    std::string getTimestamp() const override;
-    std::string getTimestampInUs() override;
+  std::string getTimestamp() const override;
+  std::string getTimestampInUs() override;
 
-  private:
-    std::string mTimestamp_;
-  };
+ private:
+  std::string mTimestamp_;
+};
 
 } /*namespace equinox*/
 

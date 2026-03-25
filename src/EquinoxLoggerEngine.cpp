@@ -38,45 +38,37 @@
  */
 
 #include "EquinoxLoggerEngine.h"
+
 #include "EquinoxLoggerEngineImpl.h"
 
-equinox::EquinoxLoggerEngine::EquinoxLoggerEngine()
-    : mEquinoxLoggerEngineImpl_{std::make_unique<EquinoxLoggerEngineImpl>()}
-{
-}
+equinox::EquinoxLoggerEngine::EquinoxLoggerEngine() : mEquinoxLoggerEngineImpl_{std::make_unique<EquinoxLoggerEngineImpl>()} {}
 
-equinox::EquinoxLoggerEngine &equinox::EquinoxLoggerEngine::getInstance()
-{
+equinox::EquinoxLoggerEngine& equinox::EquinoxLoggerEngine::getInstance() {
   static EquinoxLoggerEngine sEquinoxLoggerEngine;
   return sEquinoxLoggerEngine;
 }
 
-void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, const std::string &formatedOutputMessage)
-{
+void equinox::EquinoxLoggerEngine::processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage) {
   std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->logMessage(msgLevel, formatedOutputMessage);
 }
 
-bool equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, const std::string &logPrefix, equinox::logs_output::SINK logsOutputSink,
-                                         const std::string &logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles)
-{
+bool equinox::EquinoxLoggerEngine::setup(equinox::level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink,
+                                         const std::string& logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) {
   std::lock_guard<std::mutex> lock(mEngineMutex_);
   return mEquinoxLoggerEngineImpl_->setup(logLevel, logPrefix, logsOutputSink, logFileName, maxLogFileSizeBytes, maxLogFiles);
 }
 
-void equinox::EquinoxLoggerEngine::changeLevel(level::LOG_LEVEL logLevel)
-{
+void equinox::EquinoxLoggerEngine::changeLevel(level::LOG_LEVEL logLevel) {
   std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->changeLevel(logLevel);
 }
 
-bool equinox::EquinoxLoggerEngine::changeLogsOutputSink(logs_output::SINK logsOutputSink)
-{
+bool equinox::EquinoxLoggerEngine::changeLogsOutputSink(logs_output::SINK logsOutputSink) {
   std::lock_guard<std::mutex> lock(mEngineMutex_);
   return mEquinoxLoggerEngineImpl_->changeLogsOutputSink(logsOutputSink);
 }
-void equinox::EquinoxLoggerEngine::flush()
-{
+void equinox::EquinoxLoggerEngine::flush() {
   std::lock_guard<std::mutex> lock(mEngineMutex_);
   mEquinoxLoggerEngineImpl_->flush();
 }

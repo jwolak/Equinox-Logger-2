@@ -41,15 +41,9 @@
 
 #include "EquinoxLogger.h"
 
-int main(void)
-{
-
-  equinox::setup(equinox::level::LOG_LEVEL::trace,
-                 std::string("equinox-test"),
-                 equinox::logs_output::SINK::console_and_file,
-                 std::string("equinox.log"),
-                 3U * 1024U * 1024U,
-                 5U);
+int main(void) {
+  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("equinox-test"), equinox::logs_output::SINK::console_and_file, std::string("equinox.log"),
+                 3U * 1024U * 1024U, 5U);
 
   equinox::trace("Example trace log no:    [%d]", 1);
   equinox::debug("Example debug log no:    [%d]", 2);

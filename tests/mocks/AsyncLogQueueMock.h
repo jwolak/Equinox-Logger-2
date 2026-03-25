@@ -1,14 +1,7 @@
-/*
- * MultipleThreadsTest.cpp
- *
- *  Created on: 2023
- *      Author: Janusz Wolak
- */
-
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2023, Janusz Wolak
+ * Copyright (c) 2026, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,54 +30,17 @@
  *
  */
 
-#include <gtest/gtest.h>
+#pragma once
 
-#include <future>
-#include <iostream>
-#include <vector>
+#include <gmock/gmock.h>
 
-#include "EquinoxLogger.h"
+#include "IAsyncLogQueue.h"
 
-void LogTraceInThreadOne() {
-  equinox::trace("%s", "Message in Trace from thread one");
-}
-
-void LogDebugInThreadTwo() {
-  equinox::debug("%s", "Message in Debug from thread two");
-}
-
-TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First) {
-  equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsTest"), equinox::logs_output::SINK::console);
-
-  auto fut1 = std::async(std::launch::async, LogTraceInThreadOne);
-  auto fut2 = std::async(std::launch::async, LogDebugInThreadTwo);
-
-  fut1.wait();
-  fut2.wait();
-}
-
-TEST(MultipleThreadsTest, Repeated_Concurrent_Logging_Should_Not_Crash) {
-  for (int iteration = 0; iteration < 25; ++iteration) {
-    equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsStressTest"), equinox::logs_output::SINK::console);
-
-    std::vector<std::future<void>> tasks;
-    tasks.reserve(8);
-    for (int i = 0; i < 8; ++i) {
-      tasks.emplace_back(std::async(std::launch::async, [i]() {
-        if (i % 2 == 0) {
-          equinox::trace("%s", "Concurrent trace message");
-        } else {
-          equinox::debug("%s", "Concurrent debug message");
-        }
-      }));
-    }
-
-    for (auto& task : tasks) {
-      task.wait();
-    }
-
-    equinox::flush();
-  }
-
-  SUCCEED();
-}
+namespace mocks {
+class AsyncLogQueueMock : public equinox::IAsyncLogQueue {
+ public:
+  MOCK_METHOD(void, enqueue, (const std::string& log_message), (override));
+  MOCK_METHOD(bool, dequeue, (std::vector<std::string> & out, size_t max_batch_size, uint32_t timeout_ms), (override));
+  MOCK_METHOD(void, stop, (), (override));
+};
+}  // namespace mocks

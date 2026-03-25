@@ -37,19 +37,25 @@
  *
  */
 
-#include <iostream>
-
 #include "ConsoleLogsProducer.h"
 
-void equinox::ConsoleLogsProducer::logMessage(const std::string &messageToLog)
-{
+#include <iostream>
+#include <string_view>
+
+#include "ColorFormatter.h"
+
+void equinox::ConsoleLogsProducer::logMessage(const std::string& messageToLog) {
   thread_local std::string buffer;
   buffer.clear();
-  buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + messageToLog;
+
+  level::LOG_LEVEL level = mColorFormatter_->extractLevelFromMessage(messageToLog);
+  std::string_view color = mColorFormatter_->getColorForLevel(level);
+
+  std::string coloredMessage = mColorFormatter_->applyConsoleColors(messageToLog, color);
+  buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + coloredMessage;
   std::cout << buffer << std::endl;
 }
 
-void equinox::ConsoleLogsProducer::flush()
-{
+void equinox::ConsoleLogsProducer::flush() {
   std::cout.flush();
 }

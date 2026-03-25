@@ -1,17 +1,14 @@
 /*
- * AsyncLogQueueEngine.h
+ * ColorFormatter.h
  *
  *  Created on: 2026
  *      Author: Janusz Wolak
  */
 
-#ifndef INCLUDE_ASYNCLOGQUEUEENGINE_H_
-#define INCLUDE_ASYNCLOGQUEUEENGINE_H_
-
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2026, Janusz Wolak
+ * Copyright (c) 2023, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,45 +37,44 @@
  *
  */
 
-#include <atomic>
-#include <mutex>
-#include <string>
-#include <thread>
+#ifndef INCLUDE_COLORFORMATTER_H_
+#define INCLUDE_COLORFORMATTER_H_
 
-#include "AsyncLogQueue.h"
-#include "ConsoleLogsProducer.h"
-#include "FileLogsProducer.h"
-#include "TimestampProducer.h"
+#include <string>
+#include <string_view>
+
+#include "EquinoxLoggerCommon.h"
 
 namespace equinox {
 
-class AsyncLogQueueEngine {
+class ColorFormatter {
  public:
-  explicit AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
-                               logs_output::SINK logsOutputSink);
-  ~AsyncLogQueueEngine();
-  void processLogMessage(const std::string& messageToProcess);
-  void stopWorker();
-  void startWorkerIfNeeded();
-  void setLogsOutputSink(logs_output::SINK logsOutputSink);
-  void flush();
+  /**
+   * Extracts the log level from a formatted message (looks for [TRACE], [DEBUG], etc.)
+   *
+   * @param message The formatted message containing the level prefix
+   * @return The extracted LOG_LEVEL or info if not found
+   */
+  level::LOG_LEVEL extractLevelFromMessage(const std::string& message);
 
- protected:
-  /* For tests purpose */
-  AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
-                      std::shared_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink, std::unique_ptr<IAsyncLogQueue> logMessageQueue);
+  /**
+   * Applies ANSI color codes to a message based on its log level prefix
+   *
+   * @param message The message containing [LEVEL] prefix
+   * @param color The ANSI color code
+   * @return The message wrapped with appropriate ANSI color codes
+   */
+  std::string applyConsoleColors(const std::string& message, std::string_view color);
 
- private:
-  std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
-  std::thread mWorkerThread_;
-  std::atomic<bool> mIsWorkerRunning_;
-  std::mutex mOutputMutex_;
-
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
-  logs_output::SINK mLogsOutputSink_;
+  /**
+   * Gets the ANSI color code for the given log level
+   *
+   * @param logLevel The log level
+   * @return The ANSI color code string
+   */
+  std::string_view getColorForLevel(level::LOG_LEVEL logLevel);
 };
-}  // namespace equinox
 
-#endif /* INCLUDE_ASYNCLOGQUEUEENGINE_H_ */
+} /*namespace equinox*/
+
+#endif /* INCLUDE_COLORFORMATTER_H_ */
