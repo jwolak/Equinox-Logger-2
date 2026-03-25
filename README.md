@@ -29,12 +29,12 @@ or
 ```
 ## Example:
 
-Include "EquinoxLogger.h" to your source code:
+Include "EquinoxLogger.hpp" to your source code:
 ```sh
 See: examples/src/EquinoxLoggerExamples.cpp
 ```
 ```sh
-#include "EquinoxLogger.h"
+#include "EquinoxLogger.hpp"
 
 int main(void) {
 
