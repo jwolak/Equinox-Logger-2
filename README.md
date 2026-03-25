@@ -29,12 +29,12 @@ or
 ```
 ## Example:
 
-Include "EquinoxLogger.h" to your source code:
+Include "EquinoxLogger.hpp" to your source code:
 ```sh
 See: examples/src/EquinoxLoggerExamples.cpp
 ```
 ```sh
-#include "EquinoxLogger.h"
+#include "EquinoxLogger.hpp"
 
 int main(void) {
 
@@ -65,6 +65,17 @@ Output:
 [Mon Apr  3 15:43:39 2023][1680529419788][equinox-test][CRITICAL] Example critical log no: [6]
 
 ```
+
+### Colored logs preview (GitHub-friendly)
+
+GitHub README does not render terminal ANSI colors inside code blocks, so this preview uses colored badges for each level:
+
+- ![TRACE](https://img.shields.io/badge/TRACE-6A5ACD) `[Mon Apr 3 15:43:39 2023][1680529419785][equinox-test][TRACE] Example trace log no: [1]`
+- ![DEBUG](https://img.shields.io/badge/DEBUG-1E90FF) `[Mon Apr 3 15:43:39 2023][1680529419787][equinox-test][DEBUG] Example debug log no: [2]`
+- ![INFO](https://img.shields.io/badge/INFO-2E8B57) `[Mon Apr 3 15:43:39 2023][1680529419787][equinox-test][INFO] Example info log no: [3]`
+- ![WARNING](https://img.shields.io/badge/WARNING-DAA520) `[Mon Apr 3 15:43:39 2023][1680529419788][equinox-test][WARNING] Example warning log no: [4]`
+- ![ERROR](https://img.shields.io/badge/ERROR-B22222) `[Mon Apr 3 15:43:39 2023][1680529419788][equinox-test][ERROR] Example error log no: [5]`
+- ![CRITICAL](https://img.shields.io/badge/CRITICAL-8B0000) `[Mon Apr 3 15:43:39 2023][1680529419788][equinox-test][CRITICAL] Example critical log no: [6]`
 
 ## Log rotation
 

@@ -115,6 +115,7 @@ endif(EQUINOX_LOGGER_EXAMPLES)
 #                                Project install
 #------------------------------------------------------------------------------------------
 install(FILES ${EQUINOX_LOGGER_API}/EquinoxLogger.h
+              ${EQUINOX_LOGGER_API}/EquinoxLogger.hpp
               ${EQUINOX_LOGGER_API}/EquinoxLoggerCommon.h
               ${EQUINOX_LOGGER_API}/EquinoxLoggerEngine.h
         DESTINATION include)

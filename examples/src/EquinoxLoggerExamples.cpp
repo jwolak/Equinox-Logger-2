@@ -39,7 +39,7 @@
 
 #include <iostream>
 
-#include "EquinoxLogger.h"
+#include "EquinoxLogger.hpp"
 
 int main(void) {
   equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("equinox-test"), equinox::logs_output::SINK::console_and_file, std::string("equinox.log"),
