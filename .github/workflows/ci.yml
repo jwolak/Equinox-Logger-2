@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+      - "development"
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build build-essential libgtest-dev libgmock-dev
+
+      - name: Configure
+        run: >
+          cmake -S . -B build-ci/${{ matrix.build_type }}
+          -G Ninja
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DEQUINOX_LOGGER_TESTS=ON
+          -DEQUINOX_LOGGER_EXAMPLES=OFF
+
+      - name: Build
+        run: cmake --build build-ci/${{ matrix.build_type }} --parallel
+
+      - name: Run tests
+        working-directory: build-ci/${{ matrix.build_type }}
+        run: |
+          TEST_BIN=$(find . -type f -name "EquinoxLoggerTests.x86" | head -n 1)
+          if [ -z "$TEST_BIN" ]; then
+            echo "Test binary not found"
+            exit 1
+          fi
+
+          chmod +x "$TEST_BIN"
+          export LD_LIBRARY_PATH="$PWD:$PWD/tests:${LD_LIBRARY_PATH:-}"
+          "$TEST_BIN" --gtest_color=yes
