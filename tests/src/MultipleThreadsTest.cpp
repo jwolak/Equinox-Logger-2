@@ -41,6 +41,7 @@
 
 #include <future>
 #include <iostream>
+#include <vector>
 
 #include "EquinoxLogger.h"
 
@@ -60,4 +61,30 @@ TEST(MultipleThreadsTest, Log_Trace_And_Debug_Then_Trace_Printed_As_First) {
 
   fut1.wait();
   fut2.wait();
+}
+
+TEST(MultipleThreadsTest, Repeated_Concurrent_Logging_Should_Not_Crash) {
+  for (int iteration = 0; iteration < 25; ++iteration) {
+    equinox::setup(equinox::level::LOG_LEVEL::trace, std::string("MultipleThreadsStressTest"), equinox::logs_output::SINK::console);
+
+    std::vector<std::future<void>> tasks;
+    tasks.reserve(8);
+    for (int i = 0; i < 8; ++i) {
+      tasks.emplace_back(std::async(std::launch::async, [i]() {
+        if (i % 2 == 0) {
+          equinox::trace("%s", "Concurrent trace message");
+        } else {
+          equinox::debug("%s", "Concurrent debug message");
+        }
+      }));
+    }
+
+    for (auto& task : tasks) {
+      task.wait();
+    }
+
+    equinox::flush();
+  }
+
+  SUCCEED();
 }
