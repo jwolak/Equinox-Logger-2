@@ -47,7 +47,7 @@ static constexpr uint32_t kDefaultDequeueTimeoutMs = 50U;
 
 equinox::AsyncLogQueueEngine::AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
                                                   logs_output::SINK logsOutputSink)
-    : AsyncLogQueueEngine(timestamp_procducer, std::make_unique<ConsoleLogsProducer>(mTimestampProducer_), fileLogsProducer, logsOutputSink,
+    : AsyncLogQueueEngine(timestamp_procducer, std::make_unique<ConsoleLogsProducer>(timestamp_procducer), fileLogsProducer, logsOutputSink,
                           std::make_unique<AsyncLogQueue>(kDefaultQueueMaxSize)) {}
 
 /* For tests purpose */
