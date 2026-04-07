@@ -47,6 +47,16 @@ namespace async_log_queue_test {
     using namespace equinox;
     using namespace ::testing;
 
+    namespace {
+        static constexpr std::string_view kColorReset = "\033[0m";
+        static constexpr std::string_view kColorCyan = "\033[36m";
+        static constexpr std::string_view kColorGreen = "\033[32m";
+        static constexpr std::string_view kColorYellow = "\033[33m";
+        static constexpr std::string_view kColorRed = "\033[31m";
+        static constexpr std::string_view kColorMagenta = "\033[35m";
+        static constexpr std::string_view kColorDefault = "";
+        }  // namespace
+
     class ColorFormatterTest : public ::testing::Test {
         public:
             ColorFormatterTest() : color_formatter{} {}
@@ -55,28 +65,37 @@ namespace async_log_queue_test {
     };
 
     TEST_F(ColorFormatterTest, Try_Get_Color_For_Invalid_Level_And_Default_Color_Returned) {
+        
+        ASSERT_EQ(color_formatter.getColorForLevel(static_cast<level::LOG_LEVEL>(999)), "");
     }
 
     
     TEST_F(ColorFormatterTest, Get_Color_For_Trace_Level_And_Trace_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::trace), kColorCyan);
     }
 
     TEST_F(ColorFormatterTest, Get_Color_For_Debug_Level_And_Debug_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::debug), kColorGreen);
     }
 
     TEST_F(ColorFormatterTest, Get_Color_For_Info_Level_And_Info_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::info), kColorDefault);
     }
 
     TEST_F(ColorFormatterTest, Get_Color_For_Warning_Level_And_Warning_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::warning), kColorYellow);
     }
 
     TEST_F(ColorFormatterTest, Get_Color_For_Error_Level_And_Error_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::error), kColorRed);
     }
 
     TEST_F(ColorFormatterTest, Get_Color_For_Critical_Level_And_Critical_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::critical), kColorMagenta);
     }
 
     TEST_F(ColorFormatterTest, Try_Get_Color_For_Off_Level_And_Default_Color_Returned) {
+        ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::off), kColorDefault);
     }
 
     TEST_F(ColorFormatterTest, Extract_Level_From_Trace_Message_And_Trace_Level_Returned) {
