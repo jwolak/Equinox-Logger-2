@@ -36,7 +36,7 @@
  *
  */
 
- #include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 #include <thread>
 
@@ -55,21 +55,19 @@ namespace async_log_queue_test {
         static constexpr std::string_view kColorRed = "\033[31m";
         static constexpr std::string_view kColorMagenta = "\033[35m";
         static constexpr std::string_view kColorDefault = "";
-        }  // namespace
+    }  // namespace
 
     class ColorFormatterTest : public ::testing::Test {
-        public:
-            ColorFormatterTest() : color_formatter{} {}
+       public:
+        ColorFormatterTest() : color_formatter{} {}
 
         ColorFormatter color_formatter;
     };
 
     TEST_F(ColorFormatterTest, Try_Get_Color_For_Invalid_Level_And_Default_Color_Returned) {
-        
         ASSERT_EQ(color_formatter.getColorForLevel(static_cast<level::LOG_LEVEL>(999)), "");
     }
 
-    
     TEST_F(ColorFormatterTest, Get_Color_For_Trace_Level_And_Trace_Color_Returned) {
         ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::trace), kColorCyan);
     }
@@ -98,26 +96,19 @@ namespace async_log_queue_test {
         ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::off), kColorDefault);
     }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Trace_Message_And_Trace_Level_Returned) {
-    }
+    TEST_F(ColorFormatterTest, Extract_Level_From_Trace_Message_And_Trace_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Debug_Message_And_Debug_Level_Returned) {
-    }
+    TEST_F(ColorFormatterTest, Extract_Level_From_Debug_Message_And_Debug_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Info_Message_And_Info_Level_Returned){}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Info_Message_And_Info_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Warning_Message_And_Warning_Level_Returned) {
-    }
+    TEST_F(ColorFormatterTest, Extract_Level_From_Warning_Message_And_Warning_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Error_Message_And_Error_Level_Returned) {
-    }
+    TEST_F(ColorFormatterTest, Extract_Level_From_Error_Message_And_Error_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Critical_Message_And_Critical_Level_Returned) {
-    }
+    TEST_F(ColorFormatterTest, Extract_Level_From_Critical_Message_And_Critical_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Message_Without_Level_And_Info_Level_Returned) {
-    }
+    TEST_F(ColorFormatterTest, Extract_Level_From_Message_Without_Level_And_Info_Level_Returned) {}
 
-    TEST_F(ColorFormatterTest, Apply_Console_Colors_To_Message_And_Message_Wrapped_With_Color_Codes_Returned) {
-    }
-}
+    TEST_F(ColorFormatterTest, Apply_Console_Colors_To_Message_And_Message_Wrapped_With_Color_Codes_Returned) {}
+}  // namespace async_log_queue_test
