@@ -1,0 +1,5 @@
+Delete local branch: git branch -d branch_name
+Delete local no merged branch: git branch -D branch_name
+Delete remote branch: git push origin --delete branch_name
+Delete local branch which do not exist on remote: git fetch --prune
+Push local branch (without changes): git push -u origin branch name
