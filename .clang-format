@@ -1,10 +1,67 @@
 BasedOnStyle: Google
-IndentWidth: 2
-ColumnLimit: 160
-DerivePointerAlignment: false
-PointerAlignment: Left
-AllowShortFunctionsOnASingleLine: Inline
-SortIncludes: true
-SpacesInAngles: false
-SpaceAfterCStyleCast: false
-BreakBeforeBraces: Attach
+IndentWidth: 4                              # indent width
+TabWidth: 2                                 # tab width
+#AccessModifierOffset: 0                   # access modifier indent
+UseTab: Never                               # use spaces instead tabs
+ColumnLimit: 160                            # lines wrapping
+AllowShortFunctionsOnASingleLine: Empty     # methods/functions with empty body {} allowed in one line
+BreakBeforeBraces: Attach                   # opening brace in the same line
+DerivePointerAlignment: false               # pointer on the left: 'int* ptr;'
+PointerAlignment: Left                      # pointer on the left: 'int* ptr;'
+SpacesInParentheses: false                  # no spaces in parentheses: 'fun(a,b)'
+SpaceAfterCStyleCast: false                 # spaces after C-like cast: '(int) y + 1'
+SpaceBeforeParens: ControlStatements        # spaces after if, for, while and switch statements: 'if (a > 0) ...'
+AlwaysBreakTemplateDeclarations: Yes        # always moves the C++ template declaration to a separate line
+SortIncludes: true                          # alphabetic, grouped to order: related headers, C from C++, C system headers, C headers, standard C++, other...
+IncludeIsMainRegex: '$^'                    # disable special-casing of a "main" header include in .cpp files
+IncludeIsMainSourceRegex: '$^'              # disable special-casing of a "main" source include
+IncludeBlocks: Regroup                      # separated blocks of includes
+IncludeCategories:
+  - Regex: '^<c.*>$'                        # C headers from C++ (<cstdio>, <cstdlib>)
+    Priority: 1    
+    SortPriority: 0
+    CaseSensitive: true
+
+  - Regex: '^<boost/.*>$'                   # system headers (<boost/*.hpp>)
+    Priority: 5    
+    SortPriority: 6
+    CaseSensitive: true
+
+  - Regex: '^<sys.*\.h>$'                   # system headers (<sys/types.h>)
+    Priority: 2    
+    SortPriority: 1
+    CaseSensitive: true
+
+  - Regex: '^<.*\.h>$'                      # C headers (<unistd.h>)
+    Priority: 2    
+    SortPriority: 2
+    CaseSensitive: true
+
+  - Regex: '^<.*>$'                         # C++ standard headers ( <vector>, <string>)
+    Priority: 4    
+    SortPriority: 3
+    CaseSensitive: true
+
+  - Regex: '^<.*>'                          # others (non standard)
+    Priority: 5
+    SortPriority: 4
+    CaseSensitive: true
+
+  - Regex: '^".*"'                          # project's or/and user's headers
+    Priority: 6
+    SortPriority: 7
+    CaseSensitive: true
+
+
+ReflowComments: true                        # comments wrapping
+CommentPragmas: '^ IWYU pragma:'            # 'IWYU' comments are not formatted and not replaced: '// IWYU pragma: keep'
+FixNamespaceComments: true                  # comment with closed namespace name: '} // namespace name'
+NamespaceIndentation: All                   # code inside a namespace are indented
+AlignAfterOpenBracket: Align                # aligns next lines relative to the first element after the opening bracket
+AlignConsecutiveAssignments: false          # aligns '=' signs in subsequent assignment lines if they are next to each other
+AlignConsecutiveDeclarations: false         # aligns types, names, and other declaration elements on adjacent lines
+AlignOperands: false                        # aligns binary operators in multi-line expressions
+AlignTrailingComments: true                 # aligns comments that appear after the code in the same line: 'int a = 1; // comment'
+AllowShortIfStatementsOnASingleLine: false  # short if statements in the same line are not allowed
+Cpp11BracedListStyle: true                  # initialization lists {} style from C++11 uses: '{}' instead of '()'
+AlignConsecutiveMacros: true                # subsequent macros (#define) are aligned with each other
