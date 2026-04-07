@@ -78,4 +78,27 @@ namespace async_log_queue_test {
 
     TEST_F(ColorFormatterTest, Try_Get_Color_For_Off_Level_And_Default_Color_Returned) {
     }
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Trace_Message_And_Trace_Level_Returned) {
+    }
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Debug_Message_And_Debug_Level_Returned) {
+    }
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Info_Message_And_Info_Level_Returned){}
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Warning_Message_And_Warning_Level_Returned) {
+    }
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Error_Message_And_Error_Level_Returned) {
+    }
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Critical_Message_And_Critical_Level_Returned) {
+    }
+
+    TEST_F(ColorFormatterTest, Extract_Level_From_Message_Without_Level_And_Info_Level_Returned) {
+    }
+
+    TEST_F(ColorFormatterTest, Apply_Console_Colors_To_Message_And_Message_Wrapped_With_Color_Codes_Returned) {
+    }
 }
