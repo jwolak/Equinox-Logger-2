@@ -32,6 +32,7 @@ set(EQUINOX_LOGGER_TESTS_SRC
 	${EQUINOX_LOGGER_TESTS_DIR}/MultipleThreadsTest.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/AsyncLogQueueTest.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/AsyncLogQueueEngineTest.cpp
+	${EQUINOX_LOGGER_TESTS_DIR}/ColorFormatterTest.cpp
 	
 )
 
