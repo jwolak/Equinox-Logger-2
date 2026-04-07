@@ -96,19 +96,38 @@ namespace async_log_queue_test {
         ASSERT_EQ(color_formatter.getColorForLevel(level::LOG_LEVEL::off), kColorDefault);
     }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Trace_Message_And_Trace_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Trace_Message_And_Trace_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("[TRACE] This is a trace message"), level::LOG_LEVEL::trace);
+    }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Debug_Message_And_Debug_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Debug_Message_And_Debug_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("[DEBUG] This is a debug message"), level::LOG_LEVEL::debug);
+    }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Info_Message_And_Info_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Info_Message_And_Info_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("[INFO] This is an info message"), level::LOG_LEVEL::info);
+    }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Warning_Message_And_Warning_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Warning_Message_And_Warning_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("[WARNING] This is a warning message"), level::LOG_LEVEL::warning);
+    }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Error_Message_And_Error_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Error_Message_And_Error_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("[ERROR] This is an error message"), level::LOG_LEVEL::error);
+    }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Critical_Message_And_Critical_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Critical_Message_And_Critical_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("[CRITICAL] This is a critical message"), level::LOG_LEVEL::critical);
+    }
 
-    TEST_F(ColorFormatterTest, Extract_Level_From_Message_Without_Level_And_Info_Level_Returned) {}
+    TEST_F(ColorFormatterTest, Extract_Level_From_Message_Without_Level_And_Info_Level_Returned) {
+        ASSERT_EQ(color_formatter.extractLevelFromMessage("This message has no level prefix"), level::LOG_LEVEL::info);
+    }
 
-    TEST_F(ColorFormatterTest, Apply_Console_Colors_To_Message_And_Message_Wrapped_With_Color_Codes_Returned) {}
+    TEST_F(ColorFormatterTest, Apply_Console_Colors_To_Message_And_Message_Wrapped_With_Color_Codes_Returned) {
+        std::string message = "This is a test message";
+        std::string expected = std::string(kColorRed) + message + std::string(kColorReset);
+
+        ASSERT_EQ(color_formatter.applyConsoleColors(message, kColorRed), expected);
+    }
 }  // namespace async_log_queue_test
