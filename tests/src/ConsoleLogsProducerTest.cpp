@@ -80,13 +80,14 @@ namespace console_logs_producer_test {
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Trace_Level) {
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::trace;
-        std::string expectedOutput = kTimestamp + kTimestampInUs + kMessageToLog;
+        std::string traceColoredMessage = "\033[36mTest log message\033[0m";
+        std::string expectedOutput = kTimestamp + kTimestampInUs + traceColoredMessage;
         std::string_view color = "\033[36m";
         EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
         EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
         EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(kColoredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(traceColoredMessage));
 
         testing::internal::CaptureStdout();
         console_logs_producer.logMessage(kMessageToLog);
