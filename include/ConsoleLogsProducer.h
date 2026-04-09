@@ -50,25 +50,27 @@
 
 namespace equinox {
 
-class EQUINOX_API IConsoleLogsProducer {
- public:
-  virtual ~IConsoleLogsProducer() = default;
-  virtual void logMessage(const std::string&) = 0;
-  virtual void flush() = 0;
-};
+    class EQUINOX_API IConsoleLogsProducer {
+       public:
+        virtual ~IConsoleLogsProducer() = default;
+        virtual void logMessage(const std::string&) = 0;
+        virtual void flush() = 0;
+    };
 
-class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer {
- public:
-  ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
-      : mTimestampProducer_{timestampProducer}, mColorFormatter_{std::make_shared<ColorFormatter>()} {}
+    class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer {
+       public:
+        ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer);
 
-  void logMessage(const std::string& format) override;
-  void flush() override;
+        void logMessage(const std::string& format) override;
+        void flush() override;
 
- private:
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::shared_ptr<ColorFormatter> mColorFormatter_;
-};
+       protected:
+        ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer, std::shared_ptr<IColorFormatter> colorFormatter);
+
+       private:
+        std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+        std::shared_ptr<IColorFormatter> mColorFormatter_;
+    };
 
 } /*namespace equinox*/
 

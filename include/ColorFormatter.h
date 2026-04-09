@@ -44,36 +44,37 @@
 #include <string_view>
 
 #include "EquinoxLoggerCommon.h"
+#include "IColorFormatter.h"
 
 namespace equinox {
 
-class ColorFormatter {
- public:
-  /**
-   * Extracts the log level from a formatted message (looks for [TRACE], [DEBUG], etc.)
-   *
-   * @param message The formatted message containing the level prefix
-   * @return The extracted LOG_LEVEL or info if not found
-   */
-  level::LOG_LEVEL extractLevelFromMessage(const std::string& message);
+    class ColorFormatter : public IColorFormatter {
+       public:
+        /**
+         * Extracts the log level from a formatted message (looks for [TRACE], [DEBUG], etc.)
+         *
+         * @param message The formatted message containing the level prefix
+         * @return The extracted LOG_LEVEL or info if not found
+         */
+        level::LOG_LEVEL extractLevelFromMessage(const std::string& message) override;
 
-  /**
-   * Applies ANSI color codes to a message based on its log level prefix
-   *
-   * @param message The message containing [LEVEL] prefix
-   * @param color The ANSI color code
-   * @return The message wrapped with appropriate ANSI color codes
-   */
-  std::string applyConsoleColors(const std::string& message, std::string_view color);
+        /**
+         * Applies ANSI color codes to a message based on its log level prefix
+         *
+         * @param message The message containing [LEVEL] prefix
+         * @param color The ANSI color code
+         * @return The message wrapped with appropriate ANSI color codes
+         */
+        std::string applyConsoleColors(const std::string& message, std::string_view color) override;
 
-  /**
-   * Gets the ANSI color code for the given log level
-   *
-   * @param logLevel The log level
-   * @return The ANSI color code string
-   */
-  std::string_view getColorForLevel(level::LOG_LEVEL logLevel);
-};
+        /**
+         * Gets the ANSI color code for the given log level
+         *
+         * @param logLevel The log level
+         * @return The ANSI color code string
+         */
+        std::string_view getColorForLevel(level::LOG_LEVEL logLevel) override;
+    };
 
 } /*namespace equinox*/
 

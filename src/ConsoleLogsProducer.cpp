@@ -37,25 +37,30 @@
  *
  */
 
-#include "ConsoleLogsProducer.h"
-
 #include <iostream>
 #include <string_view>
 
 #include "ColorFormatter.h"
+#include "ConsoleLogsProducer.h"
+
+equinox::ConsoleLogsProducer::ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer)
+    : ConsoleLogsProducer(timestampProducer, std::make_shared<ColorFormatter>()) {}
+
+equinox::ConsoleLogsProducer::ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer, std::shared_ptr<IColorFormatter> colorFormatter)
+    : mTimestampProducer_{timestampProducer}, mColorFormatter_{colorFormatter} {}
 
 void equinox::ConsoleLogsProducer::logMessage(const std::string& messageToLog) {
-  thread_local std::string buffer;
-  buffer.clear();
+    thread_local std::string buffer;
+    buffer.clear();
 
-  level::LOG_LEVEL level = mColorFormatter_->extractLevelFromMessage(messageToLog);
-  std::string_view color = mColorFormatter_->getColorForLevel(level);
+    level::LOG_LEVEL level = mColorFormatter_->extractLevelFromMessage(messageToLog);
+    std::string_view color = mColorFormatter_->getColorForLevel(level);
 
-  std::string coloredMessage = mColorFormatter_->applyConsoleColors(messageToLog, color);
-  buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + coloredMessage;
-  std::cout << buffer << std::endl;
+    std::string coloredMessage = mColorFormatter_->applyConsoleColors(messageToLog, color);
+    buffer = mTimestampProducer_->getTimestamp() + mTimestampProducer_->getTimestampInUs() + coloredMessage;
+    std::cout << buffer << std::endl;
 }
 
 void equinox::ConsoleLogsProducer::flush() {
-  std::cout.flush();
+    std::cout.flush();
 }
