@@ -9,6 +9,13 @@
 
 namespace console_logs_producer_test {
 
+    namespace {
+        constexpr const char* kMessageToLog = "Test log message";
+        const std::string kTimestamp = "2023-10-01 12:00:00";
+        const std::string kTimestampInUs = ".123456";
+        const std::string kColoredMessage = "\033[31mTest log message\033[0m";
+    }  // namespace
+
     using namespace equinox;
     using namespace testing;
     using namespace mocks;
@@ -55,122 +62,99 @@ namespace console_logs_producer_test {
     };
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Error_Level) {
-        std::string messageToLog = "Test log message";
-        std::string timestamp = "2023-10-01 12:00:00";
-        std::string timestampInUs = ".123456";
-        std::string coloredMessage = "\033[31mTest log message\033[0m";
-        std::string_view color = "\033[31m";
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::error;
-        std::string expectedOutput = timestamp + timestampInUs + coloredMessage;
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(timestamp));
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(timestampInUs));
-        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(messageToLog)).WillOnce(Return(logLevel));
+        std::string expectedOutput = kTimestamp + kTimestampInUs + kColoredMessage;
+        std::string_view color = "\033[31m";
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
+        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(kColoredMessage));
 
         testing::internal::CaptureStdout();
-        console_logs_producer.logMessage(messageToLog);
+        console_logs_producer.logMessage(kMessageToLog);
         std::string output = testing::internal::GetCapturedStdout();
 
         EXPECT_EQ(output, expectedOutput + "\n");
     }
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Trace_Level) {
-        std::string messageToLog = "Test log message";
-        std::string timestamp = "2023-10-01 12:00:00";
-        std::string timestampInUs = ".123456";
-        std::string coloredMessage = "\033[36mTest log message\033[0m";
-        std::string_view color = "\033[36m";
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::trace;
-        std::string expectedOutput = timestamp + timestampInUs + coloredMessage;
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(timestamp));
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(timestampInUs));
-        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(messageToLog)).WillOnce(Return(logLevel));
+        std::string expectedOutput = kTimestamp + kTimestampInUs + kMessageToLog;
+        std::string_view color = "\033[36m";
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
+        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(kColoredMessage));
 
         testing::internal::CaptureStdout();
-        console_logs_producer.logMessage(messageToLog);
+        console_logs_producer.logMessage(kMessageToLog);
         std::string output = testing::internal::GetCapturedStdout();
         EXPECT_EQ(output, expectedOutput + "\n");
     }
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Debug_Level) {
-        std::string messageToLog = "Test log message";
-        std::string timestamp = "2023-10-01 12:00:00";
-        std::string timestampInUs = ".123456";
-        std::string coloredMessage = "\033[32mTest log message\033[0m";
-        std::string_view color = "\033[32m";
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::debug;
-        std::string expectedOutput = timestamp + timestampInUs + coloredMessage;
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(timestamp));
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(timestampInUs));
-        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(messageToLog)).WillOnce(Return(logLevel));
+        std::string expectedOutput = kTimestamp + kTimestampInUs + kColoredMessage;
+        std::string_view color = "\033[32m";
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
+        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(kColoredMessage));
 
         testing::internal::CaptureStdout();
-        console_logs_producer.logMessage(messageToLog);
+        console_logs_producer.logMessage(kMessageToLog);
         std::string output = testing::internal::GetCapturedStdout();
         EXPECT_EQ(output, expectedOutput + "\n");
     }
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Info_Level) {
-        std::string messageToLog = "Test log message";
-        std::string timestamp = "2023-10-01 12:00:00";
-        std::string timestampInUs = ".123456";
         std::string coloredMessage = "Test log message";
         std::string_view color = "";
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::info;
-        std::string expectedOutput = timestamp + timestampInUs + coloredMessage;
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(timestamp));
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(timestampInUs));
-        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(messageToLog)).WillOnce(Return(logLevel));
+        std::string expectedOutput = kTimestamp + kTimestampInUs + coloredMessage;
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
+        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(coloredMessage));
 
         testing::internal::CaptureStdout();
-        console_logs_producer.logMessage(messageToLog);
+        console_logs_producer.logMessage(kMessageToLog);
         std::string output = testing::internal::GetCapturedStdout();
         EXPECT_EQ(output, expectedOutput + "\n");
     }
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Warning_Level) {
-        std::string messageToLog = "Test log message";
-        std::string timestamp = "2023-10-01 12:00:00";
-        std::string timestampInUs = ".123456";
-        std::string coloredMessage = "\033[33mTest log message\033[0m";
         std::string_view color = "\033[33m";
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::warning;
-        std::string expectedOutput = timestamp + timestampInUs + coloredMessage;
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(timestamp));
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(timestampInUs));
-        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(messageToLog)).WillOnce(Return(logLevel));
+        std::string expectedOutput = kTimestamp + kTimestampInUs + kColoredMessage;
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
+        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(kColoredMessage));
 
         testing::internal::CaptureStdout();
-        console_logs_producer.logMessage(messageToLog);
+        console_logs_producer.logMessage(kMessageToLog);
         std::string output = testing::internal::GetCapturedStdout();
         EXPECT_EQ(output, expectedOutput + "\n");
     }
 
     TEST_F(ConsoleLogsProducerTest, Log_Message_And_It_Is_Properly_Formatted_For_Critical_Level) {
-        std::string messageToLog = "Test log message";
-        std::string timestamp = "2023-10-01 12:00:00";
-        std::string timestampInUs = ".123456";
-        std::string coloredMessage = "\033[35mTest log message\033[0m";
         std::string_view color = "\033[35m";
         equinox::level::LOG_LEVEL logLevel = equinox::level::LOG_LEVEL::critical;
-        std::string expectedOutput = timestamp + timestampInUs + coloredMessage;
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(timestamp));
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(timestampInUs));
-        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(messageToLog)).WillOnce(Return(logLevel));
+        std::string expectedOutput = kTimestamp + kTimestampInUs + kColoredMessage;
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).WillOnce(Return(kTimestamp));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).WillOnce(Return(kTimestampInUs));
+        EXPECT_CALL(*color_formatter_mock, extractLevelFromMessage(kMessageToLog)).WillOnce(Return(logLevel));
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
-        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
+        EXPECT_CALL(*color_formatter_mock, applyConsoleColors(kMessageToLog, color)).WillOnce(Return(kColoredMessage));
 
         testing::internal::CaptureStdout();
-        console_logs_producer.logMessage(messageToLog);
+        console_logs_producer.logMessage(kMessageToLog);
         std::string output = testing::internal::GetCapturedStdout();
         EXPECT_EQ(output, expectedOutput + "\n");
     }
