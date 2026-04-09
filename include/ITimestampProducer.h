@@ -1,14 +1,13 @@
 /*
- * TimestampProducer.h
  *
- *  Created on: 2023
+ *  Created on: 2026
  *      Author: Janusz Wolak
  */
 
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2023, Janusz Wolak
+ * Copyright (c) 2026, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,27 +36,18 @@
  *
  */
 
-#ifndef INCLUDE_TIMESTAMPPRODUCER_H_
-#define INCLUDE_TIMESTAMPPRODUCER_H_
+#pragma once
 
 #include <string>
 
 #include "EquinoxLoggerCommon.h"
-#include "ITimestampProducer.h"
 
 namespace equinox {
 
-    class EQUINOX_API TimestampProducer : public ITimestampProducer {
+    class EQUINOX_API ITimestampProducer {
        public:
-        TimestampProducer() : mTimestamp_{} {}
-
-        std::string getTimestamp() const override;
-        std::string getTimestampInUs() override;
-
-       private:
-        std::string mTimestamp_;
+        virtual ~ITimestampProducer() = default;
+        virtual std::string getTimestamp() const = 0;
+        virtual std::string getTimestampInUs() = 0;
     };
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_TIMESTAMPPRODUCER_H_ */
+}  // namespace equinox
