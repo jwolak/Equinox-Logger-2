@@ -1,14 +1,7 @@
-/*
- * ConsoleLogsProducer.h
- *
- *  Created on: 2023
- *      Author: Janusz Wolak
- */
-
 /*-
  * BSD 3-Clause License
  *
- * Copyright (c) 2023, Janusz Wolak
+ * Copyright (c) 2026, Janusz Wolak
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,41 +30,16 @@
  *
  */
 
-#ifndef INCLUDE_CONSOLELOGSPRODUCER_H_
-#define INCLUDE_CONSOLELOGSPRODUCER_H_
+#pragma once
 
-#include <memory>
-#include <mutex>
-#include <string>
+#include <gmock/gmock.h>
 
-#include "ColorFormatter.h"
-#include "EquinoxLoggerCommon.h"
-#include "TimestampProducer.h"
+#include "ITimestampProducer.h"
 
-namespace equinox {
-
-    class EQUINOX_API IConsoleLogsProducer {
+namespace mocks {
+    class TimestampProducerMock : public equinox::ITimestampProducer {
        public:
-        virtual ~IConsoleLogsProducer() = default;
-        virtual void logMessage(const std::string&) = 0;
-        virtual void flush() = 0;
+        MOCK_CONST_METHOD0(getTimestamp, std::string());
+        MOCK_METHOD0(getTimestampInUs, std::string());
     };
-
-    class EQUINOX_API ConsoleLogsProducer : public IConsoleLogsProducer {
-       public:
-        ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer);
-
-        void logMessage(const std::string& format) override;
-        void flush() override;
-
-       protected:
-        ConsoleLogsProducer(std::shared_ptr<ITimestampProducer> timestampProducer, std::shared_ptr<IColorFormatter> colorFormatter);
-
-       private:
-        std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-        std::shared_ptr<IColorFormatter> mColorFormatter_;
-    };
-
-} /*namespace equinox*/
-
-#endif /* INCLUDE_CONSOLELOGSPRODUCER_H_ */
+}  // namespace mocks
