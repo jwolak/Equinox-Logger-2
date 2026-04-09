@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <iostream>
+#include <sstream>
+
 #include "ColorFormatterMock.h"
 #include "ConsoleLogsProducer.h"
 #include "TimestampProducerMock.h"
@@ -14,6 +17,29 @@ namespace console_logs_producer_test {
        public:
         ConsoleLogsProducerTestable(std::shared_ptr<ITimestampProducer> timestampProducer, std::shared_ptr<IColorFormatter> colorFormatter)
             : ConsoleLogsProducer(timestampProducer, colorFormatter) {}
+    };
+
+    class TrackingStringBuf : public std::stringbuf {
+       public:
+        int syncCalls = 0;
+
+       protected:
+        int sync() override {
+            ++syncCalls;
+            return std::stringbuf::sync();
+        }
+    };
+
+    class CoutBufferGuard {
+       public:
+        explicit CoutBufferGuard(std::streambuf* newBuffer) : oldBuffer_(std::cout.rdbuf(newBuffer)) {}
+
+        ~CoutBufferGuard() {
+            std::cout.rdbuf(oldBuffer_);
+        }
+
+       private:
+        std::streambuf* oldBuffer_;
     };
 
     class ConsoleLogsProducerTest : public ::testing::Test {
@@ -49,8 +75,13 @@ namespace console_logs_producer_test {
         EXPECT_EQ(output, expectedOutput + "\n");
     }
 
-    TEST_F(ConsoleLogsProducerTest, Flush_Cout_And_It_Does_Not_Throw) {
-        EXPECT_NO_THROW(console_logs_producer.flush());
+    TEST_F(ConsoleLogsProducerTest, Flush_Cout_And_It_Synchronizes_Stream_Buffer) {
+        TrackingStringBuf trackingBuffer;
+        CoutBufferGuard coutGuard(&trackingBuffer);
+
+        console_logs_producer.flush();
+
+        EXPECT_GT(trackingBuffer.syncCalls, 0);
     }
 
 }  // namespace console_logs_producer_test
