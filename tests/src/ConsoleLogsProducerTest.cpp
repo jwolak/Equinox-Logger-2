@@ -42,7 +42,11 @@ namespace console_logs_producer_test {
         EXPECT_CALL(*color_formatter_mock, getColorForLevel(logLevel)).WillOnce(Return(color));
         EXPECT_CALL(*color_formatter_mock, applyConsoleColors(messageToLog, color)).WillOnce(Return(coloredMessage));
 
+        testing::internal::CaptureStdout();
         console_logs_producer.logMessage(messageToLog);
+        std::string output = testing::internal::GetCapturedStdout();
+
+        EXPECT_EQ(output, expectedOutput + "\n");
     }
 
     TEST_F(ConsoleLogsProducerTest, Flush_Cout_And_It_Does_Not_Throw) {
