@@ -30,11 +30,11 @@ set(EQUINOX_LOGGER_TESTS_DIR
 set(EQUINOX_LOGGER_TESTS_SRC
 	${EQUINOX_LOGGER_TESTS_DIR}/TimestampProducerTests.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/MultipleThreadsTest.cpp
-	${EQUINOX_LOGGER_TESTS_DIR}/EquinoxLoggerApiTest.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/AsyncLogQueueTest.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/AsyncLogQueueEngineTest.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/ColorFormatterTest.cpp
 	${EQUINOX_LOGGER_TESTS_DIR}/ConsoleLogsProducerTest.cpp
+		${EQUINOX_LOGGER_TESTS_DIR}/EquinoxLoggerTest.cpp
 	
 )
 
