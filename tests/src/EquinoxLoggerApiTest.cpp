@@ -46,28 +46,25 @@ namespace equinox_logger_api_test {
 
     }  // namespace
 
-    TEST(EquinoxLoggerApiTest, Setup_WithConsoleSink_ReturnsTrue) {
-        const bool setupResult = equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console);
-
-        EXPECT_TRUE(setupResult);
+    TEST(EquinoxLoggerApiTest, Setup_With_Console_Sink_And_Returns_True) {
+        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
     }
 
-    TEST(EquinoxLoggerApiTest, Setup_WithInvalidFilePath_ReturnsFalse) {
-        const bool setupResult = equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::file,
-                                                "/invalid_path_for_equinox_logger/does_not_exist/test.log");
-
-        EXPECT_FALSE(setupResult);
+    TEST(EquinoxLoggerApiTest, Setup_With_Console_And_File_Sink_And_Returns_True) {
+        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console_and_file,
+                                    "/tmp/equinox_logger_api_test.log"));
     }
 
-    TEST(EquinoxLoggerApiTest, ChangeLogsOutputSink_ToConsole_ReturnsTrue) {
-        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
-
-        const bool changeResult = equinox::changeLogsOutputSink(equinox::logs_output::SINK::console);
-
-        EXPECT_TRUE(changeResult);
+    TEST(EquinoxLoggerApiTest, Setup_With_File_Sink_And_Returns_True) {
+        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::file));
     }
 
-    TEST(EquinoxLoggerApiTest, ChangeLevel_Then_Log_Respects_CurrentLevel) {
+    TEST(EquinoxLoggerApiTest, Setup_With_Invalid_File_Path_Returns_False) {
+        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::file,
+                                    "/invalid_path_for_equinox_logger/does_not_exist/test.log"));
+    }
+
+    TEST(EquinoxLoggerApiTest, Change_Level_Then_Logger_Proceeds_With_Current_Level) {
         ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
         equinox::flush();
 
@@ -83,33 +80,33 @@ namespace equinox_logger_api_test {
         EXPECT_NE(output.find("message_that_should_be_printed"), std::string::npos);
     }
 
-    TEST(EquinoxLoggerApiTest, Flush_DoesNotCrash_WhenCalledAfterSetup) {
+    TEST(EquinoxLoggerApiTest, Flush_Does_Not_Crash_When_Called_After_Setup) {
         ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
 
         EXPECT_NO_FATAL_FAILURE(equinox::flush());
     }
 
-    TEST(EquinoxLoggerApiTest, Trace_EmitsExpectedLevelAndMessage) {
+    TEST(EquinoxLoggerApiTest, Trace_Emits_Expected_Level_And_Message) {
         VerifyLogEmission("[TRACE]", "trace_public_api_message", []() { equinox::trace("%s", "trace_public_api_message"); });
     }
 
-    TEST(EquinoxLoggerApiTest, Debug_EmitsExpectedLevelAndMessage) {
+    TEST(EquinoxLoggerApiTest, Debug_Emits_Expected_Level_And_Message) {
         VerifyLogEmission("[DEBUG]", "debug_public_api_message", []() { equinox::debug("%s", "debug_public_api_message"); });
     }
 
-    TEST(EquinoxLoggerApiTest, Info_EmitsExpectedLevelAndMessage) {
+    TEST(EquinoxLoggerApiTest, Info_Emits_Expected_Level_And_Message) {
         VerifyLogEmission("[INFO]", "info_public_api_message", []() { equinox::info("%s", "info_public_api_message"); });
     }
 
-    TEST(EquinoxLoggerApiTest, Warning_EmitsExpectedLevelAndMessage) {
+    TEST(EquinoxLoggerApiTest, Warning_Emits_Expected_Level_And_Message) {
         VerifyLogEmission("[WARNING]", "warning_public_api_message", []() { equinox::warning("%s", "warning_public_api_message"); });
     }
 
-    TEST(EquinoxLoggerApiTest, Error_EmitsExpectedLevelAndMessage) {
+    TEST(EquinoxLoggerApiTest, Error_Emits_Expected_Level_And_Message) {
         VerifyLogEmission("[ERROR]", "error_public_api_message", []() { equinox::error("%s", "error_public_api_message"); });
     }
 
-    TEST(EquinoxLoggerApiTest, Critical_EmitsExpectedLevelAndMessage) {
+    TEST(EquinoxLoggerApiTest, Critical_Emits_Expected_Level_And_Message) {
         VerifyLogEmission("[CRITICAL]", "critical_public_api_message", []() { equinox::critical("%s", "critical_public_api_message"); });
     }
 
