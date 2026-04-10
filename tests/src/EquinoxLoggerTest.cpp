@@ -47,7 +47,7 @@ namespace equinox_logger_test {
             const std::string logFilePath = "/tmp/equinox_logger_api_" + message + ".log";
             std::filesystem::remove(logFilePath);
 
-            ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerTest", equinox::logs_output::SINK::file, logFilePath));
+            ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, kLogPrefix, equinox::logs_output::SINK::file, logFilePath));
             equinox::flush();
 
             logFn();
