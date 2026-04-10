@@ -30,6 +30,15 @@ namespace equinox_logger_api_test {
             return false;
         }
 
+        std::string ReadFileContents(const std::string& filePath) {
+            std::ifstream file(filePath);
+            if (!file.is_open()) {
+                return "";
+            }
+
+            return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        }
+
         void VerifyLogEmission(const std::string& levelTag, const std::string& message, const std::function<void()>& logFn) {
             const std::string logFilePath = "/tmp/equinox_logger_api_" + message + ".log";
             std::filesystem::remove(logFilePath);
@@ -47,16 +56,16 @@ namespace equinox_logger_api_test {
     }  // namespace
 
     TEST(EquinoxLoggerApiTest, Setup_With_Console_Sink_And_Returns_True) {
-        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
+        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
     }
 
     TEST(EquinoxLoggerApiTest, Setup_With_Console_And_File_Sink_And_Returns_True) {
-        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console_and_file,
-                                    "/tmp/equinox_logger_api_test.log"));
+        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console_and_file,
+                                   "/tmp/equinox_logger_api_test.log"));
     }
 
     TEST(EquinoxLoggerApiTest, Setup_With_File_Sink_And_Returns_True) {
-        ASSERT_FALSE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::file));
+        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::file));
     }
 
     TEST(EquinoxLoggerApiTest, Setup_With_Invalid_File_Path_Returns_False) {
@@ -65,16 +74,20 @@ namespace equinox_logger_api_test {
     }
 
     TEST(EquinoxLoggerApiTest, Change_Level_Then_Logger_Proceeds_With_Current_Level) {
-        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::console));
+        const std::string logFilePath = "/tmp/equinox_logger_change_level_test.log";
+        std::filesystem::remove(logFilePath);
+
+        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, "EquinoxLoggerApiTest", equinox::logs_output::SINK::file, logFilePath));
         equinox::flush();
 
         equinox::changeLevel(equinox::level::LOG_LEVEL::error);
 
-        testing::internal::CaptureStdout();
         equinox::info("%s", "message_that_should_be_filtered");
         equinox::error("%s", "message_that_should_be_printed");
         equinox::flush();
-        const std::string output = testing::internal::GetCapturedStdout();
+
+        EXPECT_TRUE(WaitForFileToContain(logFilePath, "message_that_should_be_printed"));
+        const std::string output = ReadFileContents(logFilePath);
 
         EXPECT_EQ(output.find("message_that_should_be_filtered"), std::string::npos);
         EXPECT_NE(output.find("message_that_should_be_printed"), std::string::npos);
