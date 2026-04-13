@@ -1,6 +1,11 @@
+#include <chrono>
+
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <atomic>
+#include <thread>
+#include <vector>
 
 #include "EquinoxLoggerEngine.h"
 #include "EquinoxLoggerEngineImplMock.h"
@@ -76,6 +81,36 @@ namespace equinox_logger_engine_impl_test {
             .Times(1);
 
         equinox_logger_engine.log(level::LOG_LEVEL::warning, "%s", veryLongMessage.c_str());
+    }
+
+    TEST_F(EquinoxLoggerEngineTest, Call_Log_From_Many_Threads_And_Verify_Mutex_Serializes_LogMessage_Calls) {
+        constexpr int kThreadCount = 8;
+        std::atomic<int> activeCalls{0};
+        std::atomic<int> maxActiveCalls{0};
+
+        EXPECT_CALL(*equinox_logger_engine_impl_mock, logMessage(level::LOG_LEVEL::info, _))
+            .Times(kThreadCount)
+            .WillRepeatedly(Invoke([&](level::LOG_LEVEL, const std::string&) {
+                const int nowActive = ++activeCalls;
+                int observedMax = maxActiveCalls.load();
+                while (nowActive > observedMax && !maxActiveCalls.compare_exchange_weak(observedMax, nowActive)) {
+                }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                --activeCalls;
+            }));
+
+        std::vector<std::thread> workers;
+        workers.reserve(kThreadCount);
+        for (int i = 0; i < kThreadCount; ++i) {
+            workers.emplace_back([&]() { equinox_logger_engine.log(level::LOG_LEVEL::info, "msg %d", 123); });
+        }
+
+        for (auto& worker : workers) {
+            worker.join();
+        }
+
+        EXPECT_EQ(maxActiveCalls.load(), 1);
     }
 
     TEST_P(EquinoxLoggerEngineSetupParamTest, Call_Setup_With_Various_Levels_Console_Sink_And_Verify_Parameters_And_Returns_True) {
