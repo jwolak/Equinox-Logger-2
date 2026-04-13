@@ -51,39 +51,40 @@
 #include "ConsoleLogsProducer.h"
 #include "EquinoxLoggerCommon.h"
 #include "FileLogsProducer.h"
+#include "IEquinoxLoggerEngineImpl.h"
 #include "TimestampProducer.h"
 
 namespace equinox {
 
-class EQUINOX_API EquinoxLoggerEngineImpl {
- public:
-  EquinoxLoggerEngineImpl()
-      : mLogPrefix_{},
-        mLogLevel_{},
-        mLogFileName_{},
-        mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
-        mMaxLogFiles_{kDefaultMaxLogFiles},
-        mTimestampProducer_{std::make_shared<TimestampProducer>()},
-        mFileLogsProducer_{std::make_shared<FileLogsProducer>(mTimestampProducer_)},
-        mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(mTimestampProducer_, mFileLogsProducer_, logs_output::SINK::console)} {}
+    class EQUINOX_API EquinoxLoggerEngineImpl : public IEquinoxLoggerEngineImpl {
+       public:
+        EquinoxLoggerEngineImpl()
+            : mLogPrefix_{},
+              mLogLevel_{},
+              mLogFileName_{},
+              mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
+              mMaxLogFiles_{kDefaultMaxLogFiles},
+              mTimestampProducer_{std::make_shared<TimestampProducer>()},
+              mFileLogsProducer_{std::make_shared<FileLogsProducer>(mTimestampProducer_)},
+              mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(mTimestampProducer_, mFileLogsProducer_, logs_output::SINK::console)} {}
 
-  void logMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
-  bool setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName,
-             std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles);
-  void changeLevel(level::LOG_LEVEL logLevel);
-  bool changeLogsOutputSink(logs_output::SINK logsOutputSink);
-  void flush();
+        void logMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage) override;
+        bool setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName,
+                   std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) override;
+        void changeLevel(level::LOG_LEVEL logLevel) override;
+        bool changeLogsOutputSink(logs_output::SINK logsOutputSink) override;
+        void flush() override;
 
- private:
-  std::string mLogPrefix_;
-  level::LOG_LEVEL mLogLevel_;
-  std::string mLogFileName_;
-  std::size_t mMaxLogFileSizeBytes_;
-  std::size_t mMaxLogFiles_;
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
-  std::unique_ptr<AsyncLogQueueEngine> mAsyncLogQueueEngine_;
-};
+       private:
+        std::string mLogPrefix_;
+        level::LOG_LEVEL mLogLevel_;
+        std::string mLogFileName_;
+        std::size_t mMaxLogFileSizeBytes_;
+        std::size_t mMaxLogFiles_;
+        std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+        std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
+        std::unique_ptr<AsyncLogQueueEngine> mAsyncLogQueueEngine_;
+    };
 
 } /*namespace equinox*/
 
