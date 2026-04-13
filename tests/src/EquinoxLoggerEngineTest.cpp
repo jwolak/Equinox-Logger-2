@@ -50,7 +50,6 @@ namespace equinox_logger_engine_impl_test {
 
     TEST_P(EquinoxLoggerEngineSetupParamTest, Call_Setup_With_Various_Levels_Console_Sink_And_Verify_Parameters_And_Returns_True) {
         const auto logLevel = GetParam();
-
         EXPECT_CALL(*equinox_logger_engine_impl_mock,
                     setup(logLevel, kTestLogPrefix, logs_output::SINK::console, kTestLogFileName, kTestMaxLogFileSizeBytes, kTestMaxLogFiles))
             .Times(1)
@@ -63,5 +62,23 @@ namespace equinox_logger_engine_impl_test {
     INSTANTIATE_TEST_SUITE_P(SetupWithAllLogLevels, EquinoxLoggerEngineSetupParamTest,
                              Values(level::LOG_LEVEL::trace, level::LOG_LEVEL::debug, level::LOG_LEVEL::info, level::LOG_LEVEL::warning,
                                     level::LOG_LEVEL::error, level::LOG_LEVEL::critical));
+
+    TEST_P(EquinoxLoggerEngineSetupParamTest, Try_Setup_But_EquinoxLoggerEngineImpl_Returns_False_And_False_Is_Returned) {
+        const auto logLevel = GetParam();
+        EXPECT_CALL(*equinox_logger_engine_impl_mock,
+                    setup(logLevel, kTestLogPrefix, logs_output::SINK::console, kTestLogFileName, kTestMaxLogFileSizeBytes, kTestMaxLogFiles))
+            .Times(1)
+            .WillOnce(Return(false));
+
+        EXPECT_FALSE(
+            equinox_logger_engine.setup(logLevel, kTestLogPrefix, logs_output::SINK::console, kTestLogFileName, kTestMaxLogFileSizeBytes, kTestMaxLogFiles));
+    }
+
+    TEST_P(EquinoxLoggerEngineSetupParamTest, Change_Level_And_Verify_ChangeLevel_Called_With_Correct_Parameter) {
+        const auto logLevel = GetParam();
+        EXPECT_CALL(*equinox_logger_engine_impl_mock, changeLevel(logLevel)).Times(1);
+
+        equinox_logger_engine.changeLevel(logLevel);
+    }
 
 }  // namespace equinox_logger_engine_impl_test
