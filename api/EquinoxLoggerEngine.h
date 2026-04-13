@@ -79,7 +79,8 @@ namespace equinox {
             }
 
             std::string mFormattedOutputMessage_(messageBuffer, static_cast<size_t>(written));
-            processLogMessage(msgLevel, mFormattedOutputMessage_);
+            std::lock_guard<std::mutex> lock(mEngineMutex_);
+            mEquinoxLoggerEngineImpl_->logMessage(msgLevel, mFormattedOutputMessage_);
         }
 
         bool setup(equinox::level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink,
@@ -92,7 +93,6 @@ namespace equinox {
        protected:
         EquinoxLoggerEngine();
         EquinoxLoggerEngine(std::unique_ptr<IEquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl);
-        void processLogMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage);
 
        private:
         std::unique_ptr<IEquinoxLoggerEngineImpl> mEquinoxLoggerEngineImpl_;
