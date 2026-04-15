@@ -39,6 +39,11 @@ namespace equinox_logger_engine_impl_test {
             const char* testName;
         };
 
+        struct ChangeLevelTestCase {
+            level::LOG_LEVEL level;
+            const char* testName;
+        };
+
         std::string GetLogLevelTestCaseName(const TestParamInfo<LogLevelTestCase>& info) {
             return info.param.testName;
         }
@@ -48,6 +53,10 @@ namespace equinox_logger_engine_impl_test {
         }
 
         std::string GetSetupSinkTestCaseName(const TestParamInfo<SetupSinkTestCase>& info) {
+            return info.param.testName;
+        }
+
+        std::string GetChangeLevelTestCaseName(const TestParamInfo<ChangeLevelTestCase>& info) {
             return info.param.testName;
         }
     }  // namespace
@@ -98,6 +107,7 @@ namespace equinox_logger_engine_impl_test {
     class EquinoxLoggerEngineImplParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<LogLevelTestCase> {};
     class EquinoxLoggerEngineImplSetupLogLevelParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupLogLevelTestCase> {};
     class EquinoxLoggerEngineImplSetupSinkParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupSinkTestCase> {};
+    class EquinoxLoggerEngineImplChangeLevelParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<ChangeLevelTestCase> {};
 
     TEST_P(EquinoxLoggerEngineImplParameterizedTest, Log_Message_For_All_Log_Levels_Is_Processed_According_To_Level) {
         const LogLevelTestCase testCase = GetParam();
@@ -175,5 +185,20 @@ namespace equinox_logger_engine_impl_test {
                              Values(SetupSinkTestCase{logs_output::SINK::console, false, "Console"}, SetupSinkTestCase{logs_output::SINK::file, true, "File"},
                                     SetupSinkTestCase{logs_output::SINK::console_and_file, true, "ConsoleAndFile"}),
                              GetSetupSinkTestCaseName);
+
+    TEST_P(EquinoxLoggerEngineImplChangeLevelParameterizedTest, Change_Log_Level_For_All_Levels) {
+        const ChangeLevelTestCase testCase = GetParam();
+
+        equinox_Logger_engine_impl.changeLevel(testCase.level);
+
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogLevelForTests(), testCase.level);
+    }
+
+    INSTANTIATE_TEST_SUITE_P(AllChangeLevels, EquinoxLoggerEngineImplChangeLevelParameterizedTest,
+                             Values(ChangeLevelTestCase{level::LOG_LEVEL::trace, "Trace"}, ChangeLevelTestCase{level::LOG_LEVEL::debug, "Debug"},
+                                    ChangeLevelTestCase{level::LOG_LEVEL::info, "Info"}, ChangeLevelTestCase{level::LOG_LEVEL::warning, "Warning"},
+                                    ChangeLevelTestCase{level::LOG_LEVEL::error, "Error"}, ChangeLevelTestCase{level::LOG_LEVEL::critical, "Critical"},
+                                    ChangeLevelTestCase{level::LOG_LEVEL::off, "Off"}),
+                             GetChangeLevelTestCaseName);
 
 }  // namespace equinox_logger_engine_impl_test
