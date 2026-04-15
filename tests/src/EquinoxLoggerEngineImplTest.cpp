@@ -108,6 +108,7 @@ namespace equinox_logger_engine_impl_test {
     class EquinoxLoggerEngineImplSetupLogLevelParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupLogLevelTestCase> {};
     class EquinoxLoggerEngineImplSetupSinkParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupSinkTestCase> {};
     class EquinoxLoggerEngineImplChangeLevelParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<ChangeLevelTestCase> {};
+    class EquinoxLoggerEngineImplChangeSinkParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupSinkTestCase> {};
 
     TEST_P(EquinoxLoggerEngineImplParameterizedTest, Log_Message_For_All_Log_Levels_Is_Processed_According_To_Level) {
         const LogLevelTestCase testCase = GetParam();
@@ -200,5 +201,42 @@ namespace equinox_logger_engine_impl_test {
                                     ChangeLevelTestCase{level::LOG_LEVEL::error, "Error"}, ChangeLevelTestCase{level::LOG_LEVEL::critical, "Critical"},
                                     ChangeLevelTestCase{level::LOG_LEVEL::off, "Off"}),
                              GetChangeLevelTestCaseName);
+
+    TEST_P(EquinoxLoggerEngineImplChangeSinkParameterizedTest, Change_Logs_Output_Sink_For_All_Sinks) {
+        const SetupSinkTestCase testCase = GetParam();
+
+        EXPECT_CALL(*async_log_queue_engine_mock, setLogsOutputSink(logs_output::SINK::console)).Times(1);
+        EXPECT_CALL(*file_logs_producer_mock, setupFile(_, _, _)).Times(0);
+        EXPECT_CALL(*async_log_queue_engine_mock, startWorkerIfNeeded()).Times(1);
+
+        ASSERT_TRUE(
+            equinox_Logger_engine_impl.setup(level::LOG_LEVEL::info, kLogPrefix, logs_output::SINK::console, kLogFileName, kMaxLogFileSizeBytes, kMaxLogFiles));
+
+        Mock::VerifyAndClearExpectations(async_log_queue_engine_mock);
+        Mock::VerifyAndClearExpectations(file_logs_producer_mock);
+
+        EXPECT_CALL(*async_log_queue_engine_mock, setLogsOutputSink(testCase.sink)).Times(1);
+
+        if (testCase.shouldSetupFile) {
+            EXPECT_CALL(*file_logs_producer_mock, setupFile(kLogFileName, kMaxLogFileSizeBytes, kMaxLogFiles)).Times(1);
+        } else {
+            EXPECT_CALL(*file_logs_producer_mock, setupFile(_, _, _)).Times(0);
+        }
+
+        const bool changeResult = equinox_Logger_engine_impl.changeLogsOutputSink(testCase.sink);
+
+        EXPECT_TRUE(changeResult);
+    }
+
+    INSTANTIATE_TEST_SUITE_P(AllChangeOutputSinks, EquinoxLoggerEngineImplChangeSinkParameterizedTest,
+                             Values(SetupSinkTestCase{logs_output::SINK::console, false, "Console"}, SetupSinkTestCase{logs_output::SINK::file, true, "File"},
+                                    SetupSinkTestCase{logs_output::SINK::console_and_file, true, "ConsoleAndFile"}),
+                             GetSetupSinkTestCaseName);
+
+    TEST_F(EquinoxLoggerEngineImplTest, Flush_Method_Calls_Flush_From_AsyncLogQueueEngine) {
+        EXPECT_CALL(*async_log_queue_engine_mock, flush()).Times(1);
+
+        equinox_Logger_engine_impl.flush();
+    }
 
 }  // namespace equinox_logger_engine_impl_test
