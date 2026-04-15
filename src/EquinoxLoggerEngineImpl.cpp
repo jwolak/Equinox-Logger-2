@@ -39,86 +39,108 @@
 
 #include "EquinoxLoggerEngineImpl.h"
 
+equinox::EquinoxLoggerEngineImpl::EquinoxLoggerEngineImpl()
+    : mLogPrefix_{},
+      mLogLevel_{},
+      mLogFileName_{},
+      mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
+      mMaxLogFiles_{kDefaultMaxLogFiles},
+      mTimestampProducer_{std::make_shared<TimestampProducer>()},
+      mFileLogsProducer_{std::make_shared<FileLogsProducer>(mTimestampProducer_)},
+      mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(mTimestampProducer_, mFileLogsProducer_, logs_output::SINK::console)} {}
+
+equinox::EquinoxLoggerEngineImpl::EquinoxLoggerEngineImpl(std::shared_ptr<ITimestampProducer> mTimestampProducer,
+                                                          std::shared_ptr<IFileLogsProducer> mFileLogsProducer,
+                                                          std::unique_ptr<IAsyncLogQueueEngine> mAsyncLogQueueEngine)
+    : mLogPrefix_{},
+      mLogLevel_{},
+      mLogFileName_{},
+      mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
+      mMaxLogFiles_{kDefaultMaxLogFiles},
+      mTimestampProducer_{mTimestampProducer},
+      mFileLogsProducer_{mFileLogsProducer},
+      mAsyncLogQueueEngine_{std::move(mAsyncLogQueueEngine)} {}
+
 void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage) {
-  if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_)) {
-    thread_local std::string outputMessage;
-    outputMessage.clear();
+    if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_)) {
+        thread_local std::string outputMessage;
+        outputMessage.clear();
 
-    switch (msgLevel) {
-      case level::LOG_LEVEL::critical:
-        outputMessage = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
-        break;
+        switch (msgLevel) {
+            case level::LOG_LEVEL::critical:
+                outputMessage = mLogPrefix_ + std::string("[CRITICAL] ") + formatedOutputMessage;
+                break;
 
-      case level::LOG_LEVEL::debug:
-        outputMessage = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
-        break;
+            case level::LOG_LEVEL::debug:
+                outputMessage = mLogPrefix_ + std::string("[DEBUG] ") + formatedOutputMessage;
+                break;
 
-      case level::LOG_LEVEL::error:
-        outputMessage = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
-        break;
+            case level::LOG_LEVEL::error:
+                outputMessage = mLogPrefix_ + std::string("[ERROR] ") + formatedOutputMessage;
+                break;
 
-      case level::LOG_LEVEL::info:
-        outputMessage = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
-        break;
+            case level::LOG_LEVEL::info:
+                outputMessage = mLogPrefix_ + std::string("[INFO] ") + formatedOutputMessage;
+                break;
 
-      case level::LOG_LEVEL::trace:
-        outputMessage = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
-        break;
+            case level::LOG_LEVEL::trace:
+                outputMessage = mLogPrefix_ + std::string("[TRACE] ") + formatedOutputMessage;
+                break;
 
-      case level::LOG_LEVEL::warning:
-        outputMessage = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
-        break;
+            case level::LOG_LEVEL::warning:
+                outputMessage = mLogPrefix_ + std::string("[WARNING] ") + formatedOutputMessage;
+                break;
 
-      case level::LOG_LEVEL::off:
-        // Should not reach here due to the check above, but included for completeness
-        break;
+            case level::LOG_LEVEL::off:
+                // Should not reach here due to the check above, but included for completeness
+                break;
+        }
+
+        mAsyncLogQueueEngine_->startWorkerIfNeeded();
+        mAsyncLogQueueEngine_->processLogMessage(outputMessage);
     }
-
-    mAsyncLogQueueEngine_->startWorkerIfNeeded();
-    mAsyncLogQueueEngine_->processLogMessage(outputMessage);
-  }
 }
 
 bool equinox::EquinoxLoggerEngineImpl::setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, logs_output::SINK logsOutputSink,
                                              const std::string& logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) {
-  mLogLevel_ = logLevel;
-  mLogPrefix_ = std::string("[" + logPrefix + "]");
-  mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
-  mLogFileName_ = logFileName;
-  mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
-  mMaxLogFiles_ = maxLogFiles;
+    mLogLevel_ = logLevel;
+    mLogPrefix_ = std::string("[" + logPrefix + "]");
+    mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
+    mLogFileName_ = logFileName;
+    mMaxLogFileSizeBytes_ = maxLogFileSizeBytes;
+    mMaxLogFiles_ = maxLogFiles;
 
-  if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink) {
-    try {
-      mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
-    } catch (const std::exception& ex) {
-      std::cerr << "[EquinoxLogger] Failed to setup log file: " << ex.what() << std::endl;
-      return false;
+    if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink) {
+        try {
+            mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+        } catch (const std::exception& ex) {
+            std::cerr << "[EquinoxLogger] Failed to setup log file: " << ex.what() << std::endl;
+            return false;
+        }
     }
-  }
 
-  mAsyncLogQueueEngine_->startWorkerIfNeeded();
-  return true;
+    mAsyncLogQueueEngine_->startWorkerIfNeeded();
+    return true;
 }
 
 void equinox::EquinoxLoggerEngineImpl::changeLevel(level::LOG_LEVEL logLevel) {
-  mLogLevel_ = logLevel;
+    mLogLevel_ = logLevel;
 }
 
 bool equinox::EquinoxLoggerEngineImpl::changeLogsOutputSink(logs_output::SINK logsOutputSink) {
-  mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
+    mAsyncLogQueueEngine_->setLogsOutputSink(logsOutputSink);
 
-  if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink) {
-    try {
-      mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
-    } catch (const std::exception& ex) {
-      std::cerr << "[EquinoxLogger] Failed to switch to file output: " << ex.what() << std::endl;
-      return false;
+    if (equinox::logs_output::SINK::file == logsOutputSink or equinox::logs_output::SINK::console_and_file == logsOutputSink) {
+        try {
+            mFileLogsProducer_->setupFile(mLogFileName_, mMaxLogFileSizeBytes_, mMaxLogFiles_);
+        } catch (const std::exception& ex) {
+            std::cerr << "[EquinoxLogger] Failed to switch to file output: " << ex.what() << std::endl;
+            return false;
+        }
     }
-  }
-  return true;
+    return true;
 }
 
 void equinox::EquinoxLoggerEngineImpl::flush() {
-  mAsyncLogQueueEngine_->flush();
+    mAsyncLogQueueEngine_->flush();
 }
