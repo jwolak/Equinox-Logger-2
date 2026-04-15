@@ -47,38 +47,41 @@
 
 #include "AsyncLogQueue.h"
 #include "ConsoleLogsProducer.h"
+#include "EquinoxLoggerCommon.h"
 #include "FileLogsProducer.h"
+#include "IAsyncLogQueueEngine.h"
 #include "TimestampProducer.h"
 
 namespace equinox {
 
-class AsyncLogQueueEngine {
- public:
-  explicit AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
-                               logs_output::SINK logsOutputSink);
-  ~AsyncLogQueueEngine();
-  void processLogMessage(const std::string& messageToProcess);
-  void stopWorker();
-  void startWorkerIfNeeded();
-  void setLogsOutputSink(logs_output::SINK logsOutputSink);
-  void flush();
+    class AsyncLogQueueEngine : public IAsyncLogQueueEngine {
+       public:
+        explicit AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::shared_ptr<IFileLogsProducer> fileLogsProducer,
+                                     logs_output::SINK logsOutputSink);
+        ~AsyncLogQueueEngine();
+        void processLogMessage(const std::string& messageToProcess);
+        void stopWorker();
+        void startWorkerIfNeeded();
+        void setLogsOutputSink(logs_output::SINK logsOutputSink);
+        void flush();
 
- protected:
-  /* For tests purpose */
-  AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
-                      std::shared_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink, std::unique_ptr<IAsyncLogQueue> logMessageQueue);
+       protected:
+        /* For tests purpose */
+        AsyncLogQueueEngine(std::shared_ptr<ITimestampProducer> timestamp_procducer, std::unique_ptr<IConsoleLogsProducer> consoleLogsProducer,
+                            std::shared_ptr<IFileLogsProducer> fileLogsProducer, logs_output::SINK logsOutputSink,
+                            std::unique_ptr<IAsyncLogQueue> logMessageQueue);
 
- private:
-  std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
-  std::thread mWorkerThread_;
-  std::atomic<bool> mIsWorkerRunning_;
-  std::mutex mOutputMutex_;
+       private:
+        std::unique_ptr<IAsyncLogQueue> mLogMessageQueue_;
+        std::thread mWorkerThread_;
+        std::atomic<bool> mIsWorkerRunning_;
+        std::mutex mOutputMutex_;
 
-  std::shared_ptr<ITimestampProducer> mTimestampProducer_;
-  std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
-  std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
-  logs_output::SINK mLogsOutputSink_;
-};
+        std::shared_ptr<ITimestampProducer> mTimestampProducer_;
+        std::unique_ptr<IConsoleLogsProducer> mConsoleLogsProducer_;
+        std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
+        logs_output::SINK mLogsOutputSink_;
+    };
 }  // namespace equinox
 
 #endif /* INCLUDE_ASYNCLOGQUEUEENGINE_H_ */

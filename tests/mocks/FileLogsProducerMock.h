@@ -34,13 +34,13 @@
 
 #include <gmock/gmock.h>
 
-#include "IColorFormatter.h"
+#include "IFileLogsProducer.h"
 
 namespace mocks {
-    class ColorFormatterMock : public equinox::IColorFormatter {
+    class FileLogsProducerMock : public equinox::IFileLogsProducer {
        public:
-        MOCK_METHOD1(extractLevelFromMessage, equinox::level::LOG_LEVEL(const std::string& message));
-        MOCK_METHOD2(applyConsoleColors, std::string(const std::string& message, std::string_view color));
-        MOCK_METHOD1(getColorForLevel, std::string_view(equinox::level::LOG_LEVEL logLevel));
+        MOCK_METHOD(void, setupFile, (const std::string& logFileName, std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles), (override));
+        MOCK_METHOD(void, logMessage, (const std::string& messageToLog), (override));
+        MOCK_METHOD(void, flush, (), (override));
     };
 }  // namespace mocks

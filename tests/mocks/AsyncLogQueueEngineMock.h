@@ -34,13 +34,15 @@
 
 #include <gmock/gmock.h>
 
-#include "IColorFormatter.h"
+#include "IAsyncLogQueueEngine.h"
 
 namespace mocks {
-    class ColorFormatterMock : public equinox::IColorFormatter {
+    class AsyncLogQueueEngineMock : public equinox::IAsyncLogQueueEngine {
        public:
-        MOCK_METHOD1(extractLevelFromMessage, equinox::level::LOG_LEVEL(const std::string& message));
-        MOCK_METHOD2(applyConsoleColors, std::string(const std::string& message, std::string_view color));
-        MOCK_METHOD1(getColorForLevel, std::string_view(equinox::level::LOG_LEVEL logLevel));
+        MOCK_METHOD(void, processLogMessage, (const std::string& messageToProcess), (override));
+        MOCK_METHOD(void, stopWorker, (), (override));
+        MOCK_METHOD(void, startWorkerIfNeeded, (), (override));
+        MOCK_METHOD(void, setLogsOutputSink, (equinox::logs_output::SINK logsOutputSink), (override));
+        MOCK_METHOD(void, flush, (), (override));
     };
 }  // namespace mocks

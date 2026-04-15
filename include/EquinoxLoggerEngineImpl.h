@@ -58,22 +58,22 @@ namespace equinox {
 
     class EQUINOX_API EquinoxLoggerEngineImpl : public IEquinoxLoggerEngineImpl {
        public:
-        EquinoxLoggerEngineImpl()
-            : mLogPrefix_{},
-              mLogLevel_{},
-              mLogFileName_{},
-              mMaxLogFileSizeBytes_{kDefaultMaxLogFileSizeBytes},
-              mMaxLogFiles_{kDefaultMaxLogFiles},
-              mTimestampProducer_{std::make_shared<TimestampProducer>()},
-              mFileLogsProducer_{std::make_shared<FileLogsProducer>(mTimestampProducer_)},
-              mAsyncLogQueueEngine_{std::make_unique<AsyncLogQueueEngine>(mTimestampProducer_, mFileLogsProducer_, logs_output::SINK::console)} {}
-
+        EquinoxLoggerEngineImpl();
         void logMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage) override;
         bool setup(level::LOG_LEVEL logLevel, const std::string& logPrefix, equinox::logs_output::SINK logsOutputSink, const std::string& logFileName,
                    std::size_t maxLogFileSizeBytes, std::size_t maxLogFiles) override;
         void changeLevel(level::LOG_LEVEL logLevel) override;
         bool changeLogsOutputSink(logs_output::SINK logsOutputSink) override;
         void flush() override;
+
+       protected:
+        EquinoxLoggerEngineImpl(std::shared_ptr<ITimestampProducer> mTimestampProducer, std::shared_ptr<IFileLogsProducer> mFileLogsProducer,
+                                std::unique_ptr<IAsyncLogQueueEngine> mAsyncLogQueueEngine);
+        const std::string& getLogPrefix() const;
+        level::LOG_LEVEL getLogLevel() const;
+        const std::string& getLogFileName() const;
+        std::size_t getMaxLogFileSizeBytes() const;
+        std::size_t getMaxLogFiles() const;
 
        private:
         std::string mLogPrefix_;
@@ -83,7 +83,7 @@ namespace equinox {
         std::size_t mMaxLogFiles_;
         std::shared_ptr<ITimestampProducer> mTimestampProducer_;
         std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
-        std::unique_ptr<AsyncLogQueueEngine> mAsyncLogQueueEngine_;
+        std::unique_ptr<IAsyncLogQueueEngine> mAsyncLogQueueEngine_;
     };
 
 } /*namespace equinox*/
