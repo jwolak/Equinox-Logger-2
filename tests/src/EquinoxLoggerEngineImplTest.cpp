@@ -15,6 +15,11 @@ namespace equinox_logger_engine_impl_test {
 
     namespace {
         constexpr const char* kFormattedOutputMessage = "Test log";
+        constexpr const char* kLogPrefix = "TestPrefix";
+        constexpr const char* kExpectedLogPrefix = "[TestPrefix]";
+        constexpr const char* kLogFileName = "test.log";
+        constexpr std::size_t kMaxLogFileSizeBytes = 4096;
+        constexpr std::size_t kMaxLogFiles = 7;
 
         struct LogLevelTestCase {
             level::LOG_LEVEL level;
@@ -23,7 +28,26 @@ namespace equinox_logger_engine_impl_test {
             const char* testName;
         };
 
-        std::string GetTestCaseName(const TestParamInfo<LogLevelTestCase>& info) {
+        struct SetupLogLevelTestCase {
+            level::LOG_LEVEL level;
+            const char* testName;
+        };
+
+        struct SetupSinkTestCase {
+            logs_output::SINK sink;
+            bool shouldSetupFile;
+            const char* testName;
+        };
+
+        std::string GetLogLevelTestCaseName(const TestParamInfo<LogLevelTestCase>& info) {
+            return info.param.testName;
+        }
+
+        std::string GetSetupLogLevelTestCaseName(const TestParamInfo<SetupLogLevelTestCase>& info) {
+            return info.param.testName;
+        }
+
+        std::string GetSetupSinkTestCaseName(const TestParamInfo<SetupSinkTestCase>& info) {
             return info.param.testName;
         }
     }  // namespace
@@ -33,6 +57,26 @@ namespace equinox_logger_engine_impl_test {
         EquinoxLoggerEngineImplTestable(std::shared_ptr<ITimestampProducer> mTimestampProducer, std::shared_ptr<IFileLogsProducer> mFileLogsProducer,
                                         std::unique_ptr<IAsyncLogQueueEngine> mAsyncLogQueueEngine)
             : EquinoxLoggerEngineImpl(mTimestampProducer, mFileLogsProducer, std::move(mAsyncLogQueueEngine)) {}
+
+        const std::string& getLogPrefixForTests() const {
+            return getLogPrefix();
+        }
+
+        level::LOG_LEVEL getLogLevelForTests() const {
+            return getLogLevel();
+        }
+
+        const std::string& getLogFileNameForTests() const {
+            return getLogFileName();
+        }
+
+        std::size_t getMaxLogFileSizeBytesForTests() const {
+            return getMaxLogFileSizeBytes();
+        }
+
+        std::size_t getMaxLogFilesForTests() const {
+            return getMaxLogFiles();
+        }
     };
 
     class EquinoxLoggerEngineImplTest : public Test {
@@ -52,6 +96,8 @@ namespace equinox_logger_engine_impl_test {
     };
 
     class EquinoxLoggerEngineImplParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<LogLevelTestCase> {};
+    class EquinoxLoggerEngineImplSetupLogLevelParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupLogLevelTestCase> {};
+    class EquinoxLoggerEngineImplSetupSinkParameterizedTest : public EquinoxLoggerEngineImplTest, public WithParamInterface<SetupSinkTestCase> {};
 
     TEST_P(EquinoxLoggerEngineImplParameterizedTest, Log_Message_For_All_Log_Levels_Is_Processed_According_To_Level) {
         const LogLevelTestCase testCase = GetParam();
@@ -75,6 +121,59 @@ namespace equinox_logger_engine_impl_test {
                                     LogLevelTestCase{level::LOG_LEVEL::error, "[ERROR] Test log", true, "Error"},
                                     LogLevelTestCase{level::LOG_LEVEL::critical, "[CRITICAL] Test log", true, "Critical"},
                                     LogLevelTestCase{level::LOG_LEVEL::off, "", false, "Off"}),
-                             GetTestCaseName);
+                             GetLogLevelTestCaseName);
+
+    TEST_P(EquinoxLoggerEngineImplSetupLogLevelParameterizedTest, Setup_Logger_For_All_Log_Levels) {
+        const SetupLogLevelTestCase testCase = GetParam();
+
+        EXPECT_CALL(*async_log_queue_engine_mock, setLogsOutputSink(logs_output::SINK::console)).Times(1);
+        EXPECT_CALL(*file_logs_producer_mock, setupFile(_, _, _)).Times(0);
+        EXPECT_CALL(*async_log_queue_engine_mock, startWorkerIfNeeded()).Times(1);
+
+        const bool setupResult =
+            equinox_Logger_engine_impl.setup(testCase.level, kLogPrefix, logs_output::SINK::console, kLogFileName, kMaxLogFileSizeBytes, kMaxLogFiles);
+
+        EXPECT_TRUE(setupResult);
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogLevelForTests(), testCase.level);
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogPrefixForTests(), kExpectedLogPrefix);
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogFileNameForTests(), kLogFileName);
+        EXPECT_EQ(equinox_Logger_engine_impl.getMaxLogFileSizeBytesForTests(), kMaxLogFileSizeBytes);
+        EXPECT_EQ(equinox_Logger_engine_impl.getMaxLogFilesForTests(), kMaxLogFiles);
+    }
+
+    INSTANTIATE_TEST_SUITE_P(AllSetupLogLevels, EquinoxLoggerEngineImplSetupLogLevelParameterizedTest,
+                             Values(SetupLogLevelTestCase{level::LOG_LEVEL::trace, "Trace"}, SetupLogLevelTestCase{level::LOG_LEVEL::debug, "Debug"},
+                                    SetupLogLevelTestCase{level::LOG_LEVEL::info, "Info"}, SetupLogLevelTestCase{level::LOG_LEVEL::warning, "Warning"},
+                                    SetupLogLevelTestCase{level::LOG_LEVEL::error, "Error"}, SetupLogLevelTestCase{level::LOG_LEVEL::critical, "Critical"},
+                                    SetupLogLevelTestCase{level::LOG_LEVEL::off, "Off"}),
+                             GetSetupLogLevelTestCaseName);
+
+    TEST_P(EquinoxLoggerEngineImplSetupSinkParameterizedTest, Setup_Logger_For_All_Output_Sinks) {
+        const SetupSinkTestCase testCase = GetParam();
+
+        EXPECT_CALL(*async_log_queue_engine_mock, setLogsOutputSink(testCase.sink)).Times(1);
+        EXPECT_CALL(*async_log_queue_engine_mock, startWorkerIfNeeded()).Times(1);
+
+        if (testCase.shouldSetupFile) {
+            EXPECT_CALL(*file_logs_producer_mock, setupFile(kLogFileName, kMaxLogFileSizeBytes, kMaxLogFiles)).Times(1);
+        } else {
+            EXPECT_CALL(*file_logs_producer_mock, setupFile(_, _, _)).Times(0);
+        }
+
+        const bool setupResult =
+            equinox_Logger_engine_impl.setup(level::LOG_LEVEL::info, kLogPrefix, testCase.sink, kLogFileName, kMaxLogFileSizeBytes, kMaxLogFiles);
+
+        EXPECT_TRUE(setupResult);
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogLevelForTests(), level::LOG_LEVEL::info);
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogPrefixForTests(), kExpectedLogPrefix);
+        EXPECT_EQ(equinox_Logger_engine_impl.getLogFileNameForTests(), kLogFileName);
+        EXPECT_EQ(equinox_Logger_engine_impl.getMaxLogFileSizeBytesForTests(), kMaxLogFileSizeBytes);
+        EXPECT_EQ(equinox_Logger_engine_impl.getMaxLogFilesForTests(), kMaxLogFiles);
+    }
+
+    INSTANTIATE_TEST_SUITE_P(AllOutputSinks, EquinoxLoggerEngineImplSetupSinkParameterizedTest,
+                             Values(SetupSinkTestCase{logs_output::SINK::console, false, "Console"}, SetupSinkTestCase{logs_output::SINK::file, true, "File"},
+                                    SetupSinkTestCase{logs_output::SINK::console_and_file, true, "ConsoleAndFile"}),
+                             GetSetupSinkTestCaseName);
 
 }  // namespace equinox_logger_engine_impl_test
