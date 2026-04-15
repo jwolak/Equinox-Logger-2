@@ -69,6 +69,11 @@ namespace equinox {
        protected:
         EquinoxLoggerEngineImpl(std::shared_ptr<ITimestampProducer> mTimestampProducer, std::shared_ptr<IFileLogsProducer> mFileLogsProducer,
                                 std::unique_ptr<IAsyncLogQueueEngine> mAsyncLogQueueEngine);
+        const std::string& getLogPrefix() const;
+        level::LOG_LEVEL getLogLevel() const;
+        const std::string& getLogFileName() const;
+        std::size_t getMaxLogFileSizeBytes() const;
+        std::size_t getMaxLogFiles() const;
 
        private:
         std::string mLogPrefix_;

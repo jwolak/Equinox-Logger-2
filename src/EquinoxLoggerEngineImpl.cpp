@@ -61,6 +61,26 @@ equinox::EquinoxLoggerEngineImpl::EquinoxLoggerEngineImpl(std::shared_ptr<ITimes
       mFileLogsProducer_{mFileLogsProducer},
       mAsyncLogQueueEngine_{std::move(mAsyncLogQueueEngine)} {}
 
+const std::string& equinox::EquinoxLoggerEngineImpl::getLogPrefix() const {
+    return mLogPrefix_;
+}
+
+equinox::level::LOG_LEVEL equinox::EquinoxLoggerEngineImpl::getLogLevel() const {
+    return mLogLevel_;
+}
+
+const std::string& equinox::EquinoxLoggerEngineImpl::getLogFileName() const {
+    return mLogFileName_;
+}
+
+std::size_t equinox::EquinoxLoggerEngineImpl::getMaxLogFileSizeBytes() const {
+    return mMaxLogFileSizeBytes_;
+}
+
+std::size_t equinox::EquinoxLoggerEngineImpl::getMaxLogFiles() const {
+    return mMaxLogFiles_;
+}
+
 void equinox::EquinoxLoggerEngineImpl::logMessage(level::LOG_LEVEL msgLevel, const std::string& formatedOutputMessage) {
     if ((msgLevel != level::LOG_LEVEL::off) and (msgLevel >= mLogLevel_)) {
         thread_local std::string outputMessage;
