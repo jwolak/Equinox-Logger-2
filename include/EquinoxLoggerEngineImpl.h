@@ -83,7 +83,7 @@ namespace equinox {
         std::size_t mMaxLogFiles_;
         std::shared_ptr<ITimestampProducer> mTimestampProducer_;
         std::shared_ptr<IFileLogsProducer> mFileLogsProducer_;
-        std::unique_ptr<AsyncLogQueueEngine> mAsyncLogQueueEngine_;
+        std::unique_ptr<IAsyncLogQueueEngine> mAsyncLogQueueEngine_;
     };
 
 } /*namespace equinox*/

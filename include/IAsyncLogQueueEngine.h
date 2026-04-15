@@ -6,6 +6,7 @@
 
 namespace equinox {
     class IAsyncLogQueueEngine {
+       public:
         virtual ~IAsyncLogQueueEngine() = default;
         virtual void processLogMessage(const std::string& messageToProcess) = 0;
         virtual void stopWorker() = 0;
