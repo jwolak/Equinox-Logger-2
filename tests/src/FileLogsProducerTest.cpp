@@ -247,9 +247,11 @@ namespace file_logs_producer_test {
         EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).Times(1).WillOnce(Return("2024-06-01 12:00:00."));
         EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).Times(1).WillOnce(Return("000000"));
         EXPECT_NO_THROW(file_logs_producer.logMessage(testMessage));
-        file_logs_producer.GetLogFileStream().seekg(0);
+        file_logs_producer.GetLogFileStream().close();
+        std::ifstream readFile(file_logs_producer.GetLogFileName());
         std::string loggedMessage;
-        std::getline(file_logs_producer.GetLogFileStream(), loggedMessage);
+        std::getline(readFile, loggedMessage);
+        readFile.close();
 
         EXPECT_EQ(loggedMessage, expectedLoggedMessage);
     }
