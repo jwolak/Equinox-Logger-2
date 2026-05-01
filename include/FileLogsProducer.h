@@ -91,6 +91,13 @@ namespace equinox {
         void rotateIfNeeded();
         std::string buildRotatedFileName(std::size_t index) const;
         bool isRotationEnabled() const;
+        // for testing purposes only
+        std::ofstream& GetLogFileStream();
+        std::string& GetLogFileName();
+        std::size_t& GetMaxLogFileSizeBytes();
+        std::size_t& GetMaxLogFiles();
+        std::size_t& GetNextRotationIndex();
+
 
     private:
         std::mutex mMessageBufferAccessLock_;

@@ -177,3 +177,25 @@ void equinox::FileLogsProducer::flush() {
         }
     }
 }
+
+// for testing purposes only
+std::ofstream& equinox::FileLogsProducer::GetLogFileStream(){
+    return mFdLogFile_;
+}
+
+std::string& equinox::FileLogsProducer::GetLogFileName(){
+    return mLogFileName_;
+}
+
+std::size_t& equinox::FileLogsProducer::GetMaxLogFileSizeBytes(){
+    return mMaxLogFileSizeBytes_;
+}
+
+std::size_t& equinox::FileLogsProducer::GetMaxLogFiles(){
+    return mMaxLogFiles_;
+}
+
+std::size_t& equinox::FileLogsProducer::GetNextRotationIndex(){
+    return mNextRotationIndex_;
+}
+
