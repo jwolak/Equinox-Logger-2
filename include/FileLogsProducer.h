@@ -68,12 +68,13 @@ namespace equinox {
 
         ~FileLogsProducer() noexcept {
             if (mFdLogFile_.is_open()) {
+                // LCOV_EXCL_START
                 try {
                     mFdLogFile_.close();
                 } catch (std::ofstream::failure& ex) {
-                    // Destructor - cannot propagate exception
                     std::cerr << "[EquinoxLogger] Warning: Failed to close log file in destructor: " << ex.what() << std::endl;
                 }
+                // LCOV_EXCL_STOP
             }
         }
 
