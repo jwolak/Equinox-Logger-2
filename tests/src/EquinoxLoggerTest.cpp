@@ -127,4 +127,9 @@ namespace equinox_logger_test {
         VerifyLogEmission("[CRITICAL]", "critical_public_api_message", []() { equinox::critical("%s", "critical_public_api_message"); });
     }
 
+    TEST(EquinoxLoggerTest, ChangeLogsOutputSink_To_Console_And_Returns_True) {
+        ASSERT_TRUE(equinox::setup(equinox::level::LOG_LEVEL::trace, kLogPrefix, equinox::logs_output::SINK::file));
+        EXPECT_TRUE(equinox::changeLogsOutputSink(equinox::logs_output::SINK::console));
+    }
+
 }  // namespace equinox_logger_test

@@ -54,7 +54,7 @@ void equinox::FileLogsProducer::setupFile(const std::string& logFileName, std::s
             mFdLogFile_.close();
         } catch (std::ofstream::failure& ex) {  // LCOV_EXCL_LINE
             std::cerr << "[EquinoxLogger] Exception when closing file: " << ex.what() << std::endl;  // LCOV_EXCL_LINE
-        }
+        }  // LCOV_EXCL_LINE
     }
 
     openLogFileAppend();
