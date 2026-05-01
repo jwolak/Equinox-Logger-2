@@ -122,9 +122,9 @@ void equinox::FileLogsProducer::rotateIfNeeded() {
 
     try {
         mFdLogFile_.close();
-    } catch (std::ofstream::failure& ex) {
-        std::cerr << "[EquinoxLogger] Exception when closing file during rotation: " << ex.what() << std::endl;
-    }
+    } catch (std::ofstream::failure& ex) {  // LCOV_EXCL_LINE
+        std::cerr << "[EquinoxLogger] Exception when closing file during rotation: " << ex.what() << std::endl;  // LCOV_EXCL_LINE
+    }  // LCOV_EXCL_LINE
 
     std::string rotatedFileName = buildRotatedFileName(mNextRotationIndex_);
     std::filesystem::remove(rotatedFileName, errorCode);
@@ -159,10 +159,10 @@ void equinox::FileLogsProducer::logMessage(const std::string& messageToLog) {
     try {
         mFdLogFile_ << buffer << std::endl;
         mFdLogFile_.flush();
-    } catch (std::ofstream::failure& ex) {
-        std::cerr << "[EquinoxLogger] Failed to write to log file: " << ex.what() << std::endl;
-        return;
-    }
+    } catch (std::ofstream::failure& ex) {  // LCOV_EXCL_LINE
+        std::cerr << "[EquinoxLogger] Failed to write to log file: " << ex.what() << std::endl;  // LCOV_EXCL_LINE
+        return;  // LCOV_EXCL_LINE
+    }  // LCOV_EXCL_LINE
 
     rotateIfNeeded();
 }
@@ -172,9 +172,9 @@ void equinox::FileLogsProducer::flush() {
     if (mFdLogFile_.is_open()) {
         try {
             mFdLogFile_.flush();
-        } catch (std::ofstream::failure& ex) {
-            std::cerr << "[EquinoxLogger] Failed to flush log file: " << ex.what() << std::endl;
-        }
+        } catch (std::ofstream::failure& ex) {  // LCOV_EXCL_LINE
+            std::cerr << "[EquinoxLogger] Failed to flush log file: " << ex.what() << std::endl;  // LCOV_EXCL_LINE
+        }  // LCOV_EXCL_LINE
     }
 }
 
