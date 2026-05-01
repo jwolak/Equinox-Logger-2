@@ -99,6 +99,7 @@ namespace file_logs_producer_test {
     }
 
     TEST_F(FileLogsProducerTest, Open_Log_File_Append_Successfully) {
+        file_logs_producer.GetLogFileName() = kTestLogFileName;
         file_logs_producer.openLogFileAppend();
 
         EXPECT_TRUE(file_logs_producer.GetLogFileStream().is_open());
@@ -121,6 +122,7 @@ namespace file_logs_producer_test {
     }
 
     TEST_F(FileLogsProducerTest, Open_Log_File_Truncate_Successfully) {
+        file_logs_producer.GetLogFileName() = kTestLogFileName;
         file_logs_producer.openLogFileTruncate();
 
         EXPECT_TRUE(file_logs_producer.GetLogFileStream().is_open());
@@ -146,11 +148,13 @@ namespace file_logs_producer_test {
     }
 
     TEST_F(FileLogsProducerTest, Build_Rotated_File_Name_Correctly) {
+        file_logs_producer.GetLogFileName() = kTestLogFileName;
         const std::string expectedFileName = "test_log_1.log";
         EXPECT_EQ(file_logs_producer.buildRotatedFileName(1U), expectedFileName);
     }
 
     TEST_F(FileLogsProducerTest, Build_Rotated_File_Name_Correctly_For_Higher_Index) {
+        file_logs_producer.GetLogFileName() = kTestLogFileName;
         const std::string expectedFileName = "test_log_3.log";
         EXPECT_EQ(file_logs_producer.buildRotatedFileName(3U), expectedFileName);
     }
@@ -214,8 +218,9 @@ namespace file_logs_producer_test {
         file_logs_producer.GetMaxLogFileSizeBytes() = 1U;
         file_logs_producer.GetMaxLogFiles() = kTestMaxLogFiles;
         file_logs_producer.openLogFileAppend();
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).Times(1);
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).Times(1);
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).Times(1).WillOnce(Return("time"));
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).Times(1).WillOnce(Return("123"));
+        file_logs_producer.logMessage("x");
 
         EXPECT_NO_THROW(file_logs_producer.rotateIfNeeded());
         EXPECT_TRUE(file_logs_producer.GetLogFileStream().is_open());
@@ -233,8 +238,8 @@ namespace file_logs_producer_test {
         file_logs_producer.GetLogFileName() = kTestLogFileName;
         file_logs_producer.openLogFileAppend();
         file_logs_producer.GetLogFileStream().exceptions(std::ofstream::failbit | std::ofstream::badbit);
-        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).Times(0);
-        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).Times(0);
+        EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).Times(1);
+        EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).Times(1);
 
         EXPECT_NO_THROW(file_logs_producer.logMessage("Test message"));
     }
@@ -243,7 +248,7 @@ namespace file_logs_producer_test {
         const std::string testMessage = "Test message";
         const std::string expectedLoggedMessage = "2024-06-01 12:00:00.000000" + testMessage;
         file_logs_producer.GetLogFileName() = kTestLogFileName;
-        file_logs_producer.openLogFileAppend();
+        file_logs_producer.openLogFileTruncate();
         EXPECT_CALL(*timestamp_producer_mock, getTimestamp()).Times(1).WillOnce(Return("2024-06-01 12:00:00."));
         EXPECT_CALL(*timestamp_producer_mock, getTimestampInUs()).Times(1).WillOnce(Return("000000"));
         EXPECT_NO_THROW(file_logs_producer.logMessage(testMessage));
