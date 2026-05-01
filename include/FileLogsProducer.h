@@ -68,12 +68,13 @@ namespace equinox {
 
         ~FileLogsProducer() noexcept {
             if (mFdLogFile_.is_open()) {
+                // LCOV_EXCL_START
                 try {
                     mFdLogFile_.close();
                 } catch (std::ofstream::failure& ex) {
-                    // Destructor - cannot propagate exception
                     std::cerr << "[EquinoxLogger] Warning: Failed to close log file in destructor: " << ex.what() << std::endl;
                 }
+                // LCOV_EXCL_STOP
             }
         }
 
@@ -85,13 +86,21 @@ namespace equinox {
         void logMessage(const std::string& messageToLog) override;
         void flush() override;
 
-       private:
+    protected:
         void openLogFileAppend();
         void openLogFileTruncate();
         void rotateIfNeeded();
         std::string buildRotatedFileName(std::size_t index) const;
         bool isRotationEnabled() const;
+        // for testing purposes only
+        std::ofstream& GetLogFileStream();
+        std::string& GetLogFileName();
+        std::size_t& GetMaxLogFileSizeBytes();
+        std::size_t& GetMaxLogFiles();
+        std::size_t& GetNextRotationIndex();
 
+
+    private:
         std::mutex mMessageBufferAccessLock_;
         std::shared_ptr<ITimestampProducer> mTimestampProducer;
         std::ofstream mFdLogFile_;
